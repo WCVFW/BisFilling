@@ -54,6 +54,15 @@ const AdminSalesReports = React.lazy(() =>
 const AdminSettings = React.lazy(() =>
   import("./pages/Dashboard/AdminSettings")
 );
+const AdminLeadReport = React.lazy(() =>
+  import("./pages/Dashboard/AdminLeadReport")
+);
+const AdminDealReport = React.lazy(() =>
+  import("./pages/Dashboard/AdminDealReport")
+);
+const AdminEmployeeAttendanceReport = React.lazy(() =>
+  import("./pages/Dashboard/AdminEmployeeAttendanceReport")
+);
 
 /* ---------------------- Components ---------------------- */
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -181,6 +190,9 @@ export default function App() {
             <Route path="sales-reports" element={<React.Suspense fallback={<ServiceLoader />}><AdminSalesReports /></React.Suspense>} />
             <Route path="settings" element={<React.Suspense fallback={<ServiceLoader />}><AdminSettings /></React.Suspense>} />
             <Route path="reports" element={<AdminReports />} />
+            <Route path="lead-report" element={<React.Suspense fallback={<ServiceLoader />}><AdminLeadReport /></React.Suspense>} />
+            <Route path="deal-report" element={<React.Suspense fallback={<ServiceLoader />}><AdminDealReport /></React.Suspense>} />
+            <Route path="employee-attendance-report" element={<React.Suspense fallback={<ServiceLoader />}><AdminEmployeeAttendanceReport /></React.Suspense>} />
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="profile" element={<MyAccount />} />
           </Route>
