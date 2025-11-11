@@ -1,204 +1,253 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
-  Menu,
-  X,
-  LogOut,
   LayoutDashboard,
   Users,
-  Briefcase,
   Calendar,
-  Star,
-  ClipboardList,
-  BarChart2,
+  Users2,
+  TrendingUp,
+  BarChart,
   ShoppingCart,
   FileText,
+  Gift,
+  Zap,
+  Search,
+  Bell,
   Settings,
   User,
-  ChevronDown,
+  Menu,
+  X,
 } from "lucide-react";
+
+// ✅ Import getUser from your auth utility
 import { getUser } from "../lib/auth";
 
 const AdminLayout = ({ children, logout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [userName, setUserName] = useState("Admin");
   const location = useLocation();
-  const navigate = useNavigate();
-  const user = getUser();
 
-  // Close dropdown when clicking outside
+  // ✅ Load user info once
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const user = getUser();
+    if (user) {
+      const name =
+        user.fullName || user.name || user.email?.split("@")[0] || "Admin";
+      setUserName(name);
+    }
   }, []);
 
   const navItems = [
-    { path: "/dashboard/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-    { path: "/dashboard/admin/customers", label: "Customers", icon: Users },
-    { path: "/dashboard/admin/employees", label: "Employees", icon: Briefcase },
-    { path: "/dashboard/admin/attendance", label: "Attendance", icon: Calendar },
-    { path: "/dashboard/admin/performance", label: "Performance", icon: Star },
-    { path: "/dashboard/admin/lead-report", label: "Lead Report", icon: ClipboardList },
-    { path: "/dashboard/admin/deal-report", label: "Deal Report", icon: Briefcase },
-    { path: "/dashboard/admin/employee-attendance-report", label: "Att. Report", icon: Calendar },
-    { path: "/dashboard/admin/sales-reports", label: "Sales Reports", icon: BarChart2 },
-    { path: "/dashboard/admin/orders", label: "Orders", icon: ShoppingCart },
-    { path: "/dashboard/admin/reports", label: "Reports", icon: FileText },
-    { path: "/dashboard/admin/settings", label: "Settings", icon: Settings },
+    { path: "/dashboard/admin", label: "Dashboard", Icon: LayoutDashboard },
+    { path: "/dashboard/admin/customers", label: "Customers", Icon: Users },
+    { path: "/dashboard/admin/attendance", label: "Attendance", Icon: Calendar },
+    { path: "/dashboard/admin/employees", label: "Employees", Icon: Users2 },
+    { path: "/dashboard/admin/performance", label: "Performance", Icon: TrendingUp },
+    { path: "/dashboard/admin/sales-reports", label: "Sales Reports", Icon: BarChart },
+    { path: "/dashboard/admin/orders", label: "Orders", Icon: ShoppingCart },
+    { path: "/dashboard/admin/reports", label: "Reports", Icon: FileText },
+    { path: "/dashboard/admin/deal", label: "Deal", Icon: Gift },
+    { path: "/dashboard/admin/lead", label: "Lead", Icon: Zap },
   ];
 
-  const isActive = (itemPath, end = false) => {
-    if (end) return location.pathname === itemPath;
-    return location.pathname.startsWith(itemPath);
-  };
+  const isActive = (path) => location.pathname === path;
 
-  const NavIcon = ({ icon: IconComponent, className = "w-4 h-4" }) =>
-    IconComponent ? <IconComponent className={className} /> : null;
+  const NavLink = ({ to, label, Icon, isActive, onClick }) => (
+    <Link
+      to={to}
+      onClick={onClick}
+      className={`flex items-center py-2.5 rounded-md transition-all duration-200 text-[15px]
+        ${isActive ? "bg-[#046487] text-white font-semibold" : "text-white hover:bg-[#046487]/80"}
+        ${isSidebarExpanded ? "px-5 gap-3" : "px-0 gap-0 justify-center w-[52px] mx-auto"}
+      `}
+    >
+      <Icon size={20} className="shrink-0" />
+      <span
+        className={`truncate transition-opacity duration-200 ${isSidebarExpanded ? "opacity-100" : "opacity-0 h-0 hidden"
+          }`}
+      >
+        {label}
+      </span>
+    </Link>
+  );
+
+  useEffect(() => {
+    document.body.style.overflow = sidebarOpen ? "hidden" : "unset";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [sidebarOpen]);
 
   return (
-    // CHANGE: Removed w-screen. h-screen and flex manage full viewport.
-    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-950"> 
-      {/* Sidebar */}
+    <div className="flex h-screen w-full bg-[#EFF2F7] overflow-hidden">
+      {/* === SIDEBAR === */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-56 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex flex-col ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed lg:static top-[65px] inset-y-0 left-0 z-40 bg-[#0189BB] transition-all duration-300 ease-in-out flex flex-col shadow-2xl lg:shadow-none mt-20
+    ${isSidebarExpanded ? "w-[250px]" : "w-[130px]"}
+    ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+    rounded-tr-[45px]
+  `}
       >
-        {/* Sidebar Header */}
-        <div className="flex items-center justify-between px-4 border-b border-gray-100 h-14 dark:border-gray-800">
-          <Link
-            to="/dashboard/admin"
-            className="flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white"
+
+        {/* === SIDEBAR HEADER === */}
+        <div className="relative flex flex-col items-center -mt-8 pb-4">
+          {/* Avatar Circle */}
+          <div
+            className={`rounded-full bg-[#0189BB] flex items-center justify-center border-4 border-white shadow-md transition-all duration-300
+              ${isSidebarExpanded ? "w-20 h-20" : "w-12 h-12"}
+            `}
           >
-            <div className="flex items-center justify-center w-6 h-6 text-sm font-bold text-white bg-blue-600 rounded-md">
-              A
-            </div>
-            <span className="hidden sm:inline">Admin Panel</span>
-          </Link>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="p-1 text-gray-700 rounded lg:hidden dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            <User
+              color="white"
+              strokeWidth={1.5}
+              className={`transition-all duration-300 ${isSidebarExpanded ? "w-9 h-9" : "w-6 h-6"
+                }`}
+            />
+          </div>
+
+          {/* 🧑 User Name Below Circle (Dynamic) */}
+          <span
+            className={`text-white font-semibold mt-2 transition-all duration-300 ${isSidebarExpanded ? "text-lg" : "text-sm"
+              }`}
           >
-            <X className="w-4 h-4" />
-          </button>
+            {userName}
+          </span>
+
+          {/* Divider line */}
+          <div className="mt-4 w-[70%] h-px bg-white/40"></div>
         </div>
 
-        {/* Navigation Items */}
-        {/* NOTE: scrollbar-thin utilities require installing the tailwindcss-scrollbar plugin */}
-        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-800">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors ${
-                isActive(item.path, item.end)
-                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-semibold"
-                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-              }`}
-            >
-              <NavIcon icon={item.icon} />
-              <span>{item.label}</span>
-            </Link>
-          ))}
+        {/* === NAVIGATION === */}
+        <nav
+          className="flex-1 overflow-y-auto overflow-x-hidden"
+          style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
+        >
+          <style>{`nav::-webkit-scrollbar { display: none; }`}</style>
+          <div className="flex flex-col gap-0.5 px-0 pt-4">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                label={item.label}
+                Icon={item.Icon}
+                isActive={isActive(item.path)}
+                onClick={() => setSidebarOpen(false)}
+              />
+            ))}
+          </div>
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="p-3 space-y-1 border-t border-gray-100 dark:border-gray-800">
+        {/* === SIDEBAR FOOTER === */}
+        <div
+          className={`mt-auto mb-6 pt-3 border-t border-white/30 space-y-4 transition-all duration-300 ${isSidebarExpanded ? "px-5" : "px-2"
+            }`}
+        >
           <Link
             to="/dashboard/admin/profile"
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 transition-colors rounded-md dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className={`flex items-center text-white hover:opacity-80 transition-opacity text-[15px] ${isSidebarExpanded ? "gap-3" : "gap-0 justify-center"
+              }`}
+            onClick={() => setSidebarOpen(false)}
           >
-            <User className="w-4 h-4" />
-            <span>Profile</span>
+            <User size={20} className="shrink-0" />
+            <span
+              className={`truncate transition-opacity duration-200 ${isSidebarExpanded ? "inline" : "hidden"
+                }`}
+            >
+              Profile
+            </span>
           </Link>
+
           <button
-            onClick={() => {
-              logout();
-              setSidebarOpen(false);
-            }}
-            className="flex items-center w-full gap-2 px-3 py-2 text-sm font-medium text-red-600 transition-colors rounded-md dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+            onClick={logout}
+            className={`flex items-center text-[#FF0000] hover:opacity-80 transition-opacity text-[15px] w-full ${isSidebarExpanded ? "gap-3" : "gap-0 justify-center"
+              }`}
           >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-log-out shrink-0"
+              style={{ color: "#FF0000" }}
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+            <span
+              className={`truncate transition-opacity duration-200 ${isSidebarExpanded ? "inline" : "hidden"
+                }`}
+            >
+              Logout
+            </span>
           </button>
         </div>
       </div>
 
-      {/* Overlay */}
+      {/* === OVERLAY (MOBILE SIDEBAR) === */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Main Content Area */}
-      {/* CHANGE: Added w-full to ensure it fills the remaining space */}
-      <div className="flex flex-col flex-1 w-full h-full overflow-hidden"> 
-        {/* Top Bar */}
-        <div className="sticky top-0 z-40 flex items-center justify-between w-full px-4 bg-white border-b border-gray-100 h-14 dark:bg-gray-900 dark:border-gray-800">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-1 text-gray-700 rounded-md lg:hidden dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-
-          <h2 className="flex-1 ml-3 text-base font-semibold text-gray-900 dark:text-white lg:ml-0">
-            {navItems.find((item) => isActive(item.path, item.end))?.label || "Dashboard"}
-          </h2>
-
-          {/* Profile Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+      {/* === MAIN CONTENT === */}
+      <div className="flex flex-col flex-1 w-full">
+        {/* HEADER */}
+        <header className="fixed top-0 left-0 right-0 flex items-center justify-between w-full h-[65px] px-4 sm:px-6 ">
+          {/* Left Section (Menu) */}
+          <div className="flex items-center gap-4">
+            {/* Mobile Menu Button */}
             <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 p-2 transition rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-1 text-gray-700 hover:bg-gray-100 rounded-md lg:hidden"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              <div className="flex items-center justify-center w-8 h-8 text-white bg-blue-600 rounded-full">
-                <User className="w-4 h-4" />
-              </div>
-              {/* <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" /> */}
+              {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
-            {dropdownOpen && (
-              <div className="absolute right-0 z-50 w-40 mt-2 bg-white border border-gray-100 rounded-md shadow-md dark:bg-gray-900 dark:border-gray-700">
-                <button
-                  onClick={() => {
-                    navigate("/dashboard/admin/profile");
-                    setDropdownOpen(false);
-                  }}
-                  className="flex items-center w-full gap-2 px-3 py-2 text-sm text-gray-700 transition-colors rounded-t-md hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                >
-                  <User className="w-4 h-4" />
-                  My Account
-                </button>
-                <button
-                  onClick={() => {
-                    logout();
-                    setDropdownOpen(false);
-                  }}
-                  className="flex items-center w-full gap-2 px-3 py-2 text-sm font-medium text-red-600 transition-colors rounded-b-md hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </button>
-              </div>
-            )}
+            {/* Desktop Sidebar Toggle */}
+            <button
+              className="p-1 text-gray-700 hover:bg-gray-100 rounded-md hidden lg:block"
+              onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+            >
+              <Menu size={24} />
+            </button>
           </div>
-        </div>
 
-        {/* Page Content */}
-        {/* NOTE: scrollbar-thin utilities require installing the tailwindcss-scrollbar plugin */}
-        <div className="flex-1 w-full h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-800">
-          <div className="min-h-full p-4 lg:p-6">{children}</div>
-        </div>
+          {/* Center Section (Search Bar) */}
+          <div className="hidden sm:flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 w-[280px] sm:w-[340px] md:w-[420px] lg:w-[460px] text-[15px] mx-auto absolute left-1/2 transform -translate-x-1/2">
+            <Search size={18} className="text-gray-400 mr-2 shrink-0" />
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full border-0 outline-none text-gray-500 placeholder-gray-400"
+            />
+          </div>
+
+          {/* Right Section (Icons) */}
+          <div className="flex items-center gap-4 pr-2">
+            <div className="relative cursor-pointer">
+              <Bell size={20} className="text-gray-600" />
+              <span className="absolute top-[-4px] right-[-3px] h-2 w-2 rounded-full bg-red-500 border border-white"></span>
+            </div>
+            <Settings size={20} className="text-gray-600 cursor-pointer" />
+            {/* <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#0189BB] text-white cursor-pointer">
+              <User size={16} />
+            </div> */}
+          </div>
+        </header>
+
+        {/* MAIN BODY */}
+        <main className="flex-1 w-full h-full p-4 sm:p-6 md:p-8 overflow-y-auto mt-[65px]">
+          {children}
+        </main>
       </div>
     </div>
   );

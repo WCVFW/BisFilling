@@ -36,14 +36,20 @@ export default defineConfig({
     },
   },
 
-  // ✅ Added: Ignore missing sourcemap warnings like bootstrap.min.css.map
+  // ✅ Suppress source map warnings for third-party CSS
   build: {
     sourcemap: true,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress warnings about missing source maps for third-party CSS
+        if (warning.code === 'SOURCEMAP_ERROR' && warning.message.includes('bootstrap.min.css.map')) {
+          return;
+        }
+        warn(warning);
+      },
+    },
   },
   css: {
-    devSourcemap: false, // disable CSS sourcemap warnings
-  },
-  optimizeDeps: {
-    exclude: ['bootstrap'], // optional – prevents extra processing
+    devSourcemap: false, // disable CSS sourcemap in dev
   },
 });

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
+
+// ✅ CSS Imports
 import "./styles/globals.css";
 import "./assets1/css/bootstrap.min.css";
 import "./assets1/css/fontawesome.min.css";
@@ -10,41 +12,82 @@ import "./assets1/css/animate.css";
 import "./assets1/css/odometer.css";
 import "./assets1/css/style.css";
 
-// Enable mocked API only when explicitly toggled
+// ✅ JS Library Imports (auto-bundled by Vite)
+import "jquery";
+import "slick-carousel";
+import Isotope from "isotope-layout";
+import "odometer";
+
+// ⚙️ Safe WOW initialization inside React
+let WOWInstance = null;
+if (typeof window !== "undefined") {
+  import("wowjs").then((mod) => {
+    WOWInstance = new mod.WOW({ live: false });
+  });
+}
+
+// ✅ Initialize global libraries after mount
+function GlobalInit() {
+  useEffect(() => {
+    // Wait for DOM to be ready
+    if (WOWInstance) WOWInstance.init();
+
+    // ✅ Initialize Slick Carousel if found
+    if (window.$ && typeof window.$(".slick-slider").slick === "function") {
+      window.$(".slick-slider").slick({
+        dots: true,
+        arrows: false,
+        autoplay: true,
+        autoplaySpeed: 4000,
+      });
+    }
+
+    // ✅ Initialize Isotope (Grid Layout)
+    const grid = document.querySelector(".grid");
+    if (grid) {
+      new Isotope(grid, {
+        itemSelector: ".grid-item",
+        layoutMode: "fitRows",
+      });
+    }
+  }, []);
+
+  return null;
+}
+
+// ✅ Mock API setup
 if (import.meta.env.VITE_USE_MOCK === "true") {
   import("./lib/mock-api");
 }
 
-// Suppress noisy third-party fetch failures during dev (e.g. FullStory) to avoid breaking HMR
+// ✅ Suppress noisy fetch errors in development
 if (import.meta.env.DEV) {
   window.addEventListener("unhandledrejection", (e) => {
-    try {
-      const reason = e.reason || {};
-      const msg = reason && reason.message ? reason.message : "";
-      const stack = reason && reason.stack ? reason.stack : "";
-      if (
-        msg.includes("Failed to fetch") ||
-        stack.includes("edge.fullstory.com") ||
-        stack.includes("fs.js")
-      ) {
-        e.preventDefault();
-        console.warn("Suppressed third-party fetch error in dev:", reason);
-      }
-    } catch (err) {}
+    const reason = e.reason || {};
+    const msg = reason?.message || "";
+    const stack = reason?.stack || "";
+    if (
+      msg.includes("Failed to fetch") ||
+      stack.includes("edge.fullstory.com") ||
+      stack.includes("fs.js")
+    ) {
+      e.preventDefault();
+      console.warn("Suppressed third-party fetch error in dev:", reason);
+    }
   });
 
-  // Hard-disable FullStory network calls in dev to avoid noisy errors
+  // Disable FullStory requests in dev
   const nativeFetch = window.fetch.bind(window);
   window.fetch = async (...args) => {
+    const url = String(args[0] || "");
+    if (url.includes("edge.fullstory.com") || url.includes("/s/fs.js")) {
+      return new Response("", { status: 204 });
+    }
     try {
-      const url = String(args[0] || "");
-      if (url.includes("edge.fullstory.com") || url.includes("/s/fs.js")) {
-        return new Response("", { status: 204 });
-      }
       return await nativeFetch(...args);
     } catch (err) {
-      const msg = (err && err.message) || "";
-      const stack = (err && err.stack) || "";
+      const msg = err?.message || "";
+      const stack = err?.stack || "";
       if (
         msg.includes("Failed to fetch") &&
         (stack.includes("edge.fullstory.com") || stack.includes("fs.js"))
@@ -56,48 +99,41 @@ if (import.meta.env.DEV) {
   };
 }
 
-// Global safeguard: prevent accidental full-page navigations or reloads
-// - Prevent native form submissions unless form has data-allow-submit
-// - Prevent anchor clicks for href="#" or empty href
-(function setupGlobalGuards(){
-  if (typeof window !== 'undefined') {
-    // Prevent forms from performing a full page submit by default
-    window.addEventListener('submit', function (e) {
-      try {
+// ✅ Global guard for form + anchors
+(function setupGlobalGuards() {
+  if (typeof window !== "undefined") {
+    window.addEventListener(
+      "submit",
+      (e) => {
         const form = e.target;
-        if (form && form.tagName === 'FORM') {
-          if (!form.hasAttribute('data-allow-submit')) {
-            e.preventDefault();
-            // console.debug to help developers understand prevented submits
-            // eslint-disable-next-line no-console
-            console.debug('Prevented native form submit for', form);
-          }
-        }
-      } catch (err) {
-        // ignore
-      }
-    }, true);
-
-    // Prevent anchors with href="#" or javascript:void(0) or empty href from navigating
-    window.addEventListener('click', function (e) {
-      try {
-        const a = e.target.closest && e.target.closest('a');
-        if (!a) return;
-        const href = a.getAttribute('href');
-        if (!href || href === '#' || href.trim().toLowerCase().startsWith('javascript:')) {
+        if (form?.tagName === "FORM" && !form.hasAttribute("data-allow-submit")) {
           e.preventDefault();
-          // eslint-disable-next-line no-console
-          console.debug('Prevented default anchor navigation for', a);
+          console.debug("Prevented native form submit for", form);
         }
-      } catch (err) {
-        // ignore
-      }
-    }, true);
+      },
+      true
+    );
+
+    window.addEventListener(
+      "click",
+      (e) => {
+        const a = e.target.closest?.("a");
+        if (!a) return;
+        const href = a.getAttribute("href");
+        if (!href || href === "#" || href.trim().toLowerCase().startsWith("javascript:")) {
+          e.preventDefault();
+          console.debug("Prevented default anchor navigation for", a);
+        }
+      },
+      true
+    );
   }
 })();
 
+// ✅ Render Application
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
+    <GlobalInit />
     <App />
   </BrowserRouter>
 );

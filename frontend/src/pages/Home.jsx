@@ -8,11 +8,15 @@ import WhyChooseSection from "../pages/WhyChooseSection"
 import logo from "../assets1/img/logo.svg";
 import star1 from "../assets1/img/icons/star-1.svg";
 import heroShape1 from "../assets1/img/hero-shape-1.svg";
-import heroShape2 from "../assets1/img/hero-shape-2.svg";
+import heroShape2 from "../assets1/img/hero-shape-2.png";
 
 // Import banner and phone images
-import bannerImg1 from "../assets1/img/banner-img-1.png";
-import phoneImg1 from "../assets1/img/phone-img-1.png";
+import bannerImg1 from "../assets1/img/herooriginal.png";
+// import phoneImg1 from "../assets1/img/phone-img-1.png";
+import bannerGif from "../assets1/img/bannerGif.gif"
+import bannerGif1 from "../assets1/img/bannerGif2.gif"
+import bannerGif2 from "../assets1/img/bannerGif1.gif"
+import bannerGif3 from "../assets1/img/bannerGif3.gif"
 
 // Import brand logos
 import brand1 from "../assets1/img/brand-1.svg";
@@ -127,15 +131,18 @@ export default function Home() {
               <span className="cs_theme_color_4">
                 <img src={star1} alt="Star icon" />
               </span>
-              <span>Welcome To Saaso</span>
+              <span>Welcome To BisFilling</span>
               <span className="cs_theme_color_4">
                 <img src={star1} alt="Star icon" />
               </span>
             </p>
-
-            <h1 className="cs_hero_title cs_fs_64 cs_mb_10 wow fadeInDown">
-              Grow your company with enthusiasm. <br /> Make It Strong with
+            <h1
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-gray-900 mb-4 wow fadeInDown"
+            >
+              India&apos;s Smart Online Platform for Modern Businesses.
+              <br />
             </h1>
+
 
             <p className="cs_hero_desc cs_mb_26">
               Legal, tax, and compliance simplification. Lots of people trust it.
@@ -191,34 +198,68 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <div className="cs_banner cs_style_1 position-relative">
+      <div className="cs_banner cs_style_1 relative">
         <div className="container">
           <div className="cs_banner_thumbnail_wrapper">
-            <div className="cs_banner_thumbnail">
-              <img src={bannerImg1} alt="Banner image" />
-            </div>
-            <div className="cs_banner_thumbnail">
-              <img src={phoneImg1} alt="Phone image" />
+            <div className="cs_banner_thumbnail relative">
+              {/* Main Banner Image */}
+              <img
+                src={bannerImg1}
+                alt="Banner image"
+                className="w-full h-auto object-cover"
+              />
             </div>
           </div>
         </div>
+
+        {/* Left GIF Icon (Up) */}
+        <img
+          src={bannerGif}
+          alt="Animated icon left"
+          className="absolute z-[4] pointer-events-none opacity-90 mix-blend-screen
+      w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w-[80px] md:h-[80px]
+      top-[0] left-[10%] sm:left-[10%] md:left-[15%]"
+        />
+
+        {/* Small Mid-Left GIF (Tiny Sparkle) */}
+        <img
+          src={bannerGif3}
+          alt="Animated icon small"
+          className="absolute z-[4] pointer-events-none opacity-90 mix-blend-screen
+      w-[15px] h-[15px] sm:w-[20px] sm:h-[20px] md:w-[25px] md:h-[25px]
+      top-[2%] left-[32%] sm:left-[34%] md:left-[36%]"
+        />
+
+        {/* Center GIF Icon (Down) */}
+        <img
+          src={bannerGif1}
+          alt="Animated icon center"
+          className="absolute z-[4] pointer-events-none opacity-90 mix-blend-screen
+      w-[35px] h-[35px] sm:w-[50px] sm:h-[50px] md:w-[70px] md:h-[70px]
+      top-10 sm:top-[10%] md:top-[10%] left-[52%]"
+        />
+
+        {/* Right GIF Icon (Lower Zig-Zag Position) */}
+        <img
+          src={bannerGif2}
+          alt="Animated icon right"
+          className="absolute z-[1] pointer-events-none opacity-90 mix-blend-screen
+      w-[45px] h-[45px] sm:w-[60px] sm:h-[60px] md:w-[80px] md:h-[80px]
+      top-[26%] sm:top-[28%] md:top-[-10%] left-[80%]"
+        />
       </div>
 
       {/* About section */}
-      <section className="position-relative">
+      <section className="relative mt-10 md:mt-16 lg:mt-20 xl:mt-24">
         <div className="cs_height_120 cs_height_lg_80"></div>
 
         <div className="container">
           <div className="cs_card cs_style_1">
-            <div className="row cs_gap_y_50 position-relative z-1">
+            <div className="row cs_gap_y_50 relative z-1">
               {/* Left Image Section */}
               <div className="col-lg-5">
-                <div className="cs_card_thumbnail position-relative">
-                  <img src={aboutImg1} alt="About" />
-                  <div className="cs_about_mask_shape_1 position-absolute">
-                    <img src={aboutShape1} alt="Mask shape" />
-                  </div>
-                  <div className="cs_elipse_1 cs_radius_100 position-absolute"></div>
+                <div className="cs_card_thumbnail relative">
+                  <img src={aboutImg1} alt="About" className="w-full h-auto rounded-lg object-cover" />
                 </div>
               </div>
 
@@ -226,46 +267,52 @@ export default function Home() {
               <div className="col-lg-7">
                 <div className="cs_card_content">
                   <div className="cs_section_heading cs_style_1 cs_mb_28">
-                    <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-                      <img src={star1} alt="Star icon" />
-                      <span> About</span>
-                      <img src={star1} alt="Star icon" />
+                    <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22 flex items-center gap-2 justify-center md:justify-start">
+                      <img src={star1} alt="Star icon" className="w-4 h-4" />
+                      <span>About</span>
+                      <img src={star1} alt="Star icon" className="w-4 h-4" />
                     </div>
 
-                    <h2 className="cs_section_title cs_fs_48 cs_semibold mb-0 wow fadeInUp">
-                      Designed for the upcoming small business generation
+                    <h2 className="cs_section_title text-3xl md:text-4xl font-semibold mb-0 wow fadeInUp">
+                      Simplifying legal & Compliance
                     </h2>
                   </div>
 
-                  <p className="cs_card_desc cs_mb_22">
-                    BisFilling a is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer
+                  <p className="cs_card_desc text-gray-700 mb-4">
+                    If you're an ambitious startup navigating your first filings, a Small or Medium Enterprise (SME)
+                    needing robust ongoing compliance, or an individual requiring simple tax help—{" "}
+                    <span className="font-bold">BizFilling</span> is here for you. As a cutting-edge legal technology
+                    platform in India, we deliver all your essential legal, tax, and regulatory services fully online.
+                    We combine expert knowledge with user-friendly technology to ensure you meet all your obligations
+                    accurately and on time, all without ever leaving your desk. We handle the compliance, so you can
+                    handle the business.
                   </p>
 
-                                      <ul className="cs_list cs_style_1 cs_mp_0">
-                    <li>
-                      <img src={checkbox} alt="Check icon"/>
-                      <h3 className="cs_fs_18 cs_semibold mb-0">
+                  <ul className="cs_list cs_style_1 cs_mp_0 space-y-2">
+                    <li className="flex items-center gap-2">
+                      <img src={checkbox} alt="Check icon" className="w-5 h-5" />
+                      <h3 className="text-base font-semibold mb-0">
                         with our marketing and technological solutions.
-                      </h3  
+                      </h3>
                     </li>
-                    <li>
-                      <img src={checkbox} alt="Check icon"/>
-                      <h3 className="cs_fs_18 cs_semibold mb-0">
+                    <li className="flex items-center gap-2">
+                      <img src={checkbox} alt="Check icon" className="w-5 h-5" />
+                      <h3 className="text-base font-semibold mb-0">
                         All throughout the world, people trust us.
-                      </h3  
+                      </h3>
                     </li>
-                    <li>
-                      <img src={checkbox} alt="Check icon"/>
-                      <h3 className="cs_fs_18 cs_semibold mb-0">
+                    <li className="flex items-center gap-2">
+                      <img src={checkbox} alt="Check icon" className="w-5 h-5" />
+                      <h3 className="text-base font-semibold mb-0">
                         Start Your 14 Days Free Trials Today!
-                      </h3  
+                      </h3>
                     </li>
                   </ul>
 
                   <a
                     href="#"
                     aria-label="App download button"
-                    className="cs_btn cs_style_1 cs_bg_1 cs_fs_14 cs_white_color cs_bold text-uppercase"
+                    className="cs_btn cs_style_1 cs_bg_1 text-sm md:text-base cs_white_color font-bold uppercase mt-4 inline-flex items-center gap-2"
                   >
                     <span>Download App</span>
                     <span className="cs_btn_icon">
@@ -277,266 +324,248 @@ export default function Home() {
             </div>
 
             {/* Decorative shapes */}
-            <div className="cs_star_shape_1 position-absolute">
-              <img src={starShape} alt="Star shape"/>
+            <div className="cs_star_shape_1 absolute">
+              <img src={starShape} alt="Star shape" />
             </div>
 
-            <div className="cs_vector_shape_1 posit ion-absolute">
-              <img src={dnaShape} alt="Shape"/>
+            <div className="cs_vector_shape_1 absolute">
+              <img src={dnaShape} alt="Shape" />
             </div>
           </div>
-               
+        </div>
 
         <div className="cs_height_46 cs_height_lg_40"></div>
       </section>
       {/* About section End */}
-          <section>
-      <div className="cs_height_120 cs_height_lg_80"></div>
-      <div className="container">
-      iv className="cs_section_heading cs_style_1 cs_center_column cs_mb_47 text-center">
+      {/* <section>
+        <div className="cs_height_120 cs_height_lg_80"></div>
+        <div className="container">
+          <div className="cs_section_heading cs_style_1 cs_center_column cs_mb_47 text-center">
             <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-              <img src={star1} alt="Star icon"/>
+              <img src={star1} alt="Star icon" />
               <span>Awesome Feature</span>
-              <img src={star1} alt="Star icon"/>
-              div>  
-              2 className="cs_section_title cs_fs_48 cs_semibold mb-0 wow fadeInDown">Our Fantastic App Features</h2>
-              v>  
-            iv className="cs_features_steps_wrapper">
+              <img src={star1} alt="Star icon" />
+            </div>
+            <h2 className="cs_section_title cs_fs_48 cs_semibold mb-0 wow fadeInDown">Our Fantastic App Features</h2>
+          </div>
+          <div className="cs_features_steps_wrapper">
             <div className="cs_feature_step cs_center_column">
               <div className="cs_step_index cs_radius_50 cs_fs_14 cs_semibold cs_heading_color text-uppercase"><span>Step One</span></div>
               <div className="cs_vertical_line"></div>
               <div className="cs_step_indfo_wrapper cs_radius_30 text-center position-relative">
                 <h3 className="cs_fs_24 cs_semibold cs_mb_10">Download App</h3>
                 <p className="mb-0">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
-                <img src={borderShape} alt="Border shape"/>
-                div>
-                v>
-                 className="cs_feature_step cs_center_col umn">
+                <img src={borderShape} alt="Border shape" />
+              </div>
+            </div>
+            <div className="cs_feature_step cs_center_column">
               <div className="cs_step_index cs_radius_50 cs_fs_14 cs_semibold cs_heading_color text-uppercase"><span>Step Two</span></div>
               <div className="cs_vertical_line"></div>
               <div className="cs_step_indfo_wrapper cs_radius_30 text-center position-relative">
                 <h3 className="cs_fs_24 cs_semibold cs_mb_10">Create account</h3>
                 <p className="mb-0">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
-                <img src={borderShape} alt="Border shape"/>
-                div>
-                v>
-                 className="cs_feature_step cs_center_col umn">
+                <img src={borderShape} alt="Border shape" />
+              </div>
+            </div>
+            <div className="cs_feature_step cs_center_column">
               <div className="cs_step_index cs_radius_50 cs_fs_14 cs_semibold cs_heading_color text-uppercase"><span>Step Three</span></div>
               <div className="cs_vertical_line"></div>
               <div className="cs_step_indfo_wrapper cs_radius_30 text-center position-relative">
                 <h3 className="cs_fs_24 cs_semibold cs_mb_10">Install App, & Enjoy</h3>
                 <p className="mb-0">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
-                <img src={borderShape} alt="Border shape"/>
-                div>
-                v>
-                 
-              
-             className="cs_height_120 cs_height_lg_80"></div>
-          ction>
-        <section className="position-relative">
-          <div className="cs_height_120 cs_height_lg_80"></div>
-          <div className="container">
-          <div className="text-center cs_section_heading cs_style_1 cs_mb_47 cs_center_column position-relative z-1">
-            <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-              <img src={star1} alt="Star icon"/>
-              <span>Awesome Feature</span>
-              <img src={star1} alt="Star icon"/>
-            </div>  
-            <h2 className="mb-0 cs_section_title cs_fs_48 cs_semibold wow fadeInUp">Powerful Features to Elevate <br /> Your Workflow</h2>
-            <div className="cs_features_items_ wrapper position-relative z-1">
-              <div className="cs_feature_item cs_radius_20 cs_bg_filed" data-src="assets1/img/feature-item-bg.svg">
-                <h3 className="cs_fs_36 cs_semibold cs_white_color cs_mb_40">See more and get visibility <br /> for your business</h3>
-                <a href="contact.html" aria-label="Get started button" className="cs_btn cs_style_1 cs_fs_14 cs_bold cs_white_color text-uppercase">
-                  <span>Get Started</span>
-                  <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
-                </a>
-              </div>
-              <div className="cs_feature_item cs_white_bg cs_radius_20">
-                <span className="cs_feature_icon cs_center cs_radius_12 cs_mb_15">
-                  <img src={codeIcon} alt="Coding icon"/>
-                </span>
-                <h3 className="cs_fs_24 cs_semibold cs_mb_6">
-                  <a href="service-details.html" aria-l abel="Service details link">Software Development</a>
-                </h3>
-                <ul className="cs_features_list cs_mp_0">
-                  <li>
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Security</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Agile Methodologies</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Clear Requirements</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Feedback &  Improvement</span>
-                  </li>
-                </ul>   
-                <a href="service-details.html" aria-label="Service details link" className="cs_text_btn cs_fs_14 cs_bold text-uppercase">
-                  <span>Read More</span>
-                  <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
-                </a>
-              </div>
-              <div className="cs_feature_item cs_white_bg cs_radius_20">
-                <span className="cs_feature_icon cs_center cs_bg_1 cs_radius_12 cs_mb_15">
-                  <img src={cloudComputingIcon} alt="Cloud computing icon"/>
-                </span>
-                <h3 className="cs_fs_24 cs_semibold cs_mb_6">
-                  <a href="service-details.html" aria-label="Service detai ls link">Cloud Computing Solutions</a>
-                </h3>
-                <ul className="cs_features_list cs_mp_0">
-                  <li>
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Security</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Agile Methodologies</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Clear Requirements</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Feedback &  Improvement</span>
-                  </li>
-                </ul>   
-                <a href="service-details.html" aria-label="Service details link" className="cs_text_btn cs_fs_14 cs_bold text-uppercase">
-                  <span>Read More</span>
-                  <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
-                </a>
-              </div>
-              <div className="cs_feature_item cs_white_bg cs_radius_20">
-                <span className="cs_feature_icon cs_bg_2 cs_center cs_radius_12 cs_mb_15">
-                  <img src={qualityAssuranceIcon} alt="Quality assurance icon"/>
-                </span>
-                <h3 className="cs_fs_24 cs_semibold cs_mb_6">
-                  <a href="service-details.html" aria-label="Service details l ink">Quality Assurance</a>
-                </h3>
-                <ul className="cs_features_list cs_mp_0">
-                  <li>
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Security</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Agile Methodologies</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Clear Requirements</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Feedback &  Improvement</span>
-                  </li>
-                </ul>   
-                <a href="service-details.html" aria-label="Service details link" className="cs_text_btn cs_fs_14 cs_bold text-uppercase">
-                  <span>Read More</span>
-                  <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
-                </a>
-              </div>
-              <div className="cs_feature_item cs_white_bg cs_radius_20">
-                <span className="cs_feature_icon cs_bg_3 cs_center cs_radius_12 cs_mb_15">
-                  <img src={securityIcon} alt="Cybersecurity security icon"/>
-                </span>
-                <h3 className="cs_fs_24 cs_semibold cs_mb_6">
-                  <a href="service-details.html" aria-label="Service detail s link">Cybersecurity Services</a>
-                </h3>
-                <ul className="cs_features_list cs_mp_0">
-                  <li>
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Security</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Agile Methodologies</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Clear Requirements</span>
-                  </li>
-                  <li>  
-                    <img src={caretIcon} alt="Caret icon"/>
-                    <span>Feedback &  Improvement</span>
-                  </li>
-                </ul>   
-                <a href="service-details.html" aria-label="Service details link" className="cs_text_btn cs_fs_14 cs_bold text-uppercase">
-                  <span>Read More</span>
-                  <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
-                </a>
+                <img src={borderShape} alt="Border shape" />
               </div>
             </div>
           </div>
-          <div className="cs_feature_shape_1 position-absolute">
-            <img src={shape3d} alt="Vector shape"/>
-          </div>
-          <div className="cs_feature_shape_2 position-absolute">
-            <img src={springShape} alt="Spring sh ape"/>
-          </div>
           <div className="cs_height_120 cs_height_lg_80"></div>
-        </div>  
+        </div>
+      </section> */}
+      <section className="relative py-10 lg:pt-24 lg:pb-40">
+        <div className="container mx-auto relative z-10">
+
+          {/* Section Heading: Retained */}
+          <div className="text-center mb-16">
+            <div className="flex justify-center items-center gap-3">
+              <img src={star1} alt="Star" className="w-5 h-5" />
+              <span className="text-[#1A7F7D] text-lg font-semibold">Our Services</span>
+              <img src={star1} alt="Star" className="w-5 h-5" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 leading-tight">
+              Complete Business Solutions <br /> for Every Stage
+            </h2>
+          </div>
+
+          {/* Features Wrapper: Changed to a Flex container with custom styling and a 3-column layout */}
+          <div className="flex flex-wrap justify-center gap-8 position-relative z-1">
+
+            {/* Card 1: Start a Business (Now the first card) */}
+            <div className="cs_feature_item cs_white_bg cs_radius_20 w-full md:w-[30%]">
+              <span className="cs_feature_icon cs_center cs_radius_12 cs_mb_15">
+                <img src={codeIcon} alt="Start a Business icon" />
+              </span>
+              <h3 className="cs_fs_24 cs_semibold cs_mb_6">
+                <a href="#">Start a Business</a>
+              </h3>
+              <ul className="cs_features_list cs_mp_0">
+                {["Private Limited Company Registration",
+                  "Limited Liability Partnership Registration", // Updated text
+                  "One Person Company Registration",          // Updated text
+                  "Sole Proprietorship Registration",
+                  "Producer Company Registration",            // Added
+                  "Partnership Firm Registration",            // Added
+                  "Startup India Registration",               // Added
+                  "NGO Registration"                          // Added
+                ].map((item, idx) => (
+                  <li key={idx}>
+                    <img src={caretIcon} alt="Caret icon" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href="#" aria-label="Explore more link" className="cs_text_btn cs_fs_14 cs_bold text-uppercase">
+                <span>Explore More</span>
+                <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
+              </a>
+            </div>
+
+            {/* Card 2: Operate with Clarity */}
+            <div className="cs_feature_item cs_white_bg cs_radius_20 w-full md:w-[30%]">
+              <span className="cs_feature_icon cs_center cs_bg_1 cs_radius_12 cs_mb_15">
+                <img src={cloudComputingIcon} alt="Operate with Clarity icon" />
+              </span>
+              <h3 className="cs_fs_24 cs_semibold cs_mb_6">
+                <a href="#">Operate with Clarity</a>
+              </h3>
+              <ul className="cs_features_list cs_mp_0">
+                {["GST Registration & Compliance",
+                  "Change Company Address",
+                  "Director Replacement",
+                  "Mandatory Annual Filings",
+                  "Labor Compliance",
+                  "Shop and Establishment License",
+                  "Accounting & Tax"
+                ].map((item, idx) => (
+                  <li key={idx}>
+                    <img src={caretIcon} alt="Caret icon" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href="#" aria-label="Explore more link" className="cs_text_btn cs_fs_14 cs_bold text-uppercase">
+                <span>Explore More</span>
+                <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
+              </a>
+            </div>
+
+            {/* Card 3: Secure a Legacy */}
+            <div className="cs_feature_item cs_white_bg cs_radius_20 w-full md:w-[30%]">
+              <span className="cs_feature_icon cs_center cs_bg_2 cs_radius_12 cs_mb_15">
+                <img src={qualityAssuranceIcon} alt="Secure a Legacy icon" />
+              </span>
+              <h3 className="cs_fs_24 cs_semibold cs_mb_6">
+                <a href="#">Secure a Legacy</a>
+              </h3>
+              <ul className="cs_features_list cs_mp_0">
+                {["Trademark Registration",
+                  "Copyright Registration",
+                  "Patent Registration",
+                  "IP Infringement Protection",
+                  "Design Registration",
+                  "Free Legal Document",
+                  "Business Contracts"
+                ].map((item, idx) => (
+                  <li key={idx}>
+                    <img src={caretIcon} alt="Caret icon" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href="#" aria-label="Explore more link" className="cs_text_btn cs_fs_14 cs_bold text-uppercase">
+                <span>Explore More</span>
+                <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
+              </a>
+            </div>
+          </div>
+
+          {/* Decorative Shapes: Retained from your input, adjusted classes */}
+          <img src={shape3d} alt="Vector shape" className="cs_feature_shape_1 position-absolute top-10 left-[-10%] w-20 sm:w-28 opacity-80 pointer-events-none" />
+          <img src={springShape} alt="Spring shape" className="cs_feature_shape_2 position-absolute bottom-10 right-0 w-20 sm:w-24 opacity-80 pointer-events-none" />
+
+        </div>
+        {/* <div className="cs_height_120 cs_height_lg_80"></div> */}
       </section>
       <section className="cs_gray_bg_2 position-relative">
         <div className="cs_height_120 cs_height_lg_80"></div>
         <div className="container">
           <div className="row cs_gap_y_40 position-relative z-1">
+
+            {/* Right Column (Image/Illustration - Order 2 on large screens) */}
             <div className="col-lg-6 order-lg-2">
               <div className="cs_workink_process_heading cs_center_column position-relative">
                 <div className="cs_section_heading cs_style_1 cs_mb_11 z-1">
                   <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-                    <img src={star1} alt="Star icon"/>
+                    <img src={star1} alt="Star icon" />
                     <span>How It work</span>
-                    <img src={star1} alt="Star icon"/>
-                  </div>  
+                    <img src={star1} alt="Star icon" />
+                  </div>
                   <h2 className="cs_section_title cs_fs_48 cs_semibold wow fadeInUp">Let's Utilize Optimum In Three Easy Actions.</h2>
-                  <p className="cs_card_desc cs_mb_2 2">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
+                  <p className="cs_card_desc cs_mb_22">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
                 </div>
+
                 <div className="cs_process_thumbnail z-1">
-                  <img src={humanImg1} alt="Human image"/>
+                  {/* Note: In JSX, string paths like "assets/img/human-1.png" should be replaced with imported variables like {humanImg1} */}
+                  <img src={humanImg1} alt="Human image" />
                 </div>
-                <div className="bottom-0 cs_vector_shape position-absolute start-0">
-                  <img src={vector7} alt="Vector shape"/ >
+
+                <div className="cs_vector_shape position-absolute bottom-0 start-0">
+                  <img src={vector7} alt="Vector shape" />
                 </div>
               </div>
-                   
+            </div>
+
+            {/* Left Column (Steps/Iconboxes - Order 1 on large screens) */}
             <div className="col-lg-6 order-lg-1">
               <div className="cs_iconbox_wrapper_2">
+
+                {/* Step 1: Create Account */}
                 <div className="cs_iconbox cs_style_2">
                   <span className="cs_iconbox_icon cs_center cs_accent_bg cs_mb_18">
-                    <img src={homeIcon} alt="Browser icon"/>
+                    <img src={homeIcon} alt="Browser icon" />
                   </span>
                   <h3 className="cs_fs_24 cs_semibold cs_mb_4">Create your account</h3>
-                  <p className="mb-0">All the generators o n the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
+                  <p className="mb-0">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
                 </div>
+
+                {/* Step 2: Connect product */}
                 <div className="cs_iconbox cs_style_2">
                   <span className="cs_iconbox_icon cs_bg_1 cs_center cs_mb_18">
-                    <img src={productsIcon} alt="Product stack icon"/>
+                    <img src={productsIcon} alt="Product stack icon" />
                   </span>
                   <h3 className="cs_fs_24 cs_semibold cs_mb_4">Connect your product</h3>
-                  <p className="mb-0">All the generators on the Inte rnet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
+                  <p className="mb-0">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
                 </div>
+
+                {/* Step 3: Track Analytics */}
                 <div className="cs_iconbox cs_style_2">
                   <span className="cs_iconbox_icon cs_bg_2 cs_center cs_mb_18">
-                    <img src={analyticsIcon} alt="Analytics icon"/>
+                    <img src={analyticsIcon} alt="Analytics icon" />
                   </span>
                   <h3 className="cs_fs_24 cs_semibold cs_mb_4">Track Analytics your account</h3>
-                  <p className="mb-0">All the generators on the I nternet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
+                  <p className="mb-0">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
                 </div>
+
               </div>
             </div>
           </div>
         </div>
+
+        {/* Decorative shape at the bottom right */}
         <div className="cs_star_shape_4 position-absolute">
-          <img src={starShape2} alt="Star shape"/>
+          <img src={starShape2} alt="Star shape" />
         </div>
         <div className="cs_height_0 cs_height_lg_80"></div>
-      </section>  
+      </section>
+
       <section className="position-relative">
         <div className="cs_height_120 cs_height_lg_80"></div>
         <div className="container">
@@ -544,36 +573,36 @@ export default function Home() {
             <div className="row cs_gap_y_50 position-relative z-1">
               <div className="col-lg-6">
                 <div className="cs_card_thumbnail position-relative">
-                  <img src={dashboardImg} alt="Dashboard image"/>
+                  <img src={dashboardImg} alt="Dashboard image" />
                 </div>
               </div>
-              <div className="col-lg-6"> 
+              <div className="col-lg-6">
                 <div className="cs_card_content">
                   <div className="cs_section_heading cs_style_1 cs_mb_27">
                     <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-                      <img src={star1} alt="Star icon"/>
+                      <img src={star1} alt="Star icon" />
                       <span>Customizations & Analysis</span>
-                      <img src={star1} alt="Star icon"/>
-                    </div>  
+                      <img src={star1} alt="Star icon" />
+                    </div>
                     <h2 className="cs_section_title cs_fs_48 cs_semibold wow fadeInLeft">We Make It Easy To Track All User Analytics</h2>
-                    <p className="mb-0 cs_card_desc">A ll the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
+                    <p className="mb-0 cs_card_desc">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
                   </div>
                   <div className="cs_iconbox_wrapper_1">
                     <div className="cs_iconbox cs_style_1 cs_type_1">
                       <span className="cs_iconbox_icon cs_center cs_accent_bg">
-                        <img src={advancedTrackingIcon} alt="Advanced tracking icon"/>
+                        <img src={advancedTrackingIcon} alt="Advanced tracking icon" />
                       </span>
                       <div className="cs_iconbox_info">
-                        <h3 className="cs_fs_20 cs_semibold cs_mb_1">Advanced tracki ng</h3>
+                        <h3 className="cs_fs_20 cs_semibold cs_mb_1">Advanced tracking</h3>
                         <p className="mb-0">All the generators on the Internet tend to repeat predefined chunks as</p>
                       </div>
                     </div>
                     <div className="cs_iconbox cs_style_1 cs_type_1">
                       <span className="cs_iconbox_icon cs_center cs_bg_1">
-                        <img src={inDepthIcon} alt="In-depth monitoring icon"/>
+                        <img src={inDepthIcon} alt="In-depth monitoring icon" />
                       </span>
                       <div className="cs_iconbox_info">
-                        <h3 className="cs_fs_20 cs_semibold cs_mb_1">In-depth  monitoring</h3>
+                        <h3 className="cs_fs_20 cs_semibold cs_mb_1">In-depth  monitoring</h3>
                         <p className="mb-0">All the generators on the Internet tend to repeat predefined chunks as</p>
                       </div>
                     </div>
@@ -582,10 +611,10 @@ export default function Home() {
               </div>
             </div>
             <div className="cs_star_shape_5 position-absolute">
-              <img src={shape3d2} alt="Vector shape"/>
+              <img src={shape3d2} alt="Vector shape" />
             </div>
           </div>
-          <div className="cs_height_120 cs_height_lg _80"></div>
+          <div className="cs_height_120 cs_height_lg_80"></div>
         </div>
       </section>
       <section className="cs_bg_filed position-relative" data-src="assets1/img/whychoose-bg-1.svg">
@@ -595,19 +624,19 @@ export default function Home() {
             <div className="row cs_gap_y_50 position-relative z-1">
               <div className="col-lg-6 order-lg-2">
                 <div className="cs_card_thumbnail">
-                  <img src={phoneImg2} alt="Phone image"/>
+                  <img src={phoneImg2} alt="Phone image" />
                 </div>
               </div>
-              <div className="col-lg-6 order-lg-1">   
+              <div className="col-lg-6 order-lg-1">
                 <div className="cs_card_content">
                   <div className="cs_section_heading cs_style_1 cs_mb_27">
                     <div className="cs_section_subtitle cs_fs_18 cs_white_color cs_mb_22">
-                      <img src={star1} alt="Star icon"/>
+                      <img src={star1} alt="Star icon" />
                       <span>Why Choose us</span>
-                      <img src={star1} alt="Star icon"/>
-                    </div>  
+                      <img src={star1} alt="Star icon" />
+                    </div>
                     <h2 className="cs_section_title cs_fs_48 cs_semibold cs_white_color wow fadeInDown">Trusted Partner In Digital Growth & Innovation</h2>
-                    <p className="mb-0 cs_card_desc cs _white_color">With over 10 years of experience, a diverse team of experts, and a proven track record, Relatix is your trusted partner in achieving digital excellence.</p>
+                    <p className="mb-0 cs_card_desc cs_white_color">With over 10 years of experience, a diverse team of experts, and a proven track record, Relatix is your trusted partner in achieving digital excellence.</p>
                   </div>
                   <ul className="cs_list cs_style_2 cs_white_color cs_semibold cs_mp_0">
                     <li>
@@ -638,162 +667,13 @@ export default function Home() {
           <div className="cs_height_0 cs_height_lg_80"></div>
         </div>
       </section>
-      <section className="overflow-hidden position-relative">
-        <div className="cs_height_120 cs_height_lg_80"></div>
-        <div className="container">
-          <div className="text-center cs_section_heading cs_style_1 cs_center_column cs_mb_60 position-relative z-1">
-            <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-              <img src={star1} alt="Star icon"/>
-              <span>Our Pricing</span>
-              <img src={star1} alt="Star icon"/>
-            </div>  
-            <h2 className="cs_section_title cs_fs_48 cs_semibold cs_mb_20 text-capitalize wow fadeInUp">Choose A Plan for more <br /> advanced business</h2>
-            <div className="cs_center">   
-              <ul className="cs_pricing_control cs_center cs_mp_0 cs_fs_14 cs_bold text-uppercase position-relative">
-                <li className="active"><a href="monthly" aria-label="Pricing toggle button">Monthly</a></li>
-                <li>
-                  <a href="yearly" aria-label="Pricing toggle button">Yearly</a>
-                  <div className="cs_offer_info cs_fs_20 cs_heading_color cs_heading_font cs_normal position-absolute">
-                    <span>Save 20%</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="row cs_row_gap_30 cs_gap_y_30 position-relative z-1">
-            <div className="col-lg-6">
-              <div className="cs_pricing_table cs_style_2 cs_white_bg cs_radius_20">
-                <div className="cs_pricing_table_heading cs_mb_18">
-                  <div>
-                    <h2 className="cs_plan_title cs_fs_24 cs_semibold cs_mb_7">Starter Plan</h2>
-                    <p className="mb-0">Advanced features & reporting</p>
-                  </div>
-                  <div className="cs_price cs_fs_74 cs_semibold cs_heading_color cs_heading_font">$<span className="monthlyPrice">49</span><span className="yearlyPrice">89</span></div>
-                </div>
-                <div className="cs_separator cs_mb_24"></div>
-                <div className="cs_feature_list_wrapper cs_mb_28">
-                  <div>
-                    <h3 className="cs_feature_title cs_fs_24 cs_normal cs_mb_16">Account & Support</h3>
-                    <ul className="cs_pricing_feature_list cs_mp_0">
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Unlimited users</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Unlimited connectors</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>CRM onboarding session</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="cs_feature_title cs_fs_24 cs_normal cs_mb_16">Platform Access</h3>
-                    <ul className="cs_pricing_feature_list cs_mp_0">
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Accountant access</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Limited invoicing</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Custom number of users</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Up to 5 projects collaborations</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <a href="contact.html" aria-label="Buy service button" className="text-center cs_btn cs_style_1 cs_center cs_fs_14 cs_bold cs_heading_color text-uppercase">
-                  <span>GET STARTED NOW</span>
-                  <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
-                </a>
-              </div>
-            </div>
-            <div className="col-lg-6">
-              <div className="cs_pricing_table cs_style_2 cs_white_bg cs_radius_20 position-relative active">
-                <div className="cs_pricing_table_heading cs_mb_18 position-relative z-1">
-                  <div>
-                    <h2 className="cs_plan_title cs_fs_24 cs_semibold cs_mb_7">Standard Plan</h2>
-                    <p className="mb-0">Advanced features & reporting</p>
-                  </div>
-                  <div className="cs_price cs_fs_74 cs_semibold cs_heading_color cs_heading_font">$<span className="monthlyPrice">149</span><span className="yearlyPrice">189</span></div>
-                </div>
-                <div className="text-center cs_pricing_badge cs_heading_color cs_medium cs_theme_bg_4">Most Popular</div>
-                <div className="cs_separator cs_mb_24"></div>
-                <div className="cs_feature_list_wrapper cs_mb_28">
-                  <div>
-                    <h3 className="cs_feature_title cs_fs_24 cs_normal cs_mb_16">Account & Support</h3>
-                    <ul className="cs_pricing_feature_list cs_mp_0">
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Unlimited users</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Unlimited connectors</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>CRM onboarding session</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="cs_feature_title cs_fs_24 cs_normal cs_mb_16">Platform Access</h3>
-                    <ul className="cs_pricing_feature_list cs_mp_0">
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Accountant access</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Limited invoicing</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Custom number of users</span>
-                      </li>
-                      <li>
-                        <span className="cs_feature_icon"><i className="fa-solid fa-circle-check"></i></span>
-                        <span>Up to 5 projects collaborations</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <a href="contact.html" aria-label="Buy service button" className="text-center cs_btn cs_style_1 cs_center cs_fs_14 cs_bold cs_heading_color text-uppercase">
-                  <span>GET STARTED NOW</span>
-                  <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="cs_pricing_shape_3 position-absolute">
-            <img src={trashGroup2} alt="Vector image"/>
-          </div>
-          <div className="cs_pricing_shape_4 position-absolute">
-            <img src={vector8} alt="Vector image"/>   
-          </div>
-          <div className="cs_pricing_shape_5 position-absolute">
-            <img src={vector9} alt="Vector image" />
-          </div>
-        </div>
-        <div className="cs_height_120 cs_height_l g_80"></div>
-      </section>
       <div className="cs_counter cs_style_1 cs_type_1 cs_accent_bg" data-src="assets1/img/counter-bg-2.svg">
         <div className="container">
           <div className="row cs_gap_y_30">
             <div className="col-lg-3 col-sm-6">
               <div className="text-center cs_numberbox cs_center_column">
                 <div className="cs_counter_number cs_fs_48 cs_semibold cs_white_color cs_mb_10">
-                  <span className="odometer" data-count-to="16"></span>K+
+                  <span className="odometer" data-count-to="16">16</span>K+
                 </div>
                 <p className="mb-0 cs_fs_24 cs_white_color">Completed Our <br /> Projects</p>
               </div>
@@ -801,7 +681,7 @@ export default function Home() {
             <div className="col-lg-3 col-sm-6">
               <div className="text-center cs_numberbox cs_center_column">
                 <div className="cs_counter_number cs_fs_48 cs_semibold cs_white_color cs_mb_10">
-                  <span className="odometer" data-count-to="180"></span>+
+                  <span className="odometer" data-count-to="180">180</span>+
                 </div>
                 <p className="mb-0 cs_fs_24 cs_white_color">Our Expert Support <br /> Team Members</p>
               </div>
@@ -809,7 +689,7 @@ export default function Home() {
             <div className="col-lg-3 col-sm-6">
               <div className="text-center cs_numberbox cs_center_column">
                 <div className="cs_counter_number cs_fs_48 cs_semibold cs_white_color cs_mb_10">
-                  <span className="odometer" data-count-to="6"></span>K+
+                  <span className="odometer" data-count-to="6">6</span>K+
                 </div>
                 <p className="mb-0 cs_fs_24 cs_white_color">Our Worldwide <br /> Clients</p>
               </div>
@@ -817,7 +697,7 @@ export default function Home() {
             <div className="col-lg-3 col-sm-6">
               <div className="text-center cs_numberbox cs_center_column">
                 <div className="cs_counter_number cs_fs_48 cs_semibold cs_white_color cs_mb_10">
-                  <span className="odometer" data-count-to="35"></span>+
+                  <span className="odometer" data-count-to="35">35</span>+
                 </div>
                 <p className="mb-0 cs_fs_24 cs_white_color">We are Winning <br /> Awards</p>
               </div>
@@ -825,113 +705,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <section>
-        <div className="cs_height_120 cs_height_lg_80"></div>
-        <div className="container">
-          <div className="cs_card cs_style_1 cs_type_5">
-            <div className="row cs_gap_y_30">
-              <div className="col-lg-5 order-lg-2">
-                <a href="https://www.youtube.com/embed/HC-tgFdIcB0" aria-label="Click to play video" className="cs_video cs_style_1 cs_center cs_video_open cs_bg_filed cs_radius_15 position-relative" data-src={videoBg1}>
-                  <span className="cs_player_btn cs_style_1 cs_center cs_radius_100 cs_theme_bg_3 cs_white_color position-relative"><i className="fa-solid fa-play"></i></span>
-                  <div className="cs_vector_shape_5 position-absolute">
-                    <img src={vector10} alt="Vector shape"/>
-                  </div>
-                </a>
-                     
-              <div className="col-lg-7 order-lg-1">
-                <div className="cs_card_content">
-                  <div className="cs_section_heading cs_style_1 cs_mb_20">
-                    <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-                      <img src={star1} alt="Star icon"/>
-                      <span>Costumer Story</span>
-                      <img src={star1} alt="Star icon"/>
-                    </div>  
-                    <h2 className="mb-0 cs_section_title cs_fs_48 cs_semibold text-capitalize wow fadeInDown">How a certain consumer used a product successfully</h2>
-                  </div>  
-                  <p className="cs_card_desc cs_mb_51">CRM management is comprehensive contact management, allowing businesses to centralize and organize customer information for easy access.</p>
-                  <div className="cs_btns_group">
-                    <a href="#" aria-label="Get started button" className="cs_btn cs_style_1 cs_bg_1 cs_fs_14 cs_bold cs_white_color text-uppercase">
-                      <span>read costumer story </span>
-                      <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
-                    </a>
-                    <div className="cs_client_info_wrapper">
-                      <img src={customersGroup2} alt="Customers image"/>
-                      <div>
-                        <h3 className="mb-0 cs_fs_18 cs_normal">Happy Costumer</h3>
-                        <p className="mb-0"><span className="cs_theme_ color_5"><i className="fa-solid fa-star"></i></span> 3.5(10k Review)</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="cs_slider cs_style_1 cs_slider_gap_30 position-relative">
-        <div className="cs_height_120 cs_height_lg_80"></div>
-        <div className="container">
-          <div className="cs_testimonial_slider_wrapper cs_radius_20 position-relative">
-            <div className="cs_section_heading cs_style_1 cs_mb_10">
-              <h2 className="mb-0 cs_section_title cs_fs_24 cs_normal">Clients Feedback</h2>
-            </div>
-            <div className="cs_slider_container" data-autoplay="0" data-loop="1" data-speed="600" data-center="0" data-variable-width="0" data-slides-per-view="responsive" data-xs-slides="1" data-sm-slides="1" data-md-slides="1" data-lg-slides="1" data-add-slides="1">
-              <div className="cs_slider_wrapper">
-                <div className="cs_slide">
-                  <div className="cs_testimonial cs_style_2">
-                    <div className="cs_testimonial_heading cs_mb_10">
-                      <span className="cs_quote_icon cs_center cs_white_bg cs_radius_100">
-                        <img src={quoteIcon} alt="Quote icon"/>
-                      </span>
-                      <div className="cs_rating" data-rating="5">
-                        <div className="cs_rating_percentage" ></div>
-                      </div>
-                    </div>
-                    <blockquote>This is why having reviews and client testimonials is so important for your business. So, in this article,  go over some client testimonial examples you should be aware of and how you can go about gathering those testimonials for yourself. This is why having reviews and client testimonials is so important for your business. So, in this article, we'll go over some client testimonial</blockquote>
-                    <div className="cs_avatar cs_style_1">
-                      <span className="cs_avatar_icon cs_center cs_radius_100">
-                        <img src={avatar5} alt="Avatar"/>
-                      </span>
-                      <div className="cs_avatar_info">
-                        <h3 className="mb-0 cs_fs_20 cs _semibold">Juliana Rose</h3>
-                        <p className="mb-0 cs_fs_14">Marketing Manager</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="cs_slide">
-                  <div className="cs_testimonial cs_style_2">
-                    <div className="cs_testimonial_heading cs_mb_10">
-                      <span className="cs_quote_icon cs_center cs_white_bg cs_radius_100">
-                        <img src={quoteIcon} alt="Quote icon"/>
-                      </span>
-                      <div className="cs_rating" data-rating="5">
-                        <div className="cs_rating_percentage" ></div>
-                      </div>
-                    </div>
-                    <blockquote>This is why having reviews and client testimonials is so important for your business. So, in this article,  go over some client testimonial examples you should be aware of and how you can go about gathering those testimonials for yourself. This is why having reviews and client testimonials is so important for your business. So, in this article, we'll go over some client testimonial</blockquote>
-                    <div className="cs_avatar cs_style_1">
-                      <span className="cs_avatar_icon cs_center cs_radius_100">
-                        <img src={avatar6} alt="Avatar"/>
-                      </span>
-                      <div className="cs_avatar_info">
-                        <h3 className="mb-0 cs_fs_20 cs _semibold">Anjelina Rose</h3>
-                        <p className="mb-0 cs_fs_14">UI/UX Designer</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="cs_slider_arrows cs_style_1">
-                <div className="cs_right_arrow rounded-circle cs_center cs_white_bg cs_theme_color_2 slick-arrow">
-                  <i className="fa-solid fa-chevron-right"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="cs_height_120 cs_height_lg_80"></div>
-      </section>
 
       <section className="cs_gray_bg_2">
         <div className="cs_height_120 cs_height_lg_80"></div>
@@ -940,86 +713,86 @@ export default function Home() {
             <div className="cs_toolset_logos">
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={slackIcon} alt="Slack icon"/>
+                  <img src={slackIcon} alt="Slack icon" />
                 </span>
                 <p className="mb-0 cs_medium">Slack</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={dropboxIcon} alt="Dropbox icon"/>
+                  <img src={dropboxIcon} alt="Dropbox icon" />
                 </span>
                 <p className="mb-0 cs_medium">Dropbox</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={linkedinIcon} alt="LinkedIn icon"/>
+                  <img src={linkedinIcon} alt="LinkedIn icon" />
                 </span>
                 <p className="mb-0 cs_medium">LinkedIn</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={hubspotIcon} alt="Hubspot icon"/>
+                  <img src={hubspotIcon} alt="Hubspot icon" />
                 </span>
                 <p className="mb-0 cs_medium">Hubspot</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={whatsappIcon} alt="Whatsapp icon"/>
+                  <img src={whatsappIcon} alt="Whatsapp icon" />
                 </span>
                 <p className="mb-0 cs_medium">Whatsapp</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={discordIcon} alt="Discord icon"/>
+                  <img src={discordIcon} alt="Discord icon" />
                 </span>
                 <p className="mb-0 cs_medium">Discord</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={zoomIcon} alt="Zoom icon"/>
+                  <img src={zoomIcon} alt="Zoom icon" />
                 </span>
                 <p className="mb-0 cs_medium">Zoom</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={githubIcon} alt="Github icon"/>
+                  <img src={githubIcon} alt="Github icon" />
                 </span>
                 <p className="mb-0 cs_medium">Github</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={mailchimpIcon} alt="Mailchimp icon"/>
+                  <img src={mailchimpIcon} alt="Mailchimp icon" />
                 </span>
                 <p className="mb-0 cs_medium">Mailchimp</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={shopifyIcon} alt="Shopify icon"/>
+                  <img src={shopifyIcon} alt="Shopify icon" />
                 </span>
                 <p className="mb-0 cs_medium">Shopify</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={googledriveIcon} alt="Google Drive icon"/>
+                  <img src={googledriveIcon} alt="Google Drive icon" />
                 </span>
                 <p className="mb-0 cs_medium">Google Drive</p>
-              </div>  
+              </div>
               <div className="text-center cs_iconbox cs_style_3 cs_center_column cs_white_bg cs_radius_16">
                 <span className="cs_iconbox_icon cs_mb_14">
-                  <img src={notionIcon} alt="Notion icon"/>
+                  <img src={notionIcon} alt="Notion icon" />
                 </span>
                 <p className="mb-0 cs_medium">Notion</p>
-              </div>  
+              </div>
             </div>
             <div className="text-center cs_toolset_text">
               <div className="cs_section_heading cs_style_1 cs_mb_20">
                 <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-                  <img src={star1} alt="Star icon"/>
+                  <img src={star1} alt="Star icon" />
                   <span>Our Toolset</span>
-                  <img src={star1} alt="Star icon"/>
-                </div>  
+                  <img src={star1} alt="Star icon" />
+                </div>
                 <h2 className="mb-0 cs_section_title cs_fs_48 cs_semibold text-capitalize wow fadeInUp">Technologies Behind Our Solutions.</h2>
-              </div>  
+              </div>
               <p className="cs_card_desc cs_mb_51">All the generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
               <a href="integrations.html" aria-label="Integrations page link" className="cs_btn cs_style_1 cs_bg_1 cs_fs_14 cs_bold cs_white_color text-uppercase">
                 <span>See all integrations</span>
@@ -1030,216 +803,12 @@ export default function Home() {
           <div className="cs_height_120 cs_height_lg_80"></div>
         </div>
       </section>
-      <section className="cs_slider cs_style_1 cs_slider_gap_30 position-relative">
-        <div className="cs_height_120 cs_height_lg_80"></div>
-        <div className="container">
-          <div className="cs_section_heading cs_style_1 cs_type_1 cs_mb_60">
-            <div className="cs_section_heading_left">
-              <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
-                <img src={star1} alt="Star icon"/>
-                <span>Blog & Articles</span>
-                <img src={star1} alt="Star icon"/>
-              </div>  
-              <h2 className="mb-0 cs_section_title cs_fs_48 cs_semibold wow fadeInDown">News & Blog Insight Insights</h2>
-            </div>  
-            <div className="cs_section_heading_right">
-              <div className="cs_slider_arrows cs_style_1 cs_type_1">
-                <div className="cs_left_arrow rounded-circle cs_center cs_white_bg cs_heading_color slick-arrow">
-                  <i className="fa-solid fa-arrow-left"></i>
-                </div>
-                <div className="cs_right_arrow rounded-circle cs_center cs_white_bg cs_heading_color slick-arrow">
-                  <i className="fa-solid fa-arrow-right"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="cs_slider_container" data-autoplay="0" data-loop="1" data-speed="600" data-center="0" data-variable-width="0" data-slides-per-view="responsive" data-xs-slides="1" data-sm-slides="2" data-md-slides="2" data-lg-slides="3" data-add-slides="3">
-            <div className="cs_slider_wrapper">
-              <div className="cs_slide">
-                <article className="cs_post cs_style_1 cs_type_1 cs_radius_20">
-                  <a href="blog-details.html" aria-label="Reading details post link" className="overflow-hidden cs_post_thumbnail cs_mb_15 position-relative">
-                    <img src={postImg4} alt="Post image"/>
-                    <span className="cs_post_category cs_heading_bg cs_fs_14 cs_medium cs_white_color position-absolute">Development</span>
-                  </a>
-                  <div className="cs_post_content">   
-                    <div className="cs_post_meta_wrapper cs_mb_12">
-                      <div className="cs_post_meta">
-                        <span><i className="fa-regular fa-user"></i></span>
-                        <span>Adam Smith</span>
-                      </div>
-                      <div className="cs_post_meta">
-                        <span><i className="fa-solid fa-calendar-days"></i></span>
-                        <span>11 Jan, 2025</span>
-                      </div>
-                    </div>
-                    <h3 className="cs_post_title cs_fs_24 cs_semibold cs_mb_13"><a href="blog-details.html" aria-label="Reading details post link">How to Comprehensive at SaaS Developments.</a></h3>
-                    <a href="blog-details.html" aria-label="Reading details post link" className="cs_post_btn cs_heading_color">
-                      <span>Learn More</span>
-                      <span><i className="fa-solid fa-arrow-right"></i></span>
-                    </a>
-                  </div>
-                </article>
-              </div>
-              <div className="cs_slide">
-                <article className="cs_post cs_style_1 cs_type_1 cs_radius_20">
-                  <a href="blog-details.html" aria-label="Reading details post link" className="overflow-hidden cs_post_thumbnail cs_mb_15 position-relative">
-                    <img src={postImg5} alt="Post image"/>
-                    <span className="cs_post_category cs_fs_14 cs_medium cs_heading_bg cs_white_color position-absolute">Technology</span>
-                  </a>
-                  <div className="cs_post_content">   
-                    <div className="cs_post_meta_wrapper cs_mb_12">
-                      <div className="cs_post_meta">
-                        <span><i className="fa-regular fa-user"></i></span>
-                        <span>Adam Smith</span>
-                      </div>
-                      <div className="cs_post_meta">
-                        <span><i className="fa-solid fa-calendar-days"></i></span>
-                        <span>11 Jan, 2025</span>
-                      </div>
-                    </div>
-                    <h3 className="cs_post_title cs_fs_24 cs_semibold cs_mb_13"><a href="blog-details.html" aria-label="Reading details post link">6 Essential Tips for Big Commerce Stores</a></h3>
-                    <a href="blog-details.html" aria-label="Reading details post link" className="cs_post_btn cs_heading_color">
-                      <span>Learn More</span>
-                      <span><i className="fa-solid fa-arrow-right"></i></span>
-                    </a>
-                  </div>
-                </article>
-              </div>
-              <div className="cs_slide">
-                <article className="cs_post cs_style_1 cs_type_1 cs_radius_20">
-                  <a href="blog-details.html" aria-label="Reading details post link" className="overflow-hidden cs_post_thumbnail cs_mb_15 position-relative">
-                    <img src={postImg6} alt="Post image"/>
-                    <span className="cs_post_category cs_heading_bg cs_fs_14 cs_medium cs_white_color position-absolute">Marketing</span>
-                  </a>
-                  <div className="cs_post_content">   
-                    <div className="cs_post_meta_wrapper cs_mb_12">
-                      <div className="cs_post_meta">
-                        <span><i className="fa-regular fa-user"></i></span>
-                        <span>Adam Smith</span>
-                      </div>
-                      <div className="cs_post_meta">
-                        <span><i className="fa-solid fa-calendar-days"></i></span>
-                        <span>11 Jan, 2025</span>
-                      </div>
-                    </div>
-                    <h3 className="cs_post_title cs_fs_24 cs_semibold cs_mb_13"><a href="blog-details.html" aria-label="Reading details post link">Empowering Startups & Small Businesses</a></h3>
-                    <a href="blog-details.html" aria-label="Reading details post link" className="cs_post_btn cs_heading_color">
-                      <span>Learn More</span>
-                      <span><i className="fa-solid fa-arrow-right"></i></span>
-                    </a>
-                  </div>
-                </article>
-              </div>
-              <div className="cs_slide">
-                <article className="cs_post cs_style_1 cs_type_1 cs_radius_20">
-                  <a href="blog-details.html" aria-label="Reading details post link" className="overflow-hidden cs_post_thumbnail cs_mb_15 position-relative">
-                    <img src={postImg1} alt="Post image"/>
-                    <span className="cs_post_category cs_heading_bg cs_fs_14 cs_medium cs_white_color position-absolute">Development</span>
-                  </a>
-                  <div className="cs_post_content">   
-                    <div className="cs_post_meta_wrapper cs_mb_12">
-                      <div className="cs_post_meta">
-                        <span><i className="fa-regular fa-user"></i></span>
-                        <span>Adam Smith</span>
-                      </div>
-                      <div className="cs_post_meta">
-                        <span><i className="fa-solid fa-calendar-days"></i></span>
-                        <span>11 Jan, 2025</span>
-                      </div>
-                    </div>
-                    <h3 className="cs_post_title cs_fs_24 cs_semibold cs_mb_13"><a href="blog-details.html" aria-label="Reading details post link">How to Comprehensive at SaaS Developments.</a></h3>
-                    <a href="blog-details.html" aria-label="Reading details post link" className="cs_post_btn cs_heading_color">
-                      <span>Learn More</span>
-                      <span><i className="fa-solid fa-arrow-right"></i></span>
-                    </a>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="cs_height_120 cs_height_lg_80"></div>
-      </section>
-      <footer className="cs_footer cs_style_1 cs_type_1 cs_accent_bg cs_bg_filed cs_white_color" data-src={footerBg2}>
-        <div className="cs_height_130 cs_height_lg_80"></div>
-        <div className="container">
-          <div className="cs_footer_top position-relative">
-            <ul className="cs_location_list cs_mp_0">
-              <li>
-                <span className="cs_location_icon cs_center cs_theme_color_4 cs_radius_100">
-                  <i className="fa-solid fa-phone-volume"></i></span>
-                <a href="tel:01233337689" aria-label="Make a call link">0123-333-7689</a>
-              </li>
-              <li>
-                <span className="cs_location_icon cs_center cs_theme_color_4 cs_radius_100">
-                  <i className="fa-solid fa-envelope"></i></span>
-                <a href="mailto:info@example.com" aria-label="Send mail link">info@example.com</a>
-              </li>
-              <li>
-                <span className="cs_location_icon cs_center cs_theme_color_4 cs_radius_100">
-                  <i className="fa-solid fa-location-dot"></i></span>
-                <p className="mb-0">5919 Trussville Crossings Pkwy, United States.</p>
-              </li>
-            </ul>
-          </div>
-          <div className="cs_footer_main">
-            <div className="cs_footer_widget_wrapper">
-              <div className="cs_footer_widget cs_text_widget">
-                <div className="cs_brand cs_mb_32">
-                  <img src={logo2} alt="Logo"/>
-                </div>
-                <p className="cs_mb_32">It involves the use of CRM software and strategies to effectively manage customer relationships, improve customer satisfaction, and drive business growth.</p>
-                <div className="cs_social_lin ks cs_style_1 cs_heading_color">
-                  <a href="#" aria-label="Social link"><i className="fa-brands fa-facebook-f"></i></a>
-                  <a href="#" aria-label="Social link"><i className="fa-brands fa-linkedin-in"></i></a>
-                  <a href="#" aria-label="Social link"><i className="fa-brands fa-instagram"></i></a>
-                  <a href="#" aria-label="Social link"><i className="fa-brands fa-x-twitter"></i></a>
-                  <a href="#" aria-label="Social link"><i className="fa-brands fa-youtube"></i></a>
-                </div>
-              </div>
-              <div className="cs_footer_widget cs_links_widget">
-                <h3 className="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_29">Our Product</h3>
-                <ul className="cs_footer_menu cs_mp_0">
-                  <li><a href="project-details.html" aria-label="Project details page link">Product Overview</a></li>
-                  <li><a href="pricing.html" aria-label="Pricing page link">Pricing</a></li>
-                  <li><a href="services.html" aria-label="Services page link">Services</a></li>
-                  <li><a href="integrations.html" aria-label="Integrations page link">Integrations</a></li>
-                  <li><a href="#" aria-label="Security page link">Security</a></li>
-                </ul>
-              </div>
-              <div className="cs_footer_widget cs_help_widget">
-                <h3 className="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_29">Our Company</h3>
-                <ul className="cs_footer_menu cs_mp_0">
-                  <li><a href="about-us.html" aria-label="About page link">About Us</a></li>
-                  <li><a href="team.html" aria-label="Team page link">Leadership Team</a></li>
-                  <li><a href="contact.html" aria-label="Contact page link">Careers</a></li>
-                  <li><a href="blog.html" aria-label="Blog page link">Press</a></li>
-                </ul>
-              </div>
-              <div className="cs_footer_widget cs_contact_widget">
-                <h3 className="cs_footer_widget_title cs_fs_24 cs_semibold cs_white_color cs_mb_29">Resources</h3>
-                <ul className="cs_footer_menu cs_mp_0">
-                  <li><a href="blog.html" aria-label="Blog page link">Blog</a></li>
-                  <li><a href="#" aria-label="Events page link">Events</a></li>
-                  <li><a href="#" aria-label="Support page link">Support Center</a></li>
-                  <li><a href="#" aria-label="Demo page link">Get Demo</a></li>
-                  <li><a href="#" aria-label="Forum page link">Community Forums</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="cs_footer_bottom position-relative">
-          <div className="container">
-            <div className="text-center cs_footer_text cs_white_color">Copyright &copy; <span className="cs_getting_year"></span> Saaso theme by Themeservices</div>
-          </div>
-        </div>
-      </footer>
+
       <button type="button" aria-label="Scroll to top button" className="cs_scrollup cs_purple_bg cs_white_color cs_radius_100">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 10L1.7625 11.7625L8.75 4.7875V20H11.25V4.7875L18.225 11.775L20 10L10 0L0 10Z" fill="currentColor"/>
+          <path d="M0 10L1.7625 11.7625L8.75 4.7875V20H11.25V4.7875L18.225 11.775L20 10L10 0L0 10Z" fill="currentColor" />
         </svg>
       </button>
-           
+    </>
   );
 }

@@ -93,7 +93,7 @@ const pvtLtdPlans = [
         cashbackText: "Get ₹1000 cashback* on opening a current account. (EMI available)",
     },
     {
-        title: "Zolvit Premium",
+        title: "BisFilling Premium",
         price: "Starting from ₹50,000",
         originalPrice: "",
         discountText: null,

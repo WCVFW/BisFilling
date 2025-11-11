@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 
 /* ---------------------- Pages ---------------------- */
 import Home from "./pages/Home";
@@ -36,33 +36,15 @@ import EmployeeHomePage from "./pages/Dashboard/EmployeeHomePage";
 import AdminHome from "./pages/Dashboard/AdminHome";
 
 /* ---------------------- Admin Modules ---------------------- */
-const AdminEmployees = React.lazy(() =>
-  import("./pages/Dashboard/AdminEmployees")
-);
-const AdminAttendance = React.lazy(() =>
-  import("./pages/Dashboard/AdminAttendance")
-);
-const AdminPerformance = React.lazy(() =>
-  import("./pages/Dashboard/AdminPerformance")
-);
-const AdminCustomerLifecycle = React.lazy(() =>
-  import("./pages/Dashboard/AdminCustomerLifecycle")
-);
-const AdminSalesReports = React.lazy(() =>
-  import("./pages/Dashboard/AdminSalesReports")
-);
-const AdminSettings = React.lazy(() =>
-  import("./pages/Dashboard/AdminSettings")
-);
-const AdminLeadReport = React.lazy(() =>
-  import("./pages/Dashboard/AdminLeadReport")
-);
-const AdminDealReport = React.lazy(() =>
-  import("./pages/Dashboard/AdminDealReport")
-);
-const AdminEmployeeAttendanceReport = React.lazy(() =>
-  import("./pages/Dashboard/AdminEmployeeAttendanceReport")
-);
+const AdminEmployees = React.lazy(() => import("./pages/Dashboard/AdminEmployees"));
+const AdminAttendance = React.lazy(() => import("./pages/Dashboard/AdminAttendance"));
+const AdminPerformance = React.lazy(() => import("./pages/Dashboard/AdminPerformance"));
+const AdminCustomerLifecycle = React.lazy(() => import("./pages/Dashboard/AdminCustomerLifecycle"));
+const AdminSalesReports = React.lazy(() => import("./pages/Dashboard/AdminSalesReports"));
+const AdminSettings = React.lazy(() => import("./pages/Dashboard/AdminSettings"));
+const AdminLeadReport = React.lazy(() => import("./pages/Dashboard/AdminLeadReport"));
+const AdminDealReport = React.lazy(() => import("./pages/Dashboard/AdminDealReport"));
+const AdminEmployeeAttendanceReport = React.lazy(() => import("./pages/Dashboard/AdminEmployeeAttendanceReport"));
 
 /* ---------------------- Components ---------------------- */
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -76,15 +58,15 @@ import CheckoutModal from "./components/CheckoutModal";
 import { initAuth, getUser, clearAuth } from "./lib/auth";
 
 /* ===============================
- 🔹 MAIN APP COMPONENT
- =============================== */
+ 🔹 MAIN APP COMPONENT
+ =============================== */
 export default function App() {
   const [user, setUser] = useState(null);
   const [pageLoading, setPageLoading] = useState(false);
-
   const location = useLocation();
+  const navigate = useNavigate(); // ✅ React Router navigation
 
-  // Initialize auth state
+  /* ---------------------- Auth Initialization ---------------------- */
   useEffect(() => {
     const u = initAuth();
     setUser(u);
@@ -94,41 +76,49 @@ export default function App() {
     return () => window.removeEventListener("auth:update", handler);
   }, []);
 
-  // Global logout function - clears all auth data
+  /* ---------------------- Logout Function ---------------------- */
   const logout = () => {
-    clearAuth(); // Clears token, user, and legacy token keys
+    clearAuth();
     setUser(null);
     window.dispatchEvent(new Event("auth:update"));
-    // Redirect to home and refresh page after logout
-    setTimeout(() => {
-      window.location.href = '/';
-      window.location.reload();
-    }, 100);
+    navigate("/", { replace: true }); // ✅ Smooth redirect without reload
   };
 
-  // Page loading effect
+  /* ---------------------- Page Loading Animation ---------------------- */
   useEffect(() => {
     setPageLoading(true);
     const timer = setTimeout(() => setPageLoading(false), 300);
     return () => clearTimeout(timer);
   }, [location]);
 
-  // Hide header/footer on certain pages
+  /* ---------------------- Layout Visibility ---------------------- */
   const hideLayout =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
     location.pathname === "/ConsultanExpert/talkToIP" ||
     location.pathname.startsWith("/dashboard");
 
-  // Make homepage full width, other pages use the centered container
+  /* ---------------------- Full Width Logic ---------------------- */
   const isHome = location.pathname === "/";
+  const isDashboard = location.pathname.startsWith("/dashboard");
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900">
       <PageLoader show={pageLoading} />
+
+      {/* Header should not show on Dashboard or Auth pages */}
       {!hideLayout && <Header user={user} logout={logout} />}
 
-      <main className={isHome ? "flex-1 w-full" : "container flex-1 mx-auto"}>
+      {/* MAIN CONTENT AREA */}
+      <main
+        className={
+          isDashboard
+            ? "flex-1 w-full" // ✅ Full-width for dashboard
+            : isHome
+            ? "flex-1 w-full"
+            : "container flex-1 mx-auto px-4"
+        }
+      >
         <Routes>
           {/* ---------------------- Public Pages ---------------------- */}
           <Route path="/" element={<Home />} />
@@ -182,17 +172,80 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<AdminHome/>} />
-            <Route path="employees" element={<React.Suspense fallback={<ServiceLoader />}><AdminEmployees /></React.Suspense>} />
-            <Route path="attendance" element={<React.Suspense fallback={<ServiceLoader />}><AdminAttendance /></React.Suspense>} />
-            <Route path="performance" element={<React.Suspense fallback={<ServiceLoader />}><AdminPerformance /></React.Suspense>} />
-            <Route path="customers" element={<React.Suspense fallback={<ServiceLoader />}><AdminCustomerLifecycle /></React.Suspense>} />
-            <Route path="sales-reports" element={<React.Suspense fallback={<ServiceLoader />}><AdminSalesReports /></React.Suspense>} />
-            <Route path="settings" element={<React.Suspense fallback={<ServiceLoader />}><AdminSettings /></React.Suspense>} />
+            <Route index element={<AdminHome />} />
+            <Route
+              path="employees"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminEmployees />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="attendance"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminAttendance />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="performance"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminPerformance />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="customers"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminCustomerLifecycle />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="sales-reports"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminSalesReports />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="settings"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminSettings />
+                </React.Suspense>
+              }
+            />
             <Route path="reports" element={<AdminReports />} />
-            <Route path="lead-report" element={<React.Suspense fallback={<ServiceLoader />}><AdminLeadReport /></React.Suspense>} />
-            <Route path="deal-report" element={<React.Suspense fallback={<ServiceLoader />}><AdminDealReport /></React.Suspense>} />
-            <Route path="employee-attendance-report" element={<React.Suspense fallback={<ServiceLoader />}><AdminEmployeeAttendanceReport /></React.Suspense>} />
+            <Route
+              path="lead-report"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminLeadReport />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="deal-report"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminDealReport />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="employee-attendance-report"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminEmployeeAttendanceReport />
+                </React.Suspense>
+              }
+            />
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="profile" element={<MyAccount />} />
           </Route>
@@ -206,13 +259,13 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            {/* <Route index element={<EmployeeHomePage />} /> */}
+            <Route index element={<EmployeeHomePage />} />
             <Route path="assigned" element={<EmployeeTasksPage />} />
             <Route path="task/:orderId" element={<OrderDetailPage />} />
             <Route path="profile" element={<MyAccount />} />
           </Route>
 
-          {/* ---------------------- Public Order Detail (non-dashboard) ---------------------- */}
+          {/* ---------------------- Public Order Detail ---------------------- */}
           <Route
             path="/orders/:id"
             element={
@@ -227,15 +280,17 @@ export default function App() {
         </Routes>
       </main>
 
+      {/* Footer hidden on dashboard/auth pages */}
       {!hideLayout && <Footer />}
+
       <CheckoutModal />
     </div>
   );
 }
 
 /* ===============================
- 🔹 ROLE-BASED DASHBOARD ROUTER
- =============================== */
+ 🔹 ROLE-BASED DASHBOARD ROUTER
+ =============================== */
 function DashboardRouter({ user }) {
   if (!user) return <DashboardIndex />;
 

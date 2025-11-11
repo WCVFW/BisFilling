@@ -626,7 +626,7 @@ export default function PartnershipLandingPageDesign() {
                         Right Plan for Your Business
                     </h2>
                     <p className="text-sm sm:text-lg text-gray-600 mb-8 sm:mb-10 text-center">
-                        Zolvit provides expert assistance for partnership registration, ensuring compliance and business support.
+                        BisFilling provides expert assistance for partnership registration, ensuring compliance and business support.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">

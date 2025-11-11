@@ -89,7 +89,7 @@ const llpPlans = [
         isRecommended: false,
         isPremium: true, // Designating this as the premium tier for styling
         govtFeeNote: "+ Govt. Fee",
-        cashbackText: "Split payment by 3 with Zolvit Flex", // Using the unique text as the primary callout
+        cashbackText: "Split payment by 3 with BisFilling Flex", // Using the unique text as the primary callout
     },
     // The source text only shows 3 tiers, so we'll stick to 3.
 ];
