@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets1/img/logo.png";
+import logo from "../assets1/img/Logo.png";
 import headerShape from "../assets1/img/header-shape.svg";
 import { User } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -130,7 +130,7 @@ export default function Header({ user, logout }) {
                   >
                     {user.profileImagePath ? (
                       <img
-                        src={`/api/uploads/profile-images/${user.profileImagePath}`}
+                        src={`/uploads/profile-images/${user.profileImagePath}`}
                         alt="Profile"
                         className="object-cover w-full h-full"
                       />

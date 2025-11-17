@@ -26,6 +26,7 @@ const AdminLayout = ({ children, logout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [userName, setUserName] = useState("Admin");
+  const [userProfileImage, setUserProfileImage] = useState(null);
   const location = useLocation();
 
   // ✅ Load user info once
@@ -36,6 +37,9 @@ const AdminLayout = ({ children, logout }) => {
       const name =
         user.fullName || user.name || user.email?.split("@")[0] || "Admin";
       setUserName(name);
+      if (user.profileImagePath) {
+        setUserProfileImage(`/uploads/profile-images/${user.profileImagePath}`);
+      }
     }
   }, []);
 
@@ -95,16 +99,24 @@ const AdminLayout = ({ children, logout }) => {
         <div className="relative flex flex-col items-center -mt-8 pb-4">
           {/* Avatar Circle */}
           <div
-            className={`rounded-full bg-[#0189BB] flex items-center justify-center border-4 border-white shadow-md transition-all duration-300
+            className={`rounded-full bg-[#0189BB] flex items-center justify-center border-4 border-white shadow-md transition-all duration-300 overflow-hidden
               ${isSidebarExpanded ? "w-20 h-20" : "w-12 h-12"}
             `}
           >
-            <User
-              color="white"
-              strokeWidth={1.5}
-              className={`transition-all duration-300 ${isSidebarExpanded ? "w-9 h-9" : "w-6 h-6"
-                }`}
-            />
+            {userProfileImage ? (
+              <img
+                src={userProfileImage}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <User
+                color="white"
+                strokeWidth={1.5}
+                className={`transition-all duration-300 ${isSidebarExpanded ? "w-9 h-9" : "w-6 h-6"
+                  }`}
+              />
+            )}
           </div>
 
           {/* 🧑 User Name Below Circle (Dynamic) */}

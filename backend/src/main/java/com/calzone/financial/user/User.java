@@ -1,13 +1,27 @@
 package com.calzone.financial.user;
 
-import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity(name = "com_calzone_financial_user_User")
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(name = "uk_users_email", columnNames = "email"))
@@ -50,8 +64,13 @@ public class User implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    // Stores the path or filename of the uploaded profile image
-    private String profileImagePath;
+    // Stores the binary data of the profile image
+    @Lob
+    @Column(name = "profile_image", columnDefinition="LONGBLOB")
+    private byte[] profileImage;
+
+    // Stores the content type (e.g., "image/png") of the profile image
+    private String profileImageType;
 
     // ===================
     // Lifecycle hooks
@@ -67,7 +86,6 @@ public class User implements UserDetails {
         if (passwordHash == null) passwordHash = ""; // ensure DB NOT NULL column is satisfied
         if (phoneVerified == null) phoneVerified = false;
         if (address == null) address = "";
-        if (profileImagePath == null) profileImagePath = "";
     }
 
     @PreUpdate
@@ -139,8 +157,14 @@ public class User implements UserDetails {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
-    public String getProfileImagePath() { return profileImagePath; }
-    public void setProfileImagePath(String profileImagePath) { this.profileImagePath = profileImagePath; }
+    public byte[] getProfileImage() { return profileImage; }
+    public void setProfileImage(byte[] profileImage) { this.profileImage = profileImage; }
+
+    public String getProfileImageType() { return profileImageType; }
+    public void setProfileImageType(String profileImageType) { this.profileImageType = profileImageType; }
+
+    // Helper to check if an image exists, used in DTOs
+    public boolean hasProfileImage() { return this.profileImage != null && this.profileImage.length > 0; }
 
     // ===================
     // Builder pattern
@@ -154,7 +178,6 @@ public class User implements UserDetails {
         private String email;
         private String phone;
         private String password;
-        private String profileImagePath;
         private Boolean emailVerified = false; // Add emailVerified to Builder
 
         public Builder fullName(String fullName) {
@@ -177,11 +200,6 @@ public class User implements UserDetails {
             return this;
         }
 
-        public Builder profileImagePath(String profileImagePath) {
-            this.profileImagePath = profileImagePath;
-            return this;
-        }
-
         public Builder emailVerified(Boolean emailVerified) { // Add emailVerified to Builder
            this.emailVerified = emailVerified;
            return this;
@@ -193,7 +211,6 @@ public class User implements UserDetails {
             user.setEmail(email);
             user.setPhone(phone);
             user.setPassword(password);
-            user.setProfileImagePath(profileImagePath);
             user.setEmailVerified(emailVerified);
             return user;
         }

@@ -68,8 +68,10 @@ export const authAPI = {
 // User APIs
 export const userAPI = {
     me: () => api.get("/api/user/me"),
+    all: () => api.get("/api/user/all"),
     // Ensure multipart/form-data is set when sending FormData with PUT
     update: (formData) => api.put("/api/user/me", formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    profileImage: () => api.get("/api/user/me/profile-image", { responseType: 'blob' }),
 };
 
 // Workflow APIs
@@ -164,10 +166,10 @@ export const paymentsAPI = {
 
 // Admin
 export const adminAPI = {
-    createEmployee: (payload) => api.post(`/api/admin/employees`, payload),
+    createEmployee: (formData) => api.post(`/api/admin/employees`, formData), // formData for file uploads
     listEmployees: () => api.get(`/api/admin/employees`),
     getEmployee: (id) => api.get(`/api/admin/employees/${id}`),
-    updateEmployee: (id, payload) => api.put(`/api/admin/employees/${id}`, payload),
+    updateEmployee: (id, formData) => api.put(`/api/admin/employees/${id}`, formData), // formData for file uploads
     deleteEmployee: (id) => api.delete(`/api/admin/employees/${id}`),
 };
 

@@ -13,7 +13,7 @@ export default function Account() {
     const [loading, setLoading] = useState(false);
     const [profileImageFile, setProfileImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
-    const [imageVersion, setImageVersion] = useState(Date.now());
+    const [profileImageUrl, setProfileImageUrl] = useState(null);
     const [message, setMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -23,14 +23,13 @@ export default function Account() {
             setForm({ fullName: user.fullName || user.name || "", phone: user.phone || "", password: "" });
         }
 
-        // Effect to clean up the object URL to prevent memory leaks
+        // Effect to clean up the object URLs to prevent memory leaks
         return () => {
-            if (imagePreview) {
-                URL.revokeObjectURL(imagePreview);
-            }
+            if (imagePreview) URL.revokeObjectURL(imagePreview);
+            if (profileImageUrl) URL.revokeObjectURL(profileImageUrl);
         };
-        // Re-run if user object or imagePreview (for cleanup) changes
-    }, [user, imagePreview]);
+        // Re-run if user object or previews change (for cleanup)
+    }, [user, imagePreview, profileImageUrl]);
 
     // Fetch fresh user data on mount (and handle 401 Unauthorized)
     useEffect(() => {
@@ -46,6 +45,7 @@ export default function Account() {
 
         (async () => {
             try {
+                // Fetch user text data
                 const r = await userAPI.me();
                 if (!mounted) return;
                 
@@ -58,11 +58,18 @@ export default function Account() {
                     phone: u.phone, 
                     role: initialAuth?.user?.role,
                     // Make sure to include the profileImagePath from the fetched data
-                    profileImagePath: u.profileImagePath 
+                    hasProfileImage: u.hasProfileImage 
                 };
                 
                 setLocalUser(userObj);
                 setAuth({ ...getAuth(), user: userObj }); // Update local storage with fresh data
+
+                // Fetch profile image data if it exists
+                if (u.hasProfileImage) {
+                    const imageResponse = await userAPI.profileImage();
+                    if (!mounted) return;
+                    setProfileImageUrl(URL.createObjectURL(imageResponse.data));
+                }
                 
             } catch (err) {
                 // Handle 401 and 403 similarly: clear session and redirect to login
@@ -125,21 +132,26 @@ export default function Account() {
                 email: updated.email, 
                 phone: updated.phone, 
                 role: initialAuth?.user?.role,
-                profileImagePath: updated.profileImagePath // Ensure backend sends this!
+                hasProfileImage: updated.hasProfileImage // Use the boolean flag from the backend
             };
             setLocalUser(userObj);
             setAuth({ ...getAuth(), user: userObj });
-            // bump image version to bust cache when backend returns a new image
-            setImageVersion(Date.now());
-            // revoke any local preview URL
+
+            // If a new image was uploaded, it will be the new profile image.
+            // We can use the local preview as the new source until a page refresh.
+            // We must be careful not to revoke the URL we are about to use.
             if (imagePreview) {
-                try { URL.revokeObjectURL(imagePreview); } catch (e) {}
+                // If there was an old database image, its URL can be revoked.
+                if (profileImageUrl) {
+                    try { URL.revokeObjectURL(profileImageUrl); } catch(e) {}
+                }
+                setProfileImageUrl(imagePreview);
+                setImagePreview(null); // The preview is now the main image, clear the preview state.
             }
 
             setEditing(false);
             setMessage(r.data.message || "Profile Saved.");
             setProfileImageFile(null); // Clear the selected file after successful upload
-            setImagePreview(null); // Clear the preview
             setForm((f) => ({ ...f, password: "" })); 
             
         } catch (err) {
@@ -222,7 +234,7 @@ export default function Account() {
                                 <img
                                     src={
                                         imagePreview || 
-                                        (user.profileImagePath ? `/uploads/profile-images/${user.profileImagePath}?v=${imageVersion}` : "https://via.placeholder.com/100?text=Avatar")
+                                        profileImageUrl || "https://via.placeholder.com/100?text=Avatar"
                                     }
                                     alt="Profile Preview"
                                     className="object-cover w-24 h-24 border-2 rounded-full border-slate-300"
@@ -302,9 +314,9 @@ export default function Account() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-6">
                             <div className="flex-shrink-0">
-                                {user.profileImagePath ? (
+                                {profileImageUrl ? (
                                     <img
-                                        src={`/uploads/profile-images/${user.profileImagePath}?v=${imageVersion}`}
+                                        src={profileImageUrl}
                                         alt="Profile"
                                         className="object-cover w-24 h-24 border-2 rounded-full border-slate-200"
                                     />

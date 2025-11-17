@@ -205,7 +205,7 @@ export default function UserDashboard() {
             > 
               {user?.profileImagePath ? (
                 <img
-                  src={`/api/uploads/profile-images/${user.profileImagePath}`}
+                  src={`/uploads/profile-images/${user.profileImagePath}`}
                   alt="Profile"
                   style={{
                     width: "100%",

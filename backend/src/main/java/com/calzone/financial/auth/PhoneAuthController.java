@@ -121,7 +121,8 @@ public class PhoneAuthController {
                 "fullName", user.getFullName(),
                 "email", user.getEmail(),
                 "phone", user.getPhone(),
-                "role", role
+                "role", role,
+                "profileImagePath", user.getProfileImage()
         );
         return ResponseEntity.ok(java.util.Map.of("token", token, "user", userMap));
     }

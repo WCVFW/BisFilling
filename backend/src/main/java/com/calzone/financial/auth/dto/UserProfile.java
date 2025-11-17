@@ -7,14 +7,14 @@ public class UserProfile {
     private String fullName;
     private String email;
     private String phone;
-    private String profileImagePath;
+    private boolean hasProfileImage; // Changed from String to boolean
 
-    public UserProfile(Long id, String fullName, String email, String phone, String profileImagePath) {
+    public UserProfile(Long id, String fullName, String email, String phone, boolean hasProfileImage) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
-        this.profileImagePath = profileImagePath;
+        this.hasProfileImage = hasProfileImage;
     }
 
     // Getters are needed for Spring to serialize this object to JSON
@@ -34,7 +34,7 @@ public class UserProfile {
         return phone;
     }
 
-    public String getProfileImagePath() {
-        return profileImagePath;
+    public boolean getHasProfileImage() { // Renamed getter for clarity
+        return hasProfileImage;
     }
 }
