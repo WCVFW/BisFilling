@@ -1,13 +1,11 @@
 package com.calzone.financial.user;
 
 import com.calzone.financial.auth.dto.UserProfile;
+import com.calzone.financial.storage.FileStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -17,10 +15,14 @@ public class UserController {
 
     private final com.calzone.financial.user.UserRepository userRepository;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
-    public UserController(com.calzone.financial.user.UserRepository userRepository, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
+    public UserController(com.calzone.financial.user.UserRepository userRepository,
+            org.springframework.security.crypto.password.PasswordEncoder passwordEncoder,
+            FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping("/me")
@@ -29,24 +31,33 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(401).body(Map.of("message", "Unauthenticated"));
         }
-        
+
         // Constructs the profile DTO from the authenticated user.
-        UserProfile profile = new UserProfile(user.getId(), user.getFullName(), user.getEmail(), user.getPhone());
+        UserProfile profile = new UserProfile(user.getId(), user.getFullName(), user.getEmail(), user.getPhone(), user.getProfileImagePath());
         return ResponseEntity.ok(profile);
     }
 
-    @PutMapping("/me") 
-    public ResponseEntity<?> updateMe(@AuthenticationPrincipal User user, @RequestBody Map<String, String> body) {
+    @PutMapping("/me")
+    public ResponseEntity<?> updateMe( // Changed from @RequestBody to @RequestParam
+            @AuthenticationPrincipal User user,
+            @RequestParam(value = "fullName", required = false) String fullName,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
+    ) {
         if (user == null) {
             return ResponseEntity.status(401).body(Map.of("message", "Unauthenticated"));
         }
 
-        String fullName = body.get("fullName");
-        String phone = body.get("phone");
-        String password = body.get("password");
-
         boolean changed = false;
-        
+
+        // Handle profile image update
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String imagePath = fileStorageService.store(profileImage);
+            user.setProfileImagePath(imagePath);
+            changed = true;
+        }
+
         if (fullName != null) {
             user.setFullName(fullName.trim());
             changed = true;
@@ -55,7 +66,7 @@ public class UserController {
             user.setPhone(phone.trim());
             changed = true;
         }
-        
+
         if (password != null && !password.isBlank()) {
             // IMPORTANT: Passwords must be encoded before saving.
             user.setPassword(passwordEncoder.encode(password));
@@ -67,7 +78,8 @@ public class UserController {
             userRepository.save(user);
         }
 
-        UserProfile profile = new UserProfile(user.getId(), user.getFullName(), user.getEmail(), user.getPhone());
+        // Return the same UserProfile DTO for consistency with the GET /me endpoint.
+        UserProfile profile = new UserProfile(user.getId(), user.getFullName(), user.getEmail(), user.getPhone(), user.getProfileImagePath());
         return ResponseEntity.ok(Map.of("user", profile, "message", "Profile updated successfully"));
     }
 }

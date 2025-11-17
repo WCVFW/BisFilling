@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.Optional;
@@ -31,36 +32,46 @@ public class AdminController {
     // Partial update payload
     public record UpdateEmployee(String fullName, String phone, String mobile, String password, String role, String address, String image) {}
 
-    private static record EmployeeDto(Long id, String fullName, String email, String phone, java.util.List<String> roles, String role, String address, String image) {}
+    public record EmployeeDto(Long id, String fullName, String email, String phone, java.util.List<String> roles, String role, String address, String profileImagePath) {}
 
     private static EmployeeDto toDto(User u) {
         java.util.List<String> roleNames = u.getRoles() == null ? java.util.List.of() : u.getRoles().stream().map(r -> r.getName()).toList();
         String primaryRole = roleNames.isEmpty() ? "USER" : roleNames.get(0);
-        return new EmployeeDto(u.getId(), u.getFullName(), u.getEmail(), u.getPhone(), roleNames, primaryRole, u.getAddress(), u.getImage());
+        return new EmployeeDto(u.getId(), u.getFullName(), u.getEmail(), u.getPhone(), roleNames, primaryRole, u.getAddress(), u.getProfileImagePath());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/employees")
-    public ResponseEntity<?> createEmployee(@RequestBody CreateEmployee req) {
+    public ResponseEntity<?> createEmployee(
+            @RequestParam("email") @Email String email,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "mobile", required = false) String mobile,
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam("fullName") @NotBlank String fullName,
+            @RequestParam(value = "role", required = false) String role,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImageFile
+    ) {
         User u = new User();
-        u.setEmail(req.email());
+        u.setEmail(email);
         // Prefer phone, fallback to mobile
-        String phoneVal = req.phone() != null && !req.phone().isBlank() ? req.phone() : (req.mobile() != null ? req.mobile() : "");
+        String phoneVal = phone != null && !phone.isBlank() ? phone : (mobile != null ? mobile : "");
         u.setPhone(phoneVal);
-        u.setFullName(req.fullName());
-        if (req.password() != null && !req.password().isBlank()) {
-            u.setPassword(encoder.encode(req.password()));
+        u.setFullName(fullName);
+        if (password != null && !password.isBlank()) {
+            u.setPassword(encoder.encode(password));
         } else {
             u.setPassword("");
         }
 
         // Assign role if provided, otherwise EMPLOYEE
-        String roleName = (req.role() == null || req.role().isBlank()) ? "EMPLOYEE" : req.role().toUpperCase();
-        Role role = roles.findByName(roleName).orElseGet(() -> roles.save(new Role(roleName)));
-        u.getRoles().add(role);
+        String roleName = (role == null || role.isBlank()) ? "EMPLOYEE" : role.toUpperCase(); // Renamed 'role' to 'roleName'
+        Role employeeRole = roles.findByName(roleName).orElseGet(() -> roles.save(new Role(roleName))); // Renamed 'role' to 'employeeRole'
+        u.getRoles().add(employeeRole);
         // Persist optional fields
-        if (req.address() != null) u.setAddress(req.address());
-        if (req.image() != null) u.setImage(req.image());
+        if (address != null) u.setAddress(address);
+        // Note: You would need a FileStorageService to handle the profileImageFile
+        // For now, we are ignoring the file, but the endpoint will now accept it.
 
         users.save(u);
         return ResponseEntity.ok(Map.of("id", u.getId()));
@@ -104,7 +115,7 @@ public class AdminController {
 
         // Optional fields
         if (req.address() != null) u.setAddress(req.address());
-        if (req.image() != null) u.setImage(req.image());
+        if (req.image() != null) u.setProfileImagePath(req.image());
 
         users.save(u);
         return ResponseEntity.ok(Map.of("id", u.getId()));

@@ -50,8 +50,8 @@ public class User implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    @Column(columnDefinition = "TEXT")
-    private String image;
+    // Stores the path or filename of the uploaded profile image
+    private String profileImagePath;
 
     // ===================
     // Lifecycle hooks
@@ -67,7 +67,7 @@ public class User implements UserDetails {
         if (passwordHash == null) passwordHash = ""; // ensure DB NOT NULL column is satisfied
         if (phoneVerified == null) phoneVerified = false;
         if (address == null) address = "";
-        if (image == null) image = "";
+        if (profileImagePath == null) profileImagePath = "";
     }
 
     @PreUpdate
@@ -139,8 +139,8 @@ public class User implements UserDetails {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
+    public String getProfileImagePath() { return profileImagePath; }
+    public void setProfileImagePath(String profileImagePath) { this.profileImagePath = profileImagePath; }
 
     // ===================
     // Builder pattern
@@ -154,6 +154,7 @@ public class User implements UserDetails {
         private String email;
         private String phone;
         private String password;
+        private String profileImagePath;
         private Boolean emailVerified = false; // Add emailVerified to Builder
 
         public Builder fullName(String fullName) {
@@ -176,6 +177,11 @@ public class User implements UserDetails {
             return this;
         }
 
+        public Builder profileImagePath(String profileImagePath) {
+            this.profileImagePath = profileImagePath;
+            return this;
+        }
+
         public Builder emailVerified(Boolean emailVerified) { // Add emailVerified to Builder
            this.emailVerified = emailVerified;
            return this;
@@ -187,6 +193,7 @@ public class User implements UserDetails {
             user.setEmail(email);
             user.setPhone(phone);
             user.setPassword(password);
+            user.setProfileImagePath(profileImagePath);
             user.setEmailVerified(emailVerified);
             return user;
         }

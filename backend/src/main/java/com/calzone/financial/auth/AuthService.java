@@ -2,7 +2,9 @@ package com.calzone.financial.auth;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.calzone.financial.storage.FileStorageService;
 import com.calzone.financial.email.EmailVerificationService;
 import com.calzone.financial.user.User;
 import com.calzone.financial.user.UserRepository;
@@ -16,19 +18,25 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
-    private final EmailVerificationService emailVerificationService; // Inject EmailVerificationService
+    private final EmailVerificationService emailVerificationService;
+    private final FileStorageService fileStorageService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder encoder, JwtService jwtService, EmailVerificationService emailVerificationService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder encoder, JwtService jwtService,
+            EmailVerificationService emailVerificationService, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.jwtService = jwtService;
         this.emailVerificationService = emailVerificationService;
+        this.fileStorageService = fileStorageService;
     }
 
-    public Map<String, Object> register(String email, String password, String fullName, String phone) {
+    public Map<String, Object> register(String email, String password, String fullName, String phone, MultipartFile profileImage) {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email exists");
         }
+
+        // Use the storage service to save the file and get its unique name
+        String imagePath = fileStorageService.store(profileImage);
 
         String hash = encoder.encode(password);
         User u = User.builder()
@@ -36,6 +44,7 @@ public class AuthService {
                 .password(hash)
                 .fullName(fullName)
                 .phone(phone)
+                .profileImagePath(imagePath)
                 .emailVerified(false) // Set emailVerified to false on registration
                 .build();
 
@@ -73,7 +82,8 @@ public class AuthService {
                 "fullName", u.getFullName(),
                 "email", u.getEmail(),
                 "phone", u.getPhone(),
-                "role", role
+                "role", role,
+                "profileImagePath", u.getProfileImagePath() // Ensure this is included
         ));
         return res;
     }
