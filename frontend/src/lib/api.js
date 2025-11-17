@@ -9,20 +9,19 @@ const api = axios.create({
     timeout: 10000,
 });
 
-import { clearToken, clearUser, getToken } from "./auth";
+import { getAuth, clearAuth } from "./auth";
 
 // Attach auth token to requests using the Interceptor (CORRECT)
 api.interceptors.request.use((config) => {
-    // Read token using getToken which validates length
-    const token = getToken();
+    // Read token from the unified auth object
+    const token = getAuth()?.token;
 
     if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
     } else {
         // Clear any stale session and notify if token is invalid
-        clearToken();
-        clearUser();
+        clearAuth();
         try { window.dispatchEvent(new Event('auth:update')); } catch (e) {}
         // Helpful dev warning when making API requests without a token
         if (import.meta.env.DEV && String(config.url || "").startsWith('/api')) {
@@ -40,8 +39,7 @@ api.interceptors.response.use(
             const status = error?.response?.status;
             if (status === 401 || status === 403) {
                 // Clear local session and notify other parts of the app
-                clearToken();
-                clearUser();
+                clearAuth();
                 try { window.dispatchEvent(new Event('auth:update')); } catch (e) {}
 
                 // Redirect the user to login (best-effort)
@@ -70,7 +68,8 @@ export const authAPI = {
 // User APIs
 export const userAPI = {
     me: () => api.get("/api/user/me"),
-    update: (payload) => api.put("/api/user/me", payload),
+    // Ensure multipart/form-data is set when sending FormData with PUT
+    update: (formData) => api.put("/api/user/me", formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
 // Workflow APIs
@@ -115,7 +114,7 @@ export const orderAPI = {
     addDocument: (orderId, file) => {
         const fd = new FormData();
         fd.append('file', file);
-        return api.post(`/api/orders/${orderId}/documents`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        return api.post(`/api/orders/${orderId}/documents`, fd);
     },
     listDocuments: (orderId) => api.get(`/api/orders/${orderId}/documents`),
     verifyDocument: (orderId, docId) => api.post(`/api/orders/${orderId}/documents/${docId}/verify`),
@@ -149,7 +148,7 @@ export const caseAPI = {
 // Documents / S3
 export const docsAPI = {
     // Upload file directly to server (stores in MySQL blob)
-    upload: (formData) => api.post(`/api/docs/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    upload: (formData) => api.post(`/api/docs/upload`, formData),
     // Download document bytes
     downloadDocument: (documentId) => api.get(`/api/docs/${documentId}/download`, { responseType: 'blob' }),
     listMyDocs: () => api.get(`/api/docs/my-docs`),

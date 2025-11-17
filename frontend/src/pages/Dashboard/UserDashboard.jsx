@@ -12,11 +12,12 @@ import {
   Menu,
   User,
 } from "lucide-react";
-import { clearAuth } from "../../lib/auth";
+import { clearAuth, getAuth } from "../../lib/auth";
 
 export default function UserDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [indicatorTop, setIndicatorTop] = useState(0);
+  const [user, setUser] = useState(null);
   const menuRef = useRef(null);
   const nav = useNavigate();
   const location = useLocation();
@@ -36,6 +37,11 @@ export default function UserDashboard() {
   };
 
   useEffect(() => {
+    // Fetch user data on component mount
+    const authData = getAuth();
+    if (authData?.user) {
+      setUser(authData.user);
+    }
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
@@ -196,8 +202,21 @@ export default function UserDashboard() {
                 cursor: "pointer",
                 transition: "transform 0.2s",
               }}
-            >
-              <User size={22} />
+            > 
+              {user?.profileImagePath ? (
+                <img
+                  src={`/api/uploads/profile-images/${user.profileImagePath}`}
+                  alt="Profile"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <User size={22} />
+              )}
             </button>
 
             {menuOpen && (

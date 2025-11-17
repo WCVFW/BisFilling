@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { orderAPI } from "@/lib/api"; // Assuming orderAPI is correctly configured
 import { CloudArrowUpIcon, CheckCircleIcon, CurrencyRupeeIcon, DocumentTextIcon, XCircleIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
-import { getUser } from "../../lib/auth";
+import { getAuth } from "../../lib/auth";
 export default function ServiceOrder() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -65,10 +65,14 @@ export default function ServiceOrder() {
     const createOrder = async () => {
         setLoading(true);
         try {
-            const user = getUser()
+            const authData = getAuth();
+            if (!authData?.user?.email) {
+                throw new Error("User not logged in or email is missing.");
+            }
+
             const r = await orderAPI.create({
                 serviceName: title,
-                customerEmail: user.email,
+                customerEmail: authData.user.email,
                 totalAmount: MOCK_PRICE
             });
             setOrder(r.data);

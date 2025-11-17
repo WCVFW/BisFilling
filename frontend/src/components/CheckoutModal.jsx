@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { orderAPI } from '../lib/api';
-import { getUser } from '../lib/auth';
+import { getAuth } from '../lib/auth';
 
 export default function CheckoutModal() {
   const [open, setOpen] = useState(false);
   const [service, setService] = useState(null);
   //const [email, setEmail] = useState('demo@demo.com');
   const [creating, setCreating] = useState(false);
-  const user = getUser(); // Get logged-in user
+  const authData = getAuth();
+  const user = authData?.user; // Get logged-in user
   const email = user ? user.email : ''; // Use user's email or empty string if not logged in
 
   useEffect(() => {

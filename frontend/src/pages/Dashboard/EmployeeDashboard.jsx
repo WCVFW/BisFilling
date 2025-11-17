@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { HiOutlineUser } from "react-icons/hi";
 import MyAccount from "../MyAccount";
-import { getUser, clearAuth } from "../../lib/auth";
+import { getAuth, clearAuth } from "../../lib/auth";
 
 const employeeNavItems = [
   { to: "/dashboard/employee", label: "Home", end: true },
@@ -15,8 +15,9 @@ export default function EmployeeDashboard() {
   const [user, setUser] = React.useState(null);
 
   React.useEffect(() => {
-    const u = getUser();
-    setUser(u);
+    const authData = getAuth();
+    const user = authData?.user;
+    setUser(user);
   }, []);
 
   const handleLogout = () => {

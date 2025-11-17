@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import logo from "../assets1/img/logo.png";
 import headerShape from "../assets1/img/header-shape.svg";
+import { User } from "lucide-react";
+import { Link } from "react-router-dom";
 
-export default function Header() {
+export default function Header({ user, logout }) {
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Scroll detection effect
   useEffect(() => {
@@ -118,36 +121,62 @@ export default function Header() {
 
             {/* Login / Signup Buttons */}
             <div className="cs_main_header_right flex items-center space-x-3">
-              <a
-                href="/login"
-                className="cs_btn text-sm px-4 cs_bold uppercase transition duration-300"
-                style={{ color: "black" }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = "radial-gradient(circle at center, #1A7F7D 0%, #23938D 100%)";
-                  e.currentTarget.style.WebkitBackgroundClip = "text";
-                  e.currentTarget.style.WebkitTextFillColor = "transparent";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = "none";
-                  e.currentTarget.style.WebkitBackgroundClip = "unset";
-                  e.currentTarget.style.WebkitTextFillColor = "black";
-                }}
-              >
-                Login
-              </a>
+              {user ? (
+                // Show profile image and dashboard link if user is logged in
+                <div className="relative">
+                  <button
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    className="flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-200 rounded-full"
+                  >
+                    {user.profileImagePath ? (
+                      <img
+                        src={`/api/uploads/profile-images/${user.profileImagePath}`}
+                        alt="Profile"
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <User size={20} className="text-gray-600" />
+                    )}
+                  </button>
+                  {menuOpen && (
+                    <div className="absolute right-0 z-10 w-48 py-2 mt-2 bg-white border rounded-md shadow-lg">
+                      <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</Link>
+                      <Link to="/dashboard/user/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Account</Link>
+                      <button onClick={logout} className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-gray-100">Logout</button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // Show Login and Sign Up buttons if user is not logged in
+                <>
+                  <a
+                    href="/login"
+                    className="cs_btn text-sm px-4 cs_bold uppercase transition duration-300"
+                    style={{ color: "black" }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "radial-gradient(circle at center, #1A7F7D 0%, #23938D 100%)";
+                      e.currentTarget.style.WebkitBackgroundClip = "text";
+                      e.currentTarget.style.WebkitTextFillColor = "transparent";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "none";
+                      e.currentTarget.style.WebkitBackgroundClip = "unset";
+                      e.currentTarget.style.WebkitTextFillColor = "black";
+                    }}
+                  >
+                    Login
+                  </a>
 
-              <a
-                href="/signup"
-                className="cs_btn cs_style_1 text-sm px-3 py-1.5 cs_bold cs_white_color uppercase transition-all duration-300"
-                style={{
-                  background: "radial-gradient(circle at center, #1A7F7D 0%, #23938D 100%)"
-                }}
-              >
-                <span>Sign Up</span>
-                <span className="cs_btn_icon">
-                  <i className="fa-solid fa-arrow-right"></i>
-                </span>
-              </a>
+                  <a
+                    href="/signup"
+                    className="cs_btn cs_style_1 text-sm px-3 py-1.5 cs_bold cs_white_color uppercase transition-all duration-300"
+                    style={{ background: "radial-gradient(circle at center, #1A7F7D 0%, #23938D 100%)" }}
+                  >
+                    <span>Sign Up</span>
+                    <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>

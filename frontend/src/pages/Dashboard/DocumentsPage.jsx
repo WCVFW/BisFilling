@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CloudUpload, Download, FileText, X, Trash2, Replace } from 'lucide-react'; 
 import { docsAPI } from "../../lib/api"; 
-import { getUser } from "../../lib/auth"; 
+import { getAuth } from "../../lib/auth"; 
 
 /**
  * A utility to format file size in a human-readable way.
@@ -17,7 +17,8 @@ function formatFileSize(bytes) {
 }
 
 export default function DocumentsPage() {
-  const user = getUser();
+  const authData = getAuth();
+  const user = authData?.user;
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [docs, setDocs] = useState([]);

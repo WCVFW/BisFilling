@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 // ✅ Import getUser from your auth utility
-import { getUser } from "../lib/auth";
+import { getAuth } from "../lib/auth";
 
 const AdminLayout = ({ children, logout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,7 +30,8 @@ const AdminLayout = ({ children, logout }) => {
 
   // ✅ Load user info once
   useEffect(() => {
-    const user = getUser();
+    const authData = getAuth();
+    const user = authData?.user;
     if (user) {
       const name =
         user.fullName || user.name || user.email?.split("@")[0] || "Admin";

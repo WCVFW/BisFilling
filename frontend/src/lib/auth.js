@@ -1,59 +1,35 @@
-const TOKEN_KEY = "authToken";
-const USER_KEY = "authUser";
+const AUTH_KEY = "bis_filling_auth";
 
 /**
- * Sets the auth token in localStorage. The API interceptor 
- * in lib/api.js will automatically pick this up for all future requests.
- * @param {string} token 
+ * Stores authentication data (token and user object) in localStorage.
+ * @param {object} authData - The authentication data to store.
  */
-export function setToken(token) {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-/**
- * Removes the auth token from localStorage.
- */
-export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY);
-}
-
-export function setUser(user) {
-  if (user) {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(USER_KEY);
+export const setAuth = (authData) => {
+  if (!authData) return;
+  try {
+    localStorage.setItem(AUTH_KEY, JSON.stringify(authData));
+  } catch (e) {
+    console.error("Could not save auth data to localStorage", e);
   }
-}
-
-export function getUser() {
-  const v = localStorage.getItem(USER_KEY);
-  return v ? JSON.parse(v) : null;
-}
-
-export function clearUser() {
-  localStorage.removeItem(USER_KEY);
-}
+};
 
 /**
- * This function is now simplified. It only returns the user profile
- * from localStorage.
- * @returns {object | null}
+ * Retrieves authentication data from localStorage.
+ * @returns {object|null} The stored auth data or null if not found.
  */
-export function initAuth() {
-  return getUser();
-}
+export const getAuth = () => {
+  try {
+    const data = localStorage.getItem(AUTH_KEY);
+    return data ? JSON.parse(data) : null;
+  } catch (e) {
+    console.error("Could not retrieve auth data from localStorage", e);
+    return null;
+  }
+};
 
 /**
- * Clears all authentication data (token and user)
- * Call this for global logout across the entire application
+ * Removes authentication data from localStorage.
  */
-export function clearAuth() {
-  clearToken();
-  clearUser();
-  // Also clear any legacy token keys
-  localStorage.removeItem("token");
-}
+export const clearAuth = () => {
+  localStorage.removeItem(AUTH_KEY);
+};

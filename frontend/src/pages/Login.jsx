@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
-import { setToken, setUser } from "../lib/auth";
+import { setAuth } from "../lib/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -25,8 +25,7 @@ export default function Login() {
     setLoading(true);
     try {
       const r = await axios.post("/api/auth/login", { email, password });
-      setToken(r.data.token);
-      setUser(r.data.user);
+      setAuth(r.data); // Use setAuth to store the entire auth object
       window.dispatchEvent(new Event("auth:update"));
 
       // Browser save password prompt (built-in)
@@ -77,8 +76,7 @@ export default function Login() {
     setLoading(true);
     try {
       const r = await axios.post("/api/auth/verify-phone", { phone, code: otp });
-      setToken(r.data.token);
-      setUser(r.data.user);
+      setAuth(r.data); // Use setAuth to store the entire auth object
       window.dispatchEvent(new Event("auth:update"));
       const role = r.data.user?.role || "USER";
       if (role === "ADMIN") nav("/dashboard/admin", { replace: true });

@@ -6,10 +6,11 @@ import {
   CalendarDaysIcon,
   DocumentTextIcon,
 } from "@heroicons/react/24/outline";
-import { getUser } from "../../lib/auth";
+import { getAuth } from "../../lib/auth";
 
 export default function LandingPageContent() {
-  const user = getUser();
+  const authData = getAuth();
+  const user = authData?.user;
   const userName = user?.fullName || user?.name || user?.email || "User";
 
   const hiddenScrollStyle = {

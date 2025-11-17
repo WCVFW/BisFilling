@@ -55,7 +55,7 @@ import ServiceLoader from "./pages/ServiceLoader";
 import CheckoutModal from "./components/CheckoutModal";
 
 /* ---------------------- Auth ---------------------- */
-import { initAuth, getUser, clearAuth } from "./lib/auth";
+import { getAuth, clearAuth } from "./lib/auth";
 
 /* ===============================
  🔹 MAIN APP COMPONENT
@@ -68,10 +68,13 @@ export default function App() {
 
   /* ---------------------- Auth Initialization ---------------------- */
   useEffect(() => {
-    const u = initAuth();
-    setUser(u);
+    const authData = getAuth();
+    setUser(authData?.user || null);
 
-    const handler = () => setUser(getUser());
+    const handler = () => {
+      const updatedAuthData = getAuth();
+      setUser(updatedAuthData?.user || null);
+    };
     window.addEventListener("auth:update", handler);
     return () => window.removeEventListener("auth:update", handler);
   }, []);

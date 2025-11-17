@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import { XMarkIcon, ChevronRightIcon, BanknotesIcon, ShieldCheckIcon, DocumentMagnifyingGlassIcon, RocketLaunchIcon, ClockIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { serviceHubAPI, processAPI } from "../../lib/api";
-import { getUser } from "../../lib/auth";
+import { getAuth } from "../../lib/auth";
 
 // ===========================================
 // STATIC DATA
@@ -178,7 +178,7 @@ function GstOrdersList() {
     const [orders, setOrders] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
-    const user = getUser();
+    const user = getAuth()?.user;
 
     React.useEffect(() => {
         let mounted = true;
@@ -234,7 +234,7 @@ function GstAdminList() {
     const [orders, setOrders] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
-    const user = getUser();
+    const user = getAuth()?.user;
 
     const load = () => {
         setLoading(true);

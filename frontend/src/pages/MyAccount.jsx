@@ -1,32 +1,43 @@
 import React, { useEffect, useState } from "react";
-import { getUser, clearAuth, setUser, getToken } from "../lib/auth"; 
+import { getAuth, clearAuth, setAuth } from "../lib/auth";
+import { User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { userAPI } from "../lib/api"; 
+import { userAPI } from "../lib/api";
 
 export default function Account() {
     const nav = useNavigate();
-    const stored = getUser();
-    const [user, setLocalUser] = useState(stored);
+    const initialAuth = getAuth();
+    const [user, setLocalUser] = useState(initialAuth?.user);
     const [editing, setEditing] = useState(false);
     const [form, setForm] = useState({ fullName: "", phone: "", password: "" });
     const [loading, setLoading] = useState(false);
+    const [profileImageFile, setProfileImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [imageVersion, setImageVersion] = useState(Date.now());
     const [message, setMessage] = useState(null);
-    // FIX: State to track initial authentication loading to prevent re-fetch loop on 401
-    const [isLoading, setIsLoading] = useState(true); 
+    const [isLoading, setIsLoading] = useState(true);
 
     // Initialize form state when user data changes (e.g., on first load)
     useEffect(() => {
         if (user) {
             setForm({ fullName: user.fullName || user.name || "", phone: user.phone || "", password: "" });
         }
-    }, [user]);
+
+        // Effect to clean up the object URL to prevent memory leaks
+        return () => {
+            if (imagePreview) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+        // Re-run if user object or imagePreview (for cleanup) changes
+    }, [user, imagePreview]);
 
     // Fetch fresh user data on mount (and handle 401 Unauthorized)
     useEffect(() => {
         let mounted = true;
-        if (!getToken()) {
+        if (!getAuth()?.token) {
             setIsLoading(false);
-            if (!stored) {
+            if (!initialAuth?.user) {
                 // Only navigate if there's also no user data in local storage
                 nav("/login");
             }
@@ -40,19 +51,25 @@ export default function Account() {
                 
                 const u = r.data;
                 // Reconstruct user object, preserving properties like 'role' from local storage
-                const userObj = { id: u.id, fullName: u.fullName, email: u.email, phone: u.phone, role: stored?.role };
+                const userObj = { 
+                    id: u.id, 
+                    fullName: u.fullName, 
+                    email: u.email, 
+                    phone: u.phone, 
+                    role: initialAuth?.user?.role,
+                    // Make sure to include the profileImagePath from the fetched data
+                    profileImagePath: u.profileImagePath 
+                };
                 
                 setLocalUser(userObj);
-                setUser(userObj); // Update local storage with fresh data
+                setAuth({ ...getAuth(), user: userObj }); // Update local storage with fresh data
                 
             } catch (err) {
                 // Handle 401 and 403 similarly: clear session and redirect to login
                 const status = err?.response?.status;
                 if (status === 401 || status === 403) {
                     console.error("Auth error (401/403). Clearing session and redirecting.");
-
-                    clearToken();
-                    clearUser();
+                    clearAuth();
                     setLocalUser(null); // Clear local state immediately
 
                     nav("/login");
@@ -68,7 +85,7 @@ export default function Account() {
         
         return () => { mounted = false; };
         // We include dependencies for correctness
-    }, [nav, stored?.role]); 
+    }, [nav, initialAuth?.user?.role]); 
 
     const logout = () => {
         clearAuth();
@@ -88,26 +105,48 @@ export default function Account() {
         setLoading(true);
         
         try {
-            const payload = { fullName: form.fullName, phone: form.phone };
-            if (form.password) payload.password = form.password;
+            // Use FormData to handle both text and file data
+            const formData = new FormData();
+            formData.append('fullName', form.fullName);
+            formData.append('phone', form.phone);
+            if (form.password) {
+                formData.append('password', form.password);
+            }
+            if (profileImageFile) {
+                formData.append('profileImage', profileImageFile);
+            }
             
-            const r = await userAPI.update(payload);
+            const r = await userAPI.update(formData);
             
             const updated = r.data.user;
-            const userObj = { id: updated.id, fullName: updated.fullName, email: updated.email, phone: updated.phone, role: stored?.role };
+            const userObj = { 
+                id: updated.id, 
+                fullName: updated.fullName, 
+                email: updated.email, 
+                phone: updated.phone, 
+                role: initialAuth?.user?.role,
+                profileImagePath: updated.profileImagePath // Ensure backend sends this!
+            };
             setLocalUser(userObj);
-            setUser(userObj);
-            
+            setAuth({ ...getAuth(), user: userObj });
+            // bump image version to bust cache when backend returns a new image
+            setImageVersion(Date.now());
+            // revoke any local preview URL
+            if (imagePreview) {
+                try { URL.revokeObjectURL(imagePreview); } catch (e) {}
+            }
+
             setEditing(false);
             setMessage(r.data.message || "Profile Saved.");
+            setProfileImageFile(null); // Clear the selected file after successful upload
+            setImagePreview(null); // Clear the preview
             setForm((f) => ({ ...f, password: "" })); 
             
         } catch (err) {
             // Handle 401/403 during update: clear session and redirect
             const status = err?.response?.status;
             if (status === 401 || status === 403) {
-                clearToken();
-                clearUser();
+                clearAuth();
                 nav("/login");
                 return; // Stop processing after redirect
             }
@@ -117,13 +156,30 @@ export default function Account() {
         }
     };
 
-    // FIX: Show a loading state until authentication is checked or user data is fetched.
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
+            if (!allowedTypes.includes(file.type)) {
+                setMessage("Invalid file type. Please select a PNG, JPG, or SVG image.");
+                return;
+            }
+            // Clean up old preview if one exists
+            if (imagePreview) {
+                try { URL.revokeObjectURL(imagePreview); } catch (e) {}
+            }
+            setProfileImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    // Show a loading state until authentication is checked or user data is fetched.
     if (isLoading || !user) {
         return (
             <div className="max-w-3xl py-10 mx-auto">
                 <div className="p-6 bg-white rounded shadow">
                     <h2 className="mb-4 text-xl font-semibold">My Account</h2>
-                    <p className="text-sm text-slate-600">Loading user data or fetching authentication status...</p>
+                    <p className="text-sm text-slate-600">Loading user data...</p>
                 </div>
             </div>
         );
@@ -136,7 +192,10 @@ export default function Account() {
                     My Account 
                     { !editing && 
                         <button 
-                            onClick={() => setEditing(true)} 
+                            onClick={() => {
+                                setEditing(true);
+                                setMessage(null); // Clear any old messages
+                            }} 
                             className="ml-4 text-sm text-[#003366] bg-white border border-[#003366] px-3 py-1 rounded hover:bg-[#003366] hover:text-white transition"
                         >
                             Edit
@@ -144,10 +203,42 @@ export default function Account() {
                     }
                 </h2>
 
-                {message && <div className="p-3 mb-4 text-sm text-green-700 border border-green-200 rounded bg-green-50">{message}</div>}
+                {message && (
+                    <div 
+                        className={`p-3 mb-4 text-sm border rounded ${
+                            message.includes("Failed") || message.includes("Invalid") 
+                            ? "text-red-700 border-red-200 bg-red-50" 
+                            : "text-green-700 border-green-200 bg-green-50"
+                        }`}
+                    >
+                        {message}
+                    </div>
+                )}
 
                 {editing ? (
                     <form onSubmit={save} className="space-y-4">
+                        <div className="flex flex-col items-center mb-4">
+                            <label htmlFor="profile-image-upload" className="cursor-pointer">
+                                <img
+                                    src={
+                                        imagePreview || 
+                                        (user.profileImagePath ? `/uploads/profile-images/${user.profileImagePath}?v=${imageVersion}` : "https://via.placeholder.com/100?text=Avatar")
+                                    }
+                                    alt="Profile Preview"
+                                    className="object-cover w-24 h-24 border-2 rounded-full border-slate-300"
+                                />
+                            </label>
+                            <input
+                                id="profile-image-upload"
+                                type="file"
+                                accept="image/png, image/jpeg, image/svg+xml"
+                                onChange={handleImageChange}
+                                className="hidden"
+                                disabled={loading}
+                            />
+                            <p className="mt-2 text-xs text-slate-500">Click image to change</p>
+                        </div>
+
                         <div>
                             <label className="block text-sm text-slate-600">Full Name</label>
                             <input 
@@ -198,6 +289,8 @@ export default function Account() {
                                     // Reset form to current user values
                                     setForm({ fullName: user.fullName || '', phone: user.phone || '', password: '' }); 
                                     setMessage(null); 
+                                    setImagePreview(null); // Clear preview on cancel
+                                    setProfileImageFile(null); // Clear file on cancel
                                 }} 
                                 className="px-4 py-2 transition border border-gray-300 rounded hover:bg-gray-100"
                             >
@@ -207,16 +300,30 @@ export default function Account() {
                     </form>
                 ) : (
                     <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-sm text-slate-500">Name</p>
-                                <p className="font-medium text-gray-800">{user.fullName || user.name || "N/A"}</p>
+                        <div className="flex items-center gap-6">
+                            <div className="flex-shrink-0">
+                                {user.profileImagePath ? (
+                                    <img
+                                        src={`/uploads/profile-images/${user.profileImagePath}?v=${imageVersion}`}
+                                        alt="Profile"
+                                        className="object-cover w-24 h-24 border-2 rounded-full border-slate-200"
+                                    />
+                                ) : (
+                                    <div className="flex items-center justify-center w-24 h-24 bg-gray-100 border-2 rounded-full border-slate-200">
+                                        <User size={40} className="text-gray-400" />
+                                    </div>
+                                )}
                             </div>
-                            <div>
-                                <p className="text-sm text-slate-500">Email</p>
-                                <p className="font-medium text-gray-800">{user.email}</p>
-                            </div>
-                            <div>
+                            <div className="grid flex-1 grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-slate-500">Name</p>
+                                    <p className="font-medium text-gray-800">{user.fullName || user.name || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-slate-500">Email</p>
+                                    <p className="font-medium text-gray-800">{user.email}</p>
+                                </div>
+                                <div>
                                 <p className="text-sm text-slate-500">Phone</p>
                                 <p className="font-medium text-gray-800">{user.phone || "N/A"}</p>
                             </div>
@@ -224,6 +331,7 @@ export default function Account() {
                                 <p className="text-sm text-slate-500">Role</p>
                                 <p className="font-medium text-gray-800">{user.role || "User"}</p>
                             </div>
+                        </div>
                         </div>
                         <div className="pt-4 border-t border-gray-200">
                             <button onClick={logout} className="px-4 py-2 text-white transition bg-red-600 rounded hover:bg-red-700">Logout</button>

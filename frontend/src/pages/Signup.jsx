@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +7,8 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [signupComplete, setSignupComplete] = useState(false);
@@ -15,6 +17,34 @@ export default function Signup() {
   // Validation helpers
   const isValidEmail = (v) => /\S+@\S+\.\S+/.test(v);
   const isValidPhone = (v) => /^[0-9+\-() ]{7,20}$/.test(v); // Match backend validation
+
+  const handleImageChange = (e) => {
+    setMessage(null); // Clear previous messages
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ["image/jpeg", "image/png", "image/svg+xml"];
+      if (!allowedTypes.includes(file.type)) {
+        setMessage("Invalid file type. Please select a PNG, JPG, or SVG image.");
+        setProfileImage(null);
+        setImagePreview(null);
+        return;
+      }
+
+      setProfileImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Effect to clean up the object URL to prevent memory leaks
+  useEffect(() => {
+    // This function will be called when the component unmounts or the preview changes
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -34,8 +64,17 @@ export default function Signup() {
 
     setLoading(true);
     try {
+      const formData = new FormData();
+      formData.append("fullName", fullName);
+      formData.append("email", email);
+      formData.append("phone", phone);
+      formData.append("password", password);
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
       // Create account on backend
-      await axios.post("/api/auth/signup", { fullName, email, phone, password });
+      await axios.post("/api/auth/signup", formData);
 
       // Request OTP for email verification (sent via email only)
       try {
@@ -69,6 +108,30 @@ export default function Signup() {
         </h2>
 
         <form onSubmit={submit}>
+            <div className="flex flex-col items-center mb-4">
+              <label
+                htmlFor="profile-image-upload"
+                className="cursor-pointer"
+              >
+                <img
+                  src={
+                    imagePreview ||
+                    "https://via.placeholder.com/100?text=Avatar"
+                  }
+                  alt="Profile Preview"
+                  className="w-24 h-24 rounded-full object-cover border-2 border-slate-300"
+                />
+              </label>
+              <input
+                id="profile-image-upload"
+                type="file"
+                accept="image/png, image/jpeg, image/svg+xml"
+                onChange={handleImageChange}
+                className="hidden"
+                disabled={loading}
+              />
+            </div>
+
             <label className="block text-sm font-medium text-slate-700">
               Full Name
             </label>

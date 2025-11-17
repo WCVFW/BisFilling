@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUser, getToken } from "../lib/auth";
+import { getAuth } from "../lib/auth";
 import { orderAPI } from "../lib/api";
 
 export default function DashboardIndex() {
@@ -14,7 +14,8 @@ export default function DashboardIndex() {
 
   // ✅ Run once on mount
   useEffect(() => {
-    const user = getUser();
+    const authData = getAuth();
+    const user = authData?.user;
 
     // Redirect if no user
     if (!user) {
@@ -22,8 +23,8 @@ export default function DashboardIndex() {
       return;
     }
 
-    const token = getToken();
-    setAuthPresent(Boolean(token));
+    const token = authData?.token;
+    setAuthPresent(!!token);
 
     // If no token, show info & stop
     if (!token) {
@@ -214,7 +215,7 @@ export default function DashboardIndex() {
                 </p>
                 <p>
                   <span className="font-medium">Customer:</span>{" "}
-                  {order.customerEmail || getUser()?.email}
+                  {order.customerEmail || getAuth()?.user?.email}
                 </p>
                 <p>
                   <span className="font-medium">Status:</span>
