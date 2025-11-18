@@ -1,160 +1,132 @@
 import React, { useState, useEffect } from "react";
-// axios is kept for convention, though not used in frontend logic
-import axios from "axios";
 import {
   ChevronDown,
-  MapPin,
-  Zap,
-  Briefcase,
-  ArrowRight,
-  Users,
   Star,
   CheckCircle,
   FileText,
   Scale,
-  Smartphone,
-  Calculator,
-  Download,
   Globe,
   DollarSign,
-  Landmark, // Icon for KVK/Notary
-  Clock, // Icon for timeline/speed
+  Zap,
+  Users,
+  Briefcase
 } from "lucide-react";
 import { motion } from "framer-motion";
-// Assume the path for your background image, updated for Netherlands context
-import BackgroundImageSrc from '../../assets/business.png';
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg';
 
-
-// --- NETHERLANDS REGISTRATION STATIC DATA DEFINITIONS ---
+// --- NETHERLANDS REGISTRATION STATIC DATA ---
 
 const nlRegTabs = [
   { id: 'nl-overview-content', label: 'Overview' },
-  { id: 'nl-advantages-content', label: 'Benefits' },
+  { id: 'nl-advantages-content', label: 'Why Netherlands?' },
   { id: 'nl-types-content', label: 'Types' },
   { id: 'nl-process-content', label: 'Process' },
   { id: 'nl-documents-content', label: 'Documents' },
-  { id: 'nl-cost-compliance', label: 'Cost & Compliance' },
-  { id: 'nl-why-vakilsearch', label: 'Why Vakilsearch?' },
+  { id: 'nl-tax-content', label: 'Tax & Compliance' },
+  { id: 'nl-why-vakilsearch', label: 'Why Vakilsearch' },
   { id: 'nl-faqs-content', label: 'FAQs' },
 ];
 
 const nlAdvantages = [
   {
-    title: "Strategic Status in Europe",
-    description: "The Netherlands is strategically located in the middle, with easy access to the most important European markets.",
-    icon: MapPin
+    title: "Strategic European Hub",
+    description: "Access to 500 million consumers within 24 hours. The Port of Rotterdam and Schiphol Airport provide unmatched logistics.",
+    icon: Globe
   },
   {
-    title: "Stylish Tax Regime",
-    description: "Companies benefit from extensive double tax agreements and competitive corporate tax rates.",
+    title: "Favorable Tax Climate",
+    description: "Competitive corporate income tax rates, R&D incentives (WBSO), and an extensive network of tax treaties to prevent double taxation.",
     icon: DollarSign
   },
   {
-    title: "Rapid Incorporation",
-    description: "The process of incorporating Dutch companies is accelerated and efficient, making setup quick.",
+    title: "Highly Educated Workforce",
+    description: "Access a multilingual, tech-savvy, and highly skilled talent pool. English is widely spoken in the business community.",
+    icon: Users
+  },
+  {
+    title: "Innovation Ecosystem",
+    description: "A world-class environment for tech startups and scale-ups, with strong government support for innovation and R&D.",
     icon: Zap
   },
   {
-    title: "Access to the EU Market",
-    description: "Dutch registered companies gain full, unhindered access to the EU's vast internal market.",
-    icon: Globe
+    title: "Simple Incorporation",
+    description: "The Dutch BV (private limited company) can be set up remotely through a civil-law notary, making the process efficient for foreign entrepreneurs.",
+    icon: CheckCircle
   }
 ];
 
 const entityTypesDataNL = [
   {
-    type: "BV (Besloten Vennootschap / Private Limited Company)",
-    description: "The most used type among entrepreneurs and foreign investors. Provides limited liability and variable shareholding. Suits small and large enterprises.",
-    key_points: ["Limited liability", "Variable shareholding", "Most popular choice"],
+    type: "Private Limited Company (BV)",
+    description: "The most common legal form for foreign investors. It offers limited liability, flexibility, and can be set up with a minimum share capital of just €0.01.",
+    key_points: ["Limited liability", "Flexible structure", "Ideal for most businesses"],
   },
   {
-    type: "NV (Naamloze Vennootschap / Public Limited Company)",
-    description: "Used by large companies seeking external investments. Has public trade in shares and requires a higher minimum share capital than the BV.",
-    key_points: ["Public share trade", "Higher capital required", "Suits large entities"],
+    type: "Public Limited Company (NV)",
+    description: "Suitable for large corporations that wish to raise capital on the stock exchange. Requires a minimum share capital of €45,000.",
+    key_points: ["Can be publicly traded", "Higher capital requirement", "Stricter regulations"],
   },
   {
     type: "Branch Office",
-    description: "A foreign business can open a branch without creating a separate Dutch legal unit. The original business retains full responsibility for the branch operation.",
-    key_points: ["No separate legal entity", "Parent company liability", "Local commercial presence"],
-  },
-  {
-    type: "Sole Proprietorship (Eenmanszaak)",
-    description: "A low-cost, simple setup suitable for freelancers or small companies. The owner has complete control but also unlimited personal liability.",
-    key_points: ["Low cost, simple setup", "Complete owner control", "Unlimited personal liability"],
+    description: "An extension of a foreign parent company, not a separate legal entity. The parent company remains fully liable for the branch's activities.",
+    key_points: ["No separate legal entity", "Parent company is liable", "Simpler setup"],
   },
 ];
 
 const nlProcessSteps = [
-  "1. Selection of Business Structure: Assist you in selecting the most appropriate legal form (BV, NV, VOF, etc.), which influences tax and liability.",
-  "2. Company Name Check and Reservation: Check name availability with the Dutch Chamber of Commerce (KVK) and reserve it.",
-  "3. Residence and Address Requirements: Assist with obtaining necessary residence permits/BSN and organizing a Dutch business address (physical or virtual).",
-  "4. Preparation of Documents and Legal Formalities: Prepare Articles of Association, director/shareholder info, and liaise with Dutch notaries for legal entity enrollments (BV, NV).",
-  "5. Registration with the Dutch Chamber of Commerce (KVK): Finish KVK registration, including form submission and assisting in obtaining KVK number, SBI code, and RSIN.",
-  "6. VAT and Tax Registration: Register with the Dutch Tax Administration (Belastingdienst) for VAT (BTW) number, Company income tax, and Payroll tax.",
-  "7. Setup of Business Bank Account: Help open a Dutch business bank account and pay in the minimum share capital (for BV/NV).",
-  "8. Final Registration and Activation: Ensure all fees are paid and information in the Business Register is correct and regularly updated.",
+  "Choose a Business Structure: Decide between a BV, NV, or other forms. Our experts help you choose the best fit.",
+  "Select and Verify Company Name: We check if your desired company name is available and complies with Dutch regulations.",
+  "Prepare Incorporation Documents: This includes the deed of incorporation and articles of association, prepared by a civil-law notary.",
+  "Register with the Chamber of Commerce (KVK): The notary files the deed, officially registering your company in the Dutch Commercial Register.",
+  "Register with Tax Authorities: Your company is automatically registered with the Dutch Tax and Customs Administration (Belastingdienst) for VAT and corporate tax.",
+  "Open a Dutch Bank Account: A corporate bank account is essential for business operations. We provide guidance on this step.",
 ];
 
-const nlDocumentsIndividuals = [
-  "Valid Passport or ID Proof – Copy of the identification document.",
-  "Proof of Address – Utility bill, bank statement, or rental agreement (not more than 3 months old).",
-  "Business Plan – Summarizes activities, financial projections, and organization.",
-  "Notarized Articles of Association (AoA) – Drawn up and signed in front of a Dutch notary (for BV/NV).",
-  "Shareholder & Director Details – With ownership structure and contact details.",
+const requiredDocumentsNL = [
+  "Valid Passport or National ID of all founders/directors.",
+  "Proof of Residential Address (e.g., recent utility bill).",
+  "A detailed business plan may be required.",
+  "The company's proposed name and business activities.",
+  "For corporate shareholders, legalized corporate documents are needed.",
 ];
 
-const nlDocumentsCorporate = [
-  "Certificate of Incorporation – Documenting legal existence of parent company.",
-  "Extract from Trade Register – Indicating company directors and representatives.",
-  "Board Resolution – Resolving the formation of the Dutch entity.",
-  "UBO (Ultimate Beneficial Owner) registration details.",
-  "Bank Reference or Proof of Capital Deposit – For BV/NV incorporation.",
-];
-
-const nlCostBreakdown = [
-  { title: "Government Fees (KVK)", cost: "Around €75 (one-time)", icon: Landmark },
-  { title: "Notary Fees", cost: "Starting from €500–€1,000 (depending on complexity, for BV/NV)", icon: FileText },
-  { title: "Professional Service Fees", cost: "Starts from €1,000–€2,500 (for full assistance)", icon: Users },
-  { title: "Additional Costs", cost: "Translation, apostille, and virtual office services (variable)", icon: DollarSign },
-];
-
-const nlComplianceRequirements = [
-  { title: "Accounting & Bookkeeping", details: "Keep proper books of accounts as per Dutch GAAP or IFRS. Annual accounts must be submitted to the Chamber of Commerce.", icon: Calculator },
-  { title: "Annual Returns & Filings", details: "Submit annual financial statements and tax returns (corporate income tax, VAT, and payroll tax if required).", icon: FileText },
-  { title: "Local Director (If Applicable)", details: "Although not mandatory, a Dutch-resident director can prove convenient for tax residence purposes and easier compliance.", icon: Users },
-  { title: "Registered Office Address", details: "All companies need to keep a local Dutch office address (virtual or physical) for official correspondence and legal mail.", icon: MapPin },
+const nlTaxCompliance = [
+  {
+    title: "Corporate Income Tax (CIT)",
+    details: "A progressive rate applies. The first bracket has a lower rate, making it attractive for SMEs. As of 2024, the standard rate is 25.8%.",
+    icon: DollarSign
+  },
+  {
+    title: "Value Added Tax (VAT/BTW)",
+    details: "The standard VAT rate is 21%. Companies must file periodic VAT returns. A lower rate applies to certain goods and services.",
+    icon: Scale
+  },
+  {
+    title: "Annual Accounts Filing",
+    details: "All BVs must prepare and file annual financial statements with the Chamber of Commerce (KVK).",
+    icon: FileText
+  }
 ];
 
 const vakilsearchNLServices = [
-  "End-to-End Assistance – From selecting the right structure to bank account opening and tax registration.",
-  "Legal & Compliance Support – Drafting incorporation documents, liaising with Dutch notaries, and ensuring compliance with local regulations.",
-  "No Physical Presence Needed – Complete your Dutch business setup remotely through our team, without the need to travel.",
-  "Tailored Advisory – Guidance on tax benefits, structuring, and expansion across the EU market.",
+  "End-to-End Incorporation Support: We manage the entire process, from choosing a name to coordinating with the civil-law notary and registering with the KVK.",
+  "Remote Setup: Complete your Netherlands company registration from anywhere in the world. No travel required.",
+  "Expert Tax & Legal Guidance: Our network of experts provides advice on the Dutch tax system, compliance, and legal obligations.",
+  "Bank Account Assistance: We guide you through the process of opening a Dutch corporate bank account.",
 ];
 
 const nlFAQs = [
-  { q: "Can foreigners register a company in the Netherlands?", a: "Yes, foreigners can register various entities (like the BV) and own 100% of the shares. No physical presence is required for the setup process." },
-  { q: "What is the minimum capital required for a Dutch BV?", a: "The minimum share capital for a BV (Private Limited Company) is currently €0.01." },
-  { q: "How long does it take to register a company in the Netherlands?", a: "The process is relatively quick. Once all documents are prepared and notarized, registration with the KVK can take a few business days." },
-  { q: "Do I need to be in the Netherlands to start a business?", a: "No, the entire Dutch business setup, including KVK registration and bank account opening, can be facilitated remotely with professional assistance." },
-  { q: "What is the difference between BV and NV in the Netherlands?", a: "A BV (Private Limited) is the standard private company used by most startups. An NV (Public Limited) is designed for large companies that intend to publicly trade shares and has higher capital requirements." },
-  { q: "What role does a civil law notary play in the company formation process in the Netherlands?", a: "A civil law notary is mandatory for legal entities like the BV and NV. They draft and notarize the Articles of Association, which is essential for registration with the KVK." },
-  { q: "Can I open a bank account for my company in the Netherlands while I live abroad?", a: "Yes, many major Dutch banks offer remote or digital account opening, especially when working with a qualified formation partner." },
+  { q: "Can a foreigner start a business in the Netherlands?", a: "Yes, foreigners can easily set up a business in the Netherlands. The Dutch BV is a popular choice and allows for 100% foreign ownership." },
+  { q: "Do I need to be in the Netherlands to register a company?", a: "No, the entire process of setting up a Dutch BV can be handled remotely with the help of a civil-law notary and a service provider like Vakilsearch." },
+  { q: "What is a Dutch BV?", a: "A 'Besloten Vennootschap' (BV) is a private limited liability company. It's the most common business structure for entrepreneurs in the Netherlands due to its flexibility and liability protection." },
+  { q: "How long does it take to set up a company in the Netherlands?", a: "With all documents in order, the incorporation process typically takes 1-2 weeks." },
+  { q: "What is the minimum share capital for a Dutch BV?", a: "The minimum share capital required is only €0.01, making it very accessible for startups." },
+  { q: "Do I need a local director?", a: "While not a strict legal requirement for incorporation, having a director resident in the EU/EEA is often necessary for tax substance and practical reasons, like opening a bank account." },
+  { q: "What are the main taxes for a company in the Netherlands?", a: "The main taxes are Corporate Income Tax (CIT) on profits and Value Added Tax (VAT/BTW) on goods and services." },
 ];
 
 
-// --- REUSABLE COMPONENTS (Kept for consistency) ---
-
-const ReviewBox = ({ score, reviews, source }) => (
-  <div className="bg-white/10 rounded-xl p-3 shadow-lg w-full flex flex-col items-center justify-center border border-white/20">
-    <div className="text-yellow-400 flex items-center mb-1">
-      {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-yellow-400" />)}
-    </div>
-    <p className="text-xs font-semibold text-white/80">{source}</p>
-    <p className="mt-1 font-bold text-xl text-white">{score}</p>
-    <p className="text-xs text-white/90">{reviews}</p>
-  </div>
-);
+// --- REUSABLE COMPONENTS ---
 
 const ProcessStep = ({ stepNumber, step }) => (
   <li className="flex items-start gap-4">
@@ -190,21 +162,25 @@ const NLEntityTypeCard = ({ data }) => (
   </div>
 );
 
-// --- TAB CONTENT COMPONENTS (Netherlands Content) ---
+
+// --- TAB CONTENT COMPONENTS ---
 
 const NLOverviewContent = () => (
   <section id="nl-overview-content" className="py-12 scroll-mt-24">
-    <h2 className="text-3xl font-bold mb-6 text-gray-800">Introduction</h2>
+    <h2 className="text-3xl font-bold mb-6 text-gray-800">Company Registration in the Netherlands</h2>
     <p className="text-lg text-gray-700 mb-4 max-w-4xl">
-      **Netherlands Company Registration** is the legal procedure for creating a business entity in the Netherlands, one of Europe's most desirable centers for global business. Many entrepreneurs and investors register trade in the Netherlands because of the benefits: **EU entry**, **tax advantages**, and **investor-friendly rules** worldwide.
+      Setting up a company in the Netherlands offers a gateway to Europe's largest economies. Known for its pro-business climate, strategic location, and innovative ecosystem, it's a top choice for international entrepreneurs.
     </p>
     <p className="text-lg text-gray-700 mb-8 max-w-4xl">
-      Whether you want to establish a Dutch trading company, technology company, or financial company, the Netherlands ensures a safe economy, favorable location, and strong infrastructure that makes it the most preferred country for company registration in Europe.
+      The process is streamlined and can be done remotely, making it highly accessible for founders from India and around the world. Vakilsearch simplifies this journey, ensuring a compliant and efficient setup.
     </p>
+  </section>
+);
 
-    <h3 className="text-2xl font-bold mb-6 text-gray-800">Why Business Registration in Netherlands?</h3>
-
-    <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+const NLAdvantagesContent = () => (
+  <section id="nl-advantages-content" className="py-12 scroll-mt-24">
+    <h3 className="text-3xl font-bold mb-8 text-gray-800">Why Choose the Netherlands?</h3>
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {nlAdvantages.map((advantage, i) => (
         <DetailItem
           key={i}
@@ -219,12 +195,11 @@ const NLOverviewContent = () => (
 
 const NLTypesContent = () => (
   <section id="nl-types-content" className="py-12 scroll-mt-24">
-    <h3 className="text-3xl font-bold mb-6 text-gray-800">Types of Business Registration in the Netherlands</h3>
+    <h3 className="text-3xl font-bold mb-6 text-gray-800">Types of Companies in the Netherlands</h3>
     <p className="text-lg text-gray-700 mb-8 max-w-4xl">
-      Choosing the right business entity is essential for legal compliance and operational success. The main types of business structures available include:
+      Choosing the right legal structure is a critical first step. The Netherlands offers several options for foreign investors:
     </p>
-
-    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid md:grid-cols-3 gap-6">
       {entityTypesDataNL.map((data, i) => (
         <NLEntityTypeCard key={i} data={data} />
       ))}
@@ -234,11 +209,10 @@ const NLTypesContent = () => (
 
 const NLProcessContent = () => (
   <section id="nl-process-content" className="py-12 scroll-mt-24">
-    <h3 className="text-3xl font-bold mb-6 text-gray-800">Step-by-Step Process for Company Registration in Netherlands</h3>
+    <h3 className="text-3xl font-bold mb-6 text-gray-800">Step-by-Step Incorporation Process</h3>
     <p className="text-lg text-gray-700 mb-8 max-w-4xl">
-      Setting up a business in the Netherlands requires precise adherence to Dutch administrative and legal requirements.  streamlines the entire process, ensuring a hassle-free experience.
+      Our streamlined process makes Dutch company formation straightforward and efficient.
     </p>
-
     <ol className="space-y-5 list-none border-l-2 border-[#022B50] pl-4">
       {nlProcessSteps.map((step, i) => (
         <ProcessStep key={i} stepNumber={i + 1} step={step} />
@@ -249,74 +223,35 @@ const NLProcessContent = () => (
 
 const NLDocumentsContent = () => (
   <section id="nl-documents-content" className="py-12 scroll-mt-24">
-    <h3 className="text-3xl font-bold mb-6 text-gray-800">Documents Required for Dutch Company Registration</h3>
+    <h3 className="text-3xl font-bold mb-6 text-gray-800">Documents Required</h3>
     <p className="text-lg text-gray-700 mb-8 max-w-4xl">
-      The requirements depend on whether the applicant is an individual founder or a corporate body (parent company/investor).
+      To ensure a smooth incorporation, you will need to provide the following documents, which may need to be notarized or apostilled.
     </p>
-
-    <div className="grid md:grid-cols-2 gap-8">
-      <div>
-        <h4 className="text-2xl font-bold text-[#022B50] mb-4">For Individuals (Founders/Shareholders):</h4>
+    <div className="bg-gray-50 p-6 rounded-lg border">
         <ul className="space-y-3 text-gray-700">
-          {nlDocumentsIndividuals.map((doc, i) => (
+          {requiredDocumentsNL.map((doc, i) => (
             <li key={i} className="flex items-start gap-2">
               <FileText className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
               <span>{doc}</span>
             </li>
           ))}
         </ul>
-      </div>
-      <div>
-        <h4 className="text-2xl font-bold text-[#022B50] mb-4">For Corporate Bodies (Parent Company/Investors):</h4>
-        <ul className="space-y-3 text-gray-700">
-          {nlDocumentsCorporate.map((doc, i) => (
-            <li key={i} className="flex items-start gap-2">
-              <FileText className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-1" />
-              <span>{doc}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-    <div className="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-      <h4 className="font-semibold text-lg text-gray-800">Additional Requirements for All Applicants:</h4>
-      <p className="text-sm text-gray-600 mt-1">
-        UBO (Ultimate Beneficial Owner) registration, proof of a Dutch company address, and a declaration of consent if a third-party address is used. Legal structures (BV, NV) require notarized documents and engagement with a Dutch notary.
-      </p>
     </div>
   </section>
 );
 
-const NLCostCompliance = () => (
-  <section id="nl-cost-compliance" className="py-12 scroll-mt-24">
-    <h3 className="text-3xl font-bold mb-6 text-gray-800">Company Registration in Netherlands Cost & Compliance</h3>
+const NLTaxContent = () => (
+  <section id="nl-tax-content" className="py-12 scroll-mt-24">
+    <h3 className="text-3xl font-bold mb-6 text-gray-800">Tax & Compliance</h3>
     <p className="text-lg text-gray-700 mb-8 max-w-4xl">
-      The final business setup fee depends on the structure and services required, but here is a typical cost breakdown:
+      Understanding the Dutch tax and compliance landscape is key to running a successful business.
     </p>
-
-    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-      {nlCostBreakdown.map((item, i) => (
-        <div key={i} className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500 shadow-sm">
-          <item.icon className="w-6 h-6 text-red-700 mb-2" />
-          <h4 className="font-semibold text-lg text-gray-800">{item.title}</h4>
-          <p className="text-gray-600 text-sm font-bold">{item.cost}</p>
-        </div>
-      ))}
-    </div>
-
-    <h4 className="text-2xl font-bold text-gray-800 mt-12 mb-6">Post-Incorporation Compliance Requirements</h4>
-    <p className="text-lg text-gray-700 mb-8 max-w-4xl">
-      To remain in good standing, firms need to fulfill recurring Netherlands company maintenance requirements:
-    </p>
-
-    <div className="grid md:grid-cols-2 gap-6">
-      {nlComplianceRequirements.map((item, i) => (
-        <div key={i} className="flex items-start gap-4 p-4 bg-white rounded-lg shadow-md border-l-4 border-yellow-600">
-          <item.icon className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-1" />
-          <div>
-            <h5 className="font-semibold text-gray-800">{item.title}</h5>
-            <p className="text-sm text-gray-600">{item.details}</p>
-          </div>
+    <div className="grid md:grid-cols-3 gap-6">
+      {nlTaxCompliance.map((item, i) => (
+        <div key={i} className="p-5 bg-white rounded-xl shadow-lg border border-gray-200">
+          <item.icon className="w-8 h-8 text-yellow-600 mb-3" />
+          <h4 className="font-bold text-lg text-gray-800 mb-2">{item.title}</h4>
+          <p className="text-sm text-gray-600">{item.details}</p>
         </div>
       ))}
     </div>
@@ -325,16 +260,15 @@ const NLCostCompliance = () => (
 
 const NLWhyVakilsearch = () => (
   <section id="nl-why-vakilsearch" className="py-12 scroll-mt-24">
-    <h3 className="text-3xl font-bold mb-6 text-gray-800">Why Vakilsearch for Netherlands Company Registration?</h3>
+    <h3 className="text-3xl font-bold mb-6 text-gray-800">Why Choose Vakilsearch?</h3>
     <p className="text-lg text-gray-700 mb-8 max-w-4xl">
-      Setting up a business abroad can feel complex, but with  (Vakilsearch) you get seamless support for company registration in the Netherlands from India or anywhere in the world. Our experts simplify every step with:
+      We make your expansion into the Netherlands seamless, handling the complexities so you can focus on your business.
     </p>
-
-    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+    <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6">
       {vakilsearchNLServices.map((service, i) => (
         <div key={i} className="p-5 bg-indigo-50 rounded-xl shadow-sm border border-indigo-200">
-          <h4 className="font-bold text-xl text-gray-800 mb-2">{service.split('–')[0].trim()}</h4>
-          <p className="text-sm text-gray-600">{service.split('–')[1].trim()}</p>
+          <h4 className="font-bold text-xl text-gray-800 mb-2">{service.split(':')[0].trim()}</h4>
+          <p className="text-sm text-gray-600">{service.split(':')[1].trim()}</p>
         </div>
       ))}
     </div>
@@ -343,32 +277,24 @@ const NLWhyVakilsearch = () => (
 
 const NLFAQsContent = ({ faqs, faqOpen, setFaqOpen }) => {
   return (
-    <section id="ip-faqs-content" className="py-12 max-w-5xl mx-auto scroll-mt-24">
+    <section id="nl-faqs-content" className="py-12 max-w-5xl mx-auto scroll-mt-24">
       <h3 className="text-3xl font-bold mb-8 text-black text-center">
-        FAQs on International Trademark Registration
+        Frequently Asked Questions
       </h3>
-
       <div className="space-y-4">
         {faqs.map((faq, index) => {
           const isOpen = faqOpen === index;
           return (
             <div key={index} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-              {/* Question Button */}
               <button
-                className={`w-full flex justify-between items-center p-5 text-left transition-colors duration-300 ${
-                  isOpen ? "bg-[#E6F0F6] text-[#022B50]" : "bg-white hover:bg-gray-50 text-black"
-                }`}
+                className={`w-full flex justify-between items-center p-5 text-left transition-colors duration-300 ${isOpen ? "bg-[#E6F0F6] text-[#022B50]" : "bg-white hover:bg-gray-50 text-black"}`}
                 onClick={() => setFaqOpen(isOpen ? null : index)}
               >
                 <span className="font-semibold text-lg">{faq.q}</span>
                 <ChevronDown
-                  className={`w-6 h-6 transition-transform duration-300 ${
-                    isOpen ? "rotate-180 text-[#022B50]" : "text-gray-500"
-                  }`}
+                  className={`w-6 h-6 transition-transform duration-300 ${isOpen ? "rotate-180 text-[#022B50]" : "text-gray-500"}`}
                 />
               </button>
-
-              {/* Answer Panel */}
               <motion.div
                 initial={false}
                 animate={{ height: isOpen ? "auto" : 0 }}
@@ -391,20 +317,14 @@ export default function NetherlandsInc() {
   const [activeTab, setActiveTab] = useState(nlRegTabs[0].id);
   const [faqOpen, setFaqOpen] = useState(null);
 
-  // Offset to account for the sticky header height when calculating scroll position
   const SCROLL_OFFSET = 120;
 
-  // --- SCROLLSPY IMPLEMENTATION ---
   useEffect(() => {
     const sectionIds = nlRegTabs.map(tab => tab.id);
-
     const handleScroll = () => {
       let currentActiveTab = sectionIds[0];
-
-      for (let i = 0; i < sectionIds.length; i++) {
-        const sectionId = sectionIds[i];
+      for (const sectionId of sectionIds) {
         const section = document.getElementById(sectionId);
-
         if (section) {
           const rect = section.getBoundingClientRect();
           if (rect.top <= SCROLL_OFFSET) {
@@ -412,24 +332,15 @@ export default function NetherlandsInc() {
           }
         }
       }
-
-      setActiveTab(prevActiveTab => {
-        if (prevActiveTab !== currentActiveTab) {
-          return currentActiveTab;
-        }
-        return prevActiveTab;
-      });
+      setActiveTab(currentActiveTab);
     };
 
     window.addEventListener('scroll', handleScroll);
     handleScroll();
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Function to handle smooth scrolling when a tab is clicked
   const handleTabClick = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -443,140 +354,72 @@ export default function NetherlandsInc() {
 
   return (
     <div className="bg-white min-h-screen font-[Inter]">
-      {/* === HERO SECTION (Netherlands Registration Specific) === */}
-      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6]">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 relative pt-12">
-          {/* Background Image Section */}
-          <div className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden">
+      {/* === HERO SECTION === */}
+      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6] mt-[10%]">
+        <div className="relative px-4 pt-12 mx-auto max-w-7xl md:px-8">
+
+          <div
+            className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden"
+          >
             <img
               src={BackgroundImageSrc}
-              alt="Netherlands company registration background"
-              className="absolute top-0 left-0 w-full h-full object-cover"
+              alt="Diagonal background graphic"
+              className="absolute top-0 left-0 object-cover w-full h-full"
             />
           </div>
 
-          {/* Main Content */}
-          <div className="relative flex flex-col lg:flex-row items-start pt-10 pb-12 lg:pb-0 z-20">
+          <div className="relative z-20 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
 
-            {/* Left Column - Text Content */}
-            <div className="w-full lg:w-3/5 text-black p-4 md:p-6 pb-20 relative z-20">
+            <div className="relative z-20 w-full p-4 pb-20 text-white lg:w-3/5 md:p-6">
 
-              {/* Breadcrumb */}
-              <nav className="text-sm text-gray-600 mb-3">
-                <span className="hover:underline cursor-pointer">Home</span> &gt;{" "}
-                <span className="hover:underline cursor-pointer">Company Registration</span> &gt;{" "}
-                <span className="font-semibold text-gray-800">Business Registration in Netherlands</span>
-              </nav>
+              <p className="flex items-center justify-center gap-2 mb-4 font-semibold text-white lg:justify-start">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <span>#1 Netherlands Company Formation Service</span>
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </p>
 
-              {/* Badge */}
-              <div className="inline-flex bg-[#FFD700] text-black px-4 py-1 rounded-lg font-semibold text-xs md:text-sm mb-3 items-center gap-2">
-                <img
-                  src="/badge-icon.png"
-                  alt="badge"
-                  className="w-4 h-4 object-contain"
-                />
-                #1 Legal Service Provider In India
-              </div>
-
-              {/* Title */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-black">
-                Company Registration in Netherlands – Process, Cost & Benefits
+              <h1 className="text-[#fff] mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl font-sans">
+                Company Registration in Netherlands
               </h1>
 
-              {/* Bullet Points */}
-              <div className="space-y-4 mb-8 text-sm lg:text-base text-gray-800">
-                <p className="flex items-start gap-3">
-                  <span className="w-4 h-4 bg-blue-500 rounded-full mt-1 flex-shrink-0"></span>
-                  Register your Netherlands company online and enter the European market with confidence.
-                </p>
-                <p className="flex items-start gap-3">
-                  <span className="w-4 h-4 bg-blue-500 rounded-full mt-1 flex-shrink-0"></span>
-                  Complete your Dutch company registration remotely — no physical presence required.
-                </p>
-                <p className="flex items-start gap-3">
-                  <span className="w-4 h-4 bg-blue-500 rounded-full mt-1 flex-shrink-0"></span>
-                  Get expert support to access EU tax benefits, banking, and international opportunities.
-                </p>
-              </div>
+              <p className="text-[#fff] text-lg max-w-lg mb-6">
+                Launch your business in Europe's most connected economy. Benefit from a pro-business environment, favorable tax system, and a strategic gateway to the EU market.
+              </p>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-4">
-                <button className="bg-[#113C6D] hover:bg-indigo-900 text-white font-medium px-6 py-3 rounded-lg shadow-md transition">
-                  🚀 Get Started!
-                </button>
-                <button className="bg-white text-[#113C6D] font-medium px-6 py-3 rounded-lg shadow-md transition border border-[#113C6D]">
-                  📜 View Sample Incorporation Certificate
-                </button>
+              <div className="mb-8 space-y-1">
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-green-500"></span> 100% remote setup for your Dutch BV (Private Limited Company).</p>
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-indigo-500"></span> Expert guidance on tax, compliance, and opening a bank account.</p>
               </div>
             </div>
 
-            {/* Right Column - Form */}
-            <div className="w-full lg:w-[350px] relative z-30 lg:mt-0 lg:ml-auto mt-[-100px] sm:mt-[-50px]">
+            <div className="w-full lg:w-[400px] relative z-30 lg:mt-0 lg:ml-auto mt-[-20px] sm:mt-[-20px] mb-12 lg:mr-4">
               <div
-                className="w-full p-6 md:p-8 rounded-2xl shadow-xl bg-white"
+                className="w-full p-6 bg-white shadow-xl md:p-8 rounded-2xl"
                 style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
               >
-                {/* Offer Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">Get Started!</h2>
-                  <img
-                    src="/offer-image.png"
-                    alt="offer"
-                    className="w-10 h-10 object-contain"
-                  />
-                </div>
+                <h2 className="mb-4 text-xl font-semibold text-gray-800 font-sans">Start Your Dutch Company</h2>
+                <form className="space-y-3">
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Your Name" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Email" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Mobile Number" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="City/Pincode" />
 
-                {/* Form */}
-                <form className="space-y-4">
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Email"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Mobile Number"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="City / Pincode"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Language"
-                  />
-
-                  {/* WhatsApp Toggle */}
-                  <div className="flex items-center justify-between pt-1 text-gray-700">
-                    <p className="text-xs md:text-sm font-medium">Get easy updates through WhatsApp</p>
+                  <div className="flex items-center justify-between text-gray-600">
+                    <p className="text-xs font-medium text-gray-700 md:text-sm">Get Easy Updates Through Whatsapp</p>
                     <div className="w-10 h-5 bg-gray-300 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors">
-                      <div className="w-4 h-4 bg-white rounded-full shadow-md transition-transform transform translate-x-0"></div>
+                      <div className="w-4 h-4 transition-transform transform translate-x-0 bg-white rounded-full shadow-md"></div>
                     </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full bg-[#113C6D] text-white py-3 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-4"
-                  >
-                    Get Started
+                  <button type="submit" className="w-full bg-[#113C6D] text-white py-2.5 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-2">
+                    Talk to an Expert
                   </button>
-
-                  {/* EMI Note */}
-                  <p className="text-xs text-gray-600 text-center mt-3">
-                    Easy monthly EMI options available
-                  </p>
-
-                  {/* Confidentiality Note */}
-                  <p className="text-[11px] text-gray-500 text-center mt-1 italic">
-                    No Spam. No Sharing. 100% Confidentiality.
-                  </p>
                 </form>
               </div>
             </div>
           </div>
         </div>
       </section>
-
 
       {/* === Main Content Tabs Navigation (Sticky) === */}
       <section className="py-4 md:py-6 px-4 md:px-8 bg-white border-b border-gray-200 sticky top-0 z-30 shadow-md">
@@ -585,6 +428,7 @@ export default function NetherlandsInc() {
             {nlRegTabs.map((tab) => (
               <a
                 key={tab.id}
+                href={`#${tab.id}`}
                 className={`flex flex-col flex-shrink-0 min-w-[100px] md:min-w-[120px] py-3 md:py-4 px-2 text-center font-bold cursor-pointer transition-all ${activeTab === tab.id ? 'bg-[#E6F0F6] border-b-4 border-[#022B50] text-[#022B50]' : 'text-gray-700 hover:bg-gray-50'}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -598,14 +442,15 @@ export default function NetherlandsInc() {
         </div>
       </section>
 
-      {/* === All Tab Content Sections Rendered Sequentially === */}
+      {/* === All Tab Content Sections === */}
       <div className="py-2 md:py-4 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
           <NLOverviewContent />
+          <NLAdvantagesContent />
           <NLTypesContent />
           <NLProcessContent />
           <NLDocumentsContent />
-          <NLCostCompliance />
+          <NLTaxContent />
           <NLWhyVakilsearch />
           <NLFAQsContent faqs={nlFAQs} faqOpen={faqOpen} setFaqOpen={setFaqOpen} />
         </div>

@@ -19,7 +19,7 @@ import {
   DollarSign, // New icon for cost/tax
 } from "lucide-react";
 import { motion } from "framer-motion";
-import BackgroundImageSrc from '../../assets/business.png';
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg';
 // --- USA REGISTRATION STATIC DATA DEFINITIONS ---
 
 const usaRegTabs = [
@@ -439,122 +439,65 @@ export default function USInc() {
 
   return (
     <div className="bg-white min-h-screen font-[Inter]">
-      {/* === HERO SECTION (USA Reg Specific) === */}
-      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6]">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 relative pt-12">
-          {/* Background Image Section */}
-          <div className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden">
+      {/* === HERO SECTION (New Design) === */}
+      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6] mt-[10%]">
+        <div className="relative px-4 pt-12 mx-auto max-w-7xl md:px-8">
+
+          <div
+            className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden"
+          >
             <img
               src={BackgroundImageSrc}
-              alt="USA company registration background"
-              className="absolute top-0 left-0 w-full h-full object-cover"
+              alt="Diagonal background graphic"
+              className="absolute top-0 left-0 object-cover w-full h-full"
             />
           </div>
 
-          {/* Main Content */}
-          <div className="relative flex flex-col lg:flex-row items-start pt-10 pb-12 lg:pb-0 z-20">
+          <div className="relative z-20 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
 
-            {/* Left Column - Text Content */}
-            <div className="w-full lg:w-3/5 text-black p-4 md:p-6 pb-20 relative z-20">
+            <div className="relative z-20 w-full p-4 pb-20 text-white lg:w-3/5 md:p-6">
 
-              {/* Badge */}
-              <div className="inline-flex bg-[#FFD700] text-black px-4 py-1 rounded-lg font-semibold text-xs md:text-sm mb-2 items-center gap-2">
-                <span className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-black transform rotate-180"></span>
-                #1 Legal Service Provider In India
-              </div>
+              <p className="flex items-center justify-center gap-2 mb-4 font-semibold text-white lg:justify-start">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <span>#1 USA Company Registration Service</span>
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </p>
 
-              {/* Title */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4 text-black">
-                Company Registration in America (USA)
+              <h1 className="text-[#fff] mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl font-sans">
+                Company Registration in USA
               </h1>
 
-              {/* Description / Bullet Points */}
-              <div className="space-y-3 mb-8 text-sm lg:text-base text-gray-800">
-                <p className="flex items-start gap-3">
-                  <span className="w-3 h-3 bg-black rounded-full mt-2 flex-shrink-0"></span>
-                  Register your U.S. company in just 10 working days, with EIN issued in under 48 hours*. T&C apply.
-                </p>
-                <p className="flex items-start gap-3">
-                  <span className="w-3 h-3 bg-black rounded-full mt-2 flex-shrink-0"></span>
-                  Launch your American business for only $499 + taxes with expert-assisted documentation and filing.
-                </p>
-                <p className="flex items-start gap-3">
-                  <span className="w-3 h-3 bg-black rounded-full mt-2 flex-shrink-0"></span>
-                  Incorporate as a C Corporation to attract venture capital and startup investors confidently.
-                </p>
-              </div>
+              <p className="text-[#fff] text-lg max-w-lg mb-6">
+                Register your US company online and gain access to the world's largest market. Enjoy investor confidence, a flexible tax system, and global credibility.
+              </p>
 
-              {/* Optional Buttons */}
-              <div className="flex flex-wrap items-center gap-4">
-                <button className="bg-[#113C6D] hover:bg-indigo-900 text-white font-medium px-5 py-2 rounded-lg shadow-md transition">
-                  ▶ Watch to Know About US Incorp
-                </button>
-                <button className="bg-white text-[#113C6D] font-medium px-5 py-2 rounded-lg shadow-md transition border border-[#113C6D]">
-                  📜 View Sample Incorporation Certificate
-                </button>
+              <div className="mb-8 space-y-1">
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-green-500"></span> 100% online process, perfect for non-residents and NRIs.</p>
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-indigo-500"></span> Expert guidance on choosing the right state and entity type (LLC/C-Corp).</p>
               </div>
             </div>
 
-            {/* Right Column - Form */}
-            <div className="w-full lg:w-[350px] relative z-30 lg:mt-0 lg:ml-auto mt-[-100px] sm:mt-[-50px]">
+            <div className="w-full lg:w-[400px] relative z-30 lg:mt-0 lg:ml-auto mt-[-20px] sm:mt-[-20px] mb-12 lg:mr-4">
               <div
-                className="w-full p-6 md:p-8 rounded-2xl shadow-xl bg-white"
+                className="w-full p-6 bg-white shadow-xl md:p-8 rounded-2xl"
                 style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
               >
-                {/* Offer Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">Register Your Company Today</h2>
-                  <img
-                    src="/offer-image.png"
-                    alt="offer"
-                    className="w-10 h-10 object-contain"
-                  />
-                </div>
+                <h2 className="mb-4 text-xl font-semibold text-gray-800 font-sans">Incorporate in the USA</h2>
+                <form className="space-y-3">
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Your Name" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Email" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Mobile Number" />
 
-                {/* Form */}
-                <form className="space-y-4">
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Email"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Mobile Number"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="City / Pincode"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Language"
-                  />
-
-                  {/* WhatsApp Toggle */}
-                  <div className="flex items-center justify-between pt-1 text-gray-700">
-                    <p className="text-xs md:text-sm font-medium">Get easy updates through WhatsApp</p>
+                  <div className="flex items-center justify-between text-gray-600">
+                    <p className="text-xs font-medium text-gray-700 md:text-sm">Get Easy Updates Through WhatsApp</p>
                     <div className="w-10 h-5 bg-gray-300 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors">
-                      <div className="w-4 h-4 bg-white rounded-full shadow-md transition-transform transform translate-x-0"></div>
+                      <div className="w-4 h-4 transition-transform transform translate-x-0 bg-white rounded-full shadow-md"></div>
                     </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full bg-[#113C6D] text-white py-3 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-4"
-                  >
+                  <button type="submit" className="w-full bg-[#113C6D] text-white py-2.5 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-2">
                     Talk to an Expert
                   </button>
-
-                  {/* EMI Note */}
-                  <p className="text-xs text-gray-600 text-center mt-3">
-                    Easy monthly EMI options available
-                  </p>
-
-                  {/* Confidentiality Note */}
-                  <p className="text-[11px] text-gray-500 text-center mt-1 italic">
-                    No Spam. No Sharing. 100% Confidentiality.
-                  </p>
                 </form>
               </div>
             </div>

@@ -1,13 +1,18 @@
 package com.calzone.financial.auth.dto;
 
-// This is a Data Transfer Object (DTO) to safely send user info to the frontend.
-// It matches the data your React component needs.
+/**
+ * Data Transfer Object (DTO) for safely sending user profile information to the frontend.
+ * This object does not include sensitive information like password or image binary data.
+ */
 public class UserProfile {
     private Long id;
     private String fullName;
     private String email;
     private String phone;
-    private boolean hasProfileImage; // Changed from String to boolean
+    private boolean hasProfileImage;
+
+    public UserProfile() {
+    }
 
     public UserProfile(Long id, String fullName, String email, String phone, boolean hasProfileImage) {
         this.id = id;
@@ -17,7 +22,7 @@ public class UserProfile {
         this.hasProfileImage = hasProfileImage;
     }
 
-    // Getters are needed for Spring to serialize this object to JSON
+    // ==================== Getters ====================
     public Long getId() {
         return id;
     }
@@ -34,7 +39,28 @@ public class UserProfile {
         return phone;
     }
 
-    public boolean getHasProfileImage() { // Renamed getter for clarity
+    public boolean getHasProfileImage() {
         return hasProfileImage;
+    }
+
+    // ==================== Setters ====================
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setHasProfileImage(boolean hasProfileImage) {
+        this.hasProfileImage = hasProfileImage;
     }
 }

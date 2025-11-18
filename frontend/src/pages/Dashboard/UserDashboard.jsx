@@ -42,6 +42,19 @@ export default function UserDashboard() {
     if (authData?.user) {
       setUser(authData.user);
     }
+
+    // Try to fetch current user's profile image via authenticated endpoint
+    (async () => {
+      try {
+        const resp = await (await import("../../lib/api")).userAPI.profileImage();
+        const blob = resp.data;
+        const url = URL.createObjectURL(blob);
+        setUser((u) => ({ ...(u || {}), profileBlobUrl: url }));
+      } catch (e) {
+        // ignore
+      }
+    })();
+
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
@@ -203,9 +216,9 @@ export default function UserDashboard() {
                 transition: "transform 0.2s",
               }}
             > 
-              {user?.profileImagePath ? (
+              {user?.profileBlobUrl ? (
                 <img
-                  src={`/uploads/profile-images/${user.profileImagePath}`}
+                  src={user.profileBlobUrl}
                   alt="Profile"
                   style={{
                     width: "100%",

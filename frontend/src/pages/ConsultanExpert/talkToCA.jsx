@@ -18,6 +18,7 @@ import {
   CheckCircle, // New icon for pricing features
 } from "lucide-react";
 import { motion } from "framer-motion";
+import BackgroundImageSrc from "@/assets1/img/hero-bg-1.svg";
 
 // --- STATIC DATA DEFINITIONS (CA Consultation Content) ---
 
@@ -197,53 +198,62 @@ const CAConsultantCard = ({ expert }) => (
   </motion.div>
 );
 
-const ITRPlanCard = ({ plan }) => (
-  <div
-    className={`relative p-6 rounded-xl shadow-lg flex flex-col justify-between h-full transition-all ${plan.isRecommended
-      ? 'bg-[#E6F2FF] border-2 border-[#2E96FF] scale-[1.03] shadow-2xl'
-      : 'bg-white border border-gray-200'
-      }`}
-  >
-    {plan.isRecommended && (
-      <div className="absolute top-0 right-0 bg-[#2E96FF] text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-xl">
-        Recommended Plan
-      </div>
-    )}
+const ITRPlanCard = ({ plan }) => {
+  // A simple mapping from plan title to an icon for visual flair.
+  const icons = {
+    Lite: <Briefcase className="w-8 h-8" />,
+    Standard: <Star className="w-8 h-8" />,
+    Elite: <Zap className="w-8 h-8" />,
+  };
 
-    <div>
-      <h3 className="mb-2 text-2xl font-extrabold text-gray-900">{plan.title}</h3>
-
-      {plan.isContact ? (
-        <div className="mb-4 text-lg font-bold text-gray-600">{plan.originalPrice}</div>
-      ) : (
-        <div className="flex items-baseline gap-2 mb-4">
-          <span className="text-3xl font-extrabold text-[#2E96FF]">{plan.price}</span>
-          <span className="text-sm text-gray-400 line-through">{plan.originalPrice}</span>
-          <span className="text-sm font-bold text-green-600">{plan.discount}</span>
-        </div>
+  return (
+    <div className={`cs_pricing_table cs_style_1 cs_gray_bg_2 cs_radius_30 relative ${plan.isRecommended ? 'cs_active' : ''}`}>
+      {plan.isRecommended && (
+        <>
+          <div className="cs_pricing_table_shape position-absolute">
+            {/* Shape can be an img or SVG if you have it */}
+          </div>
+          <div className="cs_pricing_badge cs_accent_bg cs_medium cs_white_color text-center position-absolute">Most Popular</div>
+        </>
       )}
-
-      <button
-        className={`w-full py-3 font-semibold rounded-lg transition-colors shadow-md ${plan.isRecommended
-          ? 'bg-[#2E96FF] text-white hover:bg-[#0069D1]'
-          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }`}
-      >
-        {plan.isContact ? plan.price : "Get Started"}
-      </button>
-
-      <h4 className="pt-3 mt-6 mb-3 font-bold text-gray-800 border-t">What you'll get:</h4>
-      <ul className="space-y-2 text-sm text-gray-700">
-        {plan.features.map((feature, i) => (
-          <li key={i} className="flex items-start gap-2">
-            <CheckCircle className="flex-shrink-0 w-4 h-4 mt-1 text-green-500" />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="cs_pricing_table_heading cs_mb_3">
+        <h2 className="cs_plan_title cs_fs_24 cs_semibold mb-0">{plan.title} Plan</h2>
+        <span className="cs_plan_icon text-indigo-500">
+          {icons[plan.title] || <Briefcase className="w-8 h-8" />}
+        </span>
+      </div>
+      <div className="cs_pricing_info cs_mb_20">
+        {plan.isContact ? (
+          <div className="cs_price cs_fs_48 cs_semibold cs_heading_color cs_heading_font cs_mb_4">Contact Us</div>
+        ) : (
+          <div className="cs_price cs_fs_48 cs_semibold cs_heading_color cs_heading_font cs_mb_4">
+            {plan.price} <small className="text-base font-normal">/ Filing</small>
+          </div>
+        )}
+        <p className="mb-0">{plan.description}</p>
+      </div>
+      <div className="cs_separator cs_mb_22"></div>
+      <div className="cs_feature_wrapper cs_mb_30">
+        <ul className="cs_pricing_feature_list cs_mp_0">
+          {plan.features.map((feature, i) => (
+            <li key={i}>
+              <span className="cs_feature_icon cs_green_color">
+                <svg width="14" height="11" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.2442 0.289465L5.02298 7.10457L2.68046 4.6782C1.1639 3.21126 -0.947636 5.40321 0.466273 6.97165L3.86805 10.4952C3.89139 10.5194 3.93805 10.5701 3.96372 10.5919C4.57501 11.1719 5.52228 11.1284 6.08225 10.4952L13.7211 1.81682C14.5914 0.787306 13.2358 -0.611965 12.2465 0.289465H12.2442Z" fill="currentColor" />
+                </svg>
+              </span>
+              <span className="cs_feature_title cs_heading_color">{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <a href="#" aria-label="Buy service button" className="cs_btn cs_style_1 cs_fs_14 cs_bold cs_heading_color text-uppercase">
+        <span>{plan.isContact ? "Book Appointment" : "Get Started"}</span>
+        <span className="cs_btn_icon"><ArrowRight className="w-4 h-4" /></span>
+      </a>
     </div>
-  </div>
-);
+  );
+};
 
 
 // --- TAB CONTENT COMPONENTS (CA Content) ---
@@ -500,100 +510,72 @@ export default function Dashboard() {
 
   return (
     <div className="bg-white min-h-screen font-[Inter]">
-
-      {/* Breadcrumb Header
-			<div className="px-4 pt-4 mx-auto text-sm text-gray-500 max-w-7xl">
-				<a href="#" className="hover:underline">Home</a> &gt; <span className="font-semibold text-gray-700">CA Consultation</span>
-			</div> */}
-
-      {/* === HERO SECTION (CA Specific) === */}
-      <section className="relative w-full overflow-hidden min-h-[700px] md:min-h-[700px] bg-white">
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+      {/* === HERO SECTION (New Design) === */}
+      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6] mt-[10%]">
         <div className="relative px-4 pt-12 mx-auto max-w-7xl md:px-8">
 
-          {/* Dark Blue Background Card */}
           <div
-            className="absolute top-0 left-0 w-full h-[550px] md:h-[600px] bg-[#113C6D] shadow-2xl overflow-hidden"
-            style={{
-              clipPath: 'polygon(0 0, calc(100% - 60px) 0, 90% 48px, 40% 100%, 0 100%, 0 0)',
-              borderRadius: '24px',
-            }}
-          />
+            className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden"
+          >
+            <img
+              src={BackgroundImageSrc}
+              alt="Diagonal background graphic"
+              className="absolute top-0 left-0 object-cover w-full h-full"
+            />
+          </div>
 
-          {/* Content + Form Wrapper */}
-          <div className="relative z-10 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
+          <div className="relative z-20 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
 
-            {/* Left Column (Content) */}
             <div className="relative z-20 w-full p-4 pb-20 text-white lg:w-3/5 md:p-6">
 
-              {/* Badge */}
-              <div className="inline-flex bg-[#FFD700] text-black px-3 py-1 rounded-full font-bold text-xs md:text-sm mb-4">
-                #1 Company Secretary Service Provider in India
-              </div>
-
-              {/* H1 Title */}
-              <h1 className="mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
-                Company Secretary Services Online
-              </h1>
-
-              {/* Description Text */}
-              <p className="max-w-xl mb-4 text-base text-white/80 lg:text-lg">
-                Consult 200+ verified company secretaries for expert compliance guidance.
+              <p className="flex items-center justify-center gap-2 mb-4 font-semibold text-white lg:justify-start">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <span>#1 CA Service Provider In India</span>
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
               </p>
 
-              {/* Bullet Points */}
-              <div className="mb-8 space-y-2 text-white">
-                <p className="flex items-start gap-3">
-                  <CheckCircle className="flex-shrink-0 w-5 h-5 mt-1 text-green-400" />
-                  Clear, hassle-free advice to keep your business compliant at every step
-                </p>
-                <p className="flex items-start gap-3">
-                  <CheckCircle className="flex-shrink-0 w-5 h-5 mt-1 text-green-400" />
-                  Transparent pricing with no hidden fees and satisfaction guaranteed
-                </p>
-              </div>
+              <h1 className="text-[#fff] mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl font-sans">
+                Online CA Consultation
+              </h1>
 
+              <p className="text-[#fff] text-lg max-w-lg mb-6">
+                Consult 200+ verified Chartered Accountants for expert financial and tax guidance.
+              </p>
+
+              <div className="mb-8 space-y-1">
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-green-500"></span> Clear, hassle-free advice for tax and compliance.</p>
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-indigo-500"></span> Transparent pricing with no hidden fees.</p>
+              </div>
             </div>
 
-            {/* Right Column (Form & Pricing) */}
-            <div className="w-full lg:w-[400px] relative z-30 lg:mt-[-50px] mt-[-100px] sm:mt-[-50px]">
+            <div className="w-full lg:w-[400px] relative z-30 lg:mt-0 lg:ml-auto mt-[-20px] sm:mt-[-20px] mb-12 lg:mr-4">
               <div
-                className="w-full p-6 bg-white shadow-2xl md:p-8 rounded-2xl"
+                className="w-full p-6 bg-white shadow-xl md:p-8 rounded-2xl"
                 style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
               >
-                <h2 className="mb-3 text-xl font-semibold text-gray-800">Get Started</h2>
+                <h2 className="mb-4 text-xl font-semibold text-gray-800 font-sans">Get Expert CA Consultation</h2>
+                <form className="space-y-3">
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Email" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Mobile Number" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="City/Pincode" />
 
-                {/* Pricing Box */}
-                <div className="p-3 mb-4 border-l-4 border-green-500 rounded-lg bg-green-50">
-                  <p className="text-lg font-bold text-green-700">
-                    ₹999 for a 30-min Expert Consultation
-                  </p>
-                </div>
-
-                {/* Form */}
-                <form className="space-y-2.5">
-                  {['Email', 'Mobile Number', 'City/Pincode', 'Language', 'Problem Type'].map((placeholder) => (
-                    <input
-                      key={placeholder}
-                      placeholder={placeholder}
-                      className="w-full px-3 py-2.5 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-[#2E96FF] focus:ring-1 focus:ring-[#2E96FF]"
-                    />
-                  ))}
-
-                  {/* WhatsApp Toggle */}
-                  <div className="flex items-center justify-between pt-1 text-gray-600">
-                    <p className="text-xs font-medium text-gray-700 md:text-sm">
-                      Get easy updates through Whatsapp
-                    </p>
-                    <div className="w-9 h-4.5 bg-green-500 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors justify-end">
-                      <div className="w-3.5 h-3.5 bg-white rounded-full shadow-md transition-transform transform translate-x-0"></div>
+                  <div className="flex items-center justify-between text-gray-600">
+                    <p className="text-xs font-medium text-gray-700 md:text-sm">Get Easy Updates Through Whatsapp</p>
+                    <div className="w-10 h-5 bg-gray-300 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors">
+                      <div className="w-4 h-4 transition-transform transform translate-x-0 bg-white rounded-full shadow-md"></div>
                     </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full bg-[#2E96FF] text-white py-2.5 text-sm font-semibold rounded-lg transition-colors hover:bg-[#0069D1] shadow-md mt-3"
-                  >
+                  <button type="submit" className="w-full bg-[#113C6D] text-white py-2.5 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-2">
                     Book An Appointment Now
                   </button>
                 </form>
@@ -605,16 +587,23 @@ export default function Dashboard() {
 
 
       {/* --- ITR Pricing Section --- */}
-      <section className="px-4 py-16 md:px-8 bg-gray-50">
+      <section className="relative px-4 py-16 md:px-8 bg-gray-50">
         <div className="mx-auto max-w-7xl">
-          <h2 className="mb-4 text-3xl font-bold text-center text-gray-900">
-            Choose the Right Plan For Your ITR Filing
-          </h2>
-          <p className="mb-10 text-lg text-center text-gray-600">
-            Vakilsearch's experts file over 10,000+ ITRs every month.
-          </p>
+          <div className="cs_section_heading cs_style_1 cs_center_column cs_mb_60 text-center">
+            <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22 flex items-center justify-center gap-2">
+              <Star className="w-5 h-5 text-yellow-500 fill-current" />
+              <span>Our Pricing</span>
+              <Star className="w-5 h-5 text-yellow-500 fill-current" />
+            </div>
+            <h2 className="cs_section_title cs_fs_48 cs_semibold cs_mb_20 text-capitalize">
+              Starter Plan For Everyone
+            </h2>
+            <p className="mb-0 text-gray-600">
+              Vakilsearch's experts file over 10,000+ ITRs every month. Choose the right plan for your needs.
+            </p>
+          </div>
 
-          <div className="grid items-stretch gap-8 md:grid-cols-3">
+          <div className="grid items-end grid-cols-1 gap-8 md:grid-cols-3">
             {itrPlans.map((plan, i) => (
               <ITRPlanCard key={i} plan={plan} />
             ))}

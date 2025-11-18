@@ -2,13 +2,11 @@ package com.calzone.financial.auth;
 
 // import com.calzone.financial.auth.dto.AuthResponse;
 // import com.calzone.financial.auth.dto.UserProfile;
-import com.calzone.financial.sms.PhoneOtp;
-import com.calzone.financial.sms.PhoneOtpRepository;
-import com.calzone.financial.sms.SmsService;
-import com.calzone.financial.user.User;
-import com.calzone.financial.user.UserRepository;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,10 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.SecureRandom;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Map;
+import com.calzone.financial.sms.PhoneOtp;
+import com.calzone.financial.sms.PhoneOtpRepository;
+import com.calzone.financial.sms.SmsService;
+import com.calzone.financial.user.User;
+import com.calzone.financial.user.UserRepository;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -117,12 +119,13 @@ public class PhoneAuthController {
             role = user.getRoles().iterator().next().getName();
         }
         java.util.Map<String,Object> userMap = java.util.Map.of(
-                "id", user.getId(),
-                "fullName", user.getFullName(),
-                "email", user.getEmail(),
-                "phone", user.getPhone(),
-                "role", role,
-                "profileImagePath", user.getProfileImage()
+            "id", user.getId(),
+            "fullName", user.getFullName(),
+            "email", user.getEmail(),
+            "phone", user.getPhone(),
+            "role", role,
+            // Return the stored path/filename for the profile image (may be null or empty)
+            "profileImagePath", user.getProfileImage()
         );
         return ResponseEntity.ok(java.util.Map.of("token", token, "user", userMap));
     }

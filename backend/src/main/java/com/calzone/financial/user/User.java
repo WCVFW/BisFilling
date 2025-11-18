@@ -60,21 +60,19 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Boolean emailVerified = false;
 
-    // Optional profile fields
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    // Stores the binary data of the profile image
+    // Profile image stored as binary data in database
     @Lob
-    @Column(name = "profile_image", columnDefinition="LONGBLOB")
+    @Column(name = "profile_image", columnDefinition = "LONGBLOB")
     private byte[] profileImage;
 
-    // Stores the content type (e.g., "image/png") of the profile image
+    // Content type of the profile image (e.g., "image/png")
+    @Column(name = "profile_image_type")
     private String profileImageType;
 
-    // ===================
-    // Lifecycle hooks
-    // ===================
+    // ==================== Lifecycle Hooks ====================
     @PrePersist
     public void prePersist() {
         Instant now = Instant.now();
@@ -83,7 +81,7 @@ public class User implements UserDetails {
         if (emailVerified == null) emailVerified = false;
         if (phone == null) phone = "";
         if (fullName == null) fullName = "";
-        if (passwordHash == null) passwordHash = ""; // ensure DB NOT NULL column is satisfied
+        if (passwordHash == null) passwordHash = "";
         if (phoneVerified == null) phoneVerified = false;
         if (address == null) address = "";
     }
@@ -93,9 +91,7 @@ public class User implements UserDetails {
         updatedAt = Instant.now();
     }
 
-    // ===================
-    // UserDetails methods
-    // ===================
+    // ==================== UserDetails Methods ====================
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (roles == null || roles.isEmpty()) {
@@ -105,70 +101,142 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String getPassword() { return passwordHash; }
+    public String getPassword() {
+        return passwordHash;
+    }
 
     @Override
-    public String getUsername() { return email; }
+    public String getUsername() {
+        return email;
+    }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isEnabled() { return true; }
+    public boolean isEnabled() {
+        return true;
+    }
 
-    // ===================
-    // Getters & Setters
-    // ===================
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // ==================== Getters & Setters ====================
+    public Long getId() {
+        return id;
+    }
 
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getFullName() {
+        return fullName;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-    public void setPassword(String password) { this.passwordHash = password; }
+    public String getEmail() {
+        return email;
+    }
 
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public Instant getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+    public String getPhone() {
+        return phone;
+    }
 
-    public Boolean getEmailVerified() { return emailVerified; }
-    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-    public Boolean getPhoneVerified() { return phoneVerified; }
-    public void setPhoneVerified(Boolean phoneVerified) { this.phoneVerified = phoneVerified; }
+    public void setPassword(String password) {
+        this.passwordHash = password;
+    }
 
-    public java.util.Set<Role> getRoles() { return roles; }
-    public void setRoles(java.util.Set<Role> roles) { this.roles = roles; }
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    public byte[] getProfileImage() { return profileImage; }
-    public void setProfileImage(byte[] profileImage) { this.profileImage = profileImage; }
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 
-    public String getProfileImageType() { return profileImageType; }
-    public void setProfileImageType(String profileImageType) { this.profileImageType = profileImageType; }
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
-    // Helper to check if an image exists, used in DTOs
-    public boolean hasProfileImage() { return this.profileImage != null && this.profileImage.length > 0; }
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
 
-    // ===================
-    // Builder pattern
-    // ===================
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public Boolean getPhoneVerified() {
+        return phoneVerified;
+    }
+
+    public void setPhoneVerified(Boolean phoneVerified) {
+        this.phoneVerified = phoneVerified;
+    }
+
+    public java.util.Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(java.util.Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public byte[] getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(byte[] profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public String getProfileImageType() {
+        return profileImageType;
+    }
+
+    public void setProfileImageType(String profileImageType) {
+        this.profileImageType = profileImageType;
+    }
+
+    // Helper method to check if a profile image exists
+    public boolean hasProfileImage() {
+        return this.profileImage != null && this.profileImage.length > 0;
+    }
+
+    // ==================== Builder Pattern ====================
     public static Builder builder() {
         return new Builder();
     }
@@ -178,7 +246,7 @@ public class User implements UserDetails {
         private String email;
         private String phone;
         private String password;
-        private Boolean emailVerified = false; // Add emailVerified to Builder
+        private Boolean emailVerified = false;
 
         public Builder fullName(String fullName) {
             this.fullName = fullName;
@@ -200,9 +268,9 @@ public class User implements UserDetails {
             return this;
         }
 
-        public Builder emailVerified(Boolean emailVerified) { // Add emailVerified to Builder
-           this.emailVerified = emailVerified;
-           return this;
+        public Builder emailVerified(Boolean emailVerified) {
+            this.emailVerified = emailVerified;
+            return this;
         }
 
         public User build() {

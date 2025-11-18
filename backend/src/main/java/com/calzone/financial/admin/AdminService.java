@@ -1,21 +1,27 @@
-package com.calzone.financial.config;
-
-import java.io.IOException;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
+package com.calzone.financial.admin;
 
 import com.calzone.financial.user.Role;
 import com.calzone.financial.user.RoleRepository;
 import com.calzone.financial.user.User;
 import com.calzone.financial.user.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+@Service
 public class AdminService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    // Define a constant for the maximum image size (e.g., 5MB)
+    private static final long MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
     public AdminService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -44,10 +50,8 @@ public class AdminService {
             user.setAddress(address);
         }
 
-        if (profileImageFile != null && !profileImageFile.isEmpty()) {
-            user.setProfileImage(profileImageFile.getBytes());
-            user.setProfileImageType(profileImageFile.getContentType());
-        }
+        // Validate and set profile image
+        validateAndSetImage(user, profileImageFile);
 
         return userRepository.save(user);
     }
@@ -78,11 +82,35 @@ public class AdminService {
             user.setAddress(address);
         }
 
-        if (profileImageFile != null && !profileImageFile.isEmpty()) {
-            user.setProfileImage(profileImageFile.getBytes());
-            user.setProfileImageType(profileImageFile.getContentType());
-        }
+        // Validate and set profile image
+        validateAndSetImage(user, profileImageFile);
 
         return userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> listEmployees() {
+        return userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> r.getName().equals("EMPLOYEE") || r.getName().equals("ADMIN")))
+                .toList();
+    }
+
+    @Transactional
+    public void deleteEmployee(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    private void validateAndSetImage(User user, MultipartFile imageFile) throws IOException {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            if (imageFile.getSize() > MAX_IMAGE_SIZE_BYTES) {
+                throw new IllegalArgumentException("Image size exceeds the limit of 5MB.");
+            }
+            List<String> allowedTypes = Arrays.asList("image/jpeg", "image/png", "image/gif", "image/svg+xml");
+            if (!allowedTypes.contains(imageFile.getContentType())) {
+                throw new IllegalArgumentException("Invalid image type. Only JPG, PNG, GIF, or SVG are allowed.");
+            }
+            user.setProfileImage(imageFile.getBytes());
+            user.setProfileImageType(imageFile.getContentType());
+        }
     }
 }

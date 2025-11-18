@@ -21,7 +21,7 @@ import {
     Lightbulb // For Acts/Rules
 } from "lucide-react";
 import { motion } from "framer-motion";
-import BackgroundImageSrc from '../../assets/business.png'; // Reusing a general business image
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg'; // Reusing a general business image
 
 // --- MSME REGISTRATION STATIC DATA DEFINITIONS ---
 

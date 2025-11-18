@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { userAPI } from "../lib/api";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -37,9 +38,19 @@ const AdminLayout = ({ children, logout }) => {
       const name =
         user.fullName || user.name || user.email?.split("@")[0] || "Admin";
       setUserName(name);
-      if (user.profileImagePath) {
-        setUserProfileImage(`/uploads/profile-images/${user.profileImagePath}`);
-      }
+
+      // If current user has a profile image stored as blob, fetch it
+      (async () => {
+        try {
+          const resp = await userAPI.profileImage();
+          const blob = resp.data;
+          const url = URL.createObjectURL(blob);
+          setUserProfileImage(url);
+        } catch (e) {
+          // ignore - keep default avatar
+          setUserProfileImage(null);
+        }
+      })();
     }
   }, []);
 
@@ -107,7 +118,7 @@ const AdminLayout = ({ children, logout }) => {
               <img
                 src={userProfileImage}
                 alt="Profile"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             ) : (
               <User

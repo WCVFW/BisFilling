@@ -21,7 +21,7 @@ import {
     Lightbulb // For Government/Authority Registration
 } from "lucide-react";
 import { motion } from "framer-motion";
-import BackgroundImageSrc from '../../assets/business.png'; // Reusing a general business image
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg'; // Reusing a general business image
 
 // --- CLRA REGISTRATION STATIC DATA DEFINITIONS ---
 

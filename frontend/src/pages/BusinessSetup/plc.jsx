@@ -13,7 +13,7 @@ import {
     Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import BackgroundImageSrc from "@/assets/business.png"
+import BackgroundImageSrc from "@/assets1/img/hero-bg-1.svg"
 
 // NOTE: BackgroundImageSrc is imported from a relative path, ensure it exists in your project.
 // import BackgroundImageSrc from "@/assets/business.png" 
@@ -141,6 +141,17 @@ const pvtLtdFAQs = [
     { q: "How Does Limited Liability Work?", a: "Shareholders are only financially responsible for the company's debts up to the amount of capital they invested or guaranteed; their personal assets are protected." },
 ];
 
+const resourceLinks = [
+    { title: "Trademark", icon: Briefcase, items: ["Trademark Search", "Trademark Registration", "Trademark Objection", "Trademark Infringement", "Well Known Trademark", "International Trademark Registration", "Trademark Class List"] },
+    { title: "GST", icon: Layers, items: ["HSN Code Finder", "Online GST Registration", "GST Return Filing", "GST Cancellation", "GST Revocation"] },
+    { title: "Company Registration", icon: Briefcase, items: ["Company Name Search", "Company Registration", "PVT LTD Company Registration", "LLP Registration", "Sole Proprietorship Registration", "OPC Registration", "Partnership Firm Registration", "Startup India Registration"] },
+    { title: "ITR, Patent & BNS", icon: FileText, items: ["IT Return Filing", "Patent Search", "Patent Registration", "Provisional Patent Application", "Patent Infringement", "BNS Sections"] },
+    { title: "Copyright & Experts", icon: Users, items: ["Copyright Registration", "Copyright Music Protection", "Copyright Infringement", "Online Lawyer Consultation", "Online CA Consultation", "Company Secretary Services", "Consumer Complaints", "Lawyer Services", "Intellectual Property Lawyers"] },
+    { title: "Calculators", icon: Trello, items: ["GST Calculator", "TDS Calculator", "HRA Calculator", "Gratuity Calculator", "SIP Calculator", "NPS Calculator", "EPF Calculator", "Business Setup Calculator", "PPF Calculator", "Income Tax Calculator", "Simple Compound Interest Calculator", "Salary Calculator", "Retirement Planning Calculator", "RD Calculator", "Mutual Fund Calculator", "FD Calculator", "Home Loan EMI Calculator", "EMI Calculator", "Lumpsum Calculator"] },
+    { title: "Downloads", icon: Trello, items: ["Rental Agreement Format", "GST Invoice Format", "Income Certificate Format", "Power of Attorney Format", "Affidavit Format", "Salary Slip Sample", "Appointment Letter Format", "Relieving Letter Format", "Legal Heir Certificate Format", "Generate Free Rent Receipt", "Commercial Rental Agreement", "Consent Letter for GST Registration Format", "No Objection Certificate (NOC) Format", "Partnership Deed Format", "Experience Letter Format", "Resignation Letter Format", "Offer Letter Format", "Bonafide Certificate Format", "Delivery Challan Format", "Authorised Signatory in GST"] },
+    { title: "Find Lawyers By City", icon: Home, items: ["Top Lawyers in Chennai", "Top Lawyers in Bangalore", "Top Lawyers in Mumbai", "Top Lawyers in Delhi", "Top Lawyers in Kolkata", "Top Lawyers in Gurgaon", "Search Lawyers in Other Cities"] },
+];
+
 
 // --- REUSABLE COMPONENTS ---
 
@@ -222,32 +233,30 @@ const PvtLtdPlanCard = ({ plan, hoveredPlanId, setHoveredPlanId, selectedPlanId,
                 <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900 mb-1">{plan.title}</h3>
                 <p className={`text-sm mb-4 ${isPremiumPlan ? 'text-gray-700 font-semibold' : 'text-gray-500'}`}>{plan.description}</p>
 
-                {isPremiumPlan ? (
-                    <div className="text-lg font-bold text-red-600 mb-4">{plan.price}</div>
-                ) : (
-                    <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 mb-4">
-                        <span className="text-xl sm:text-3xl font-extrabold text-[#2E96FF]">{plan.price}</span>
-                        <span className="text-sm line-through text-gray-400">{plan.originalPrice}</span>
-                        <span className="text-sm text-green-600 font-bold">{plan.discountText}</span>
-                        {plan.govtFeeNote && <span className="text-xs text-gray-500">{plan.govtFeeNote}</span>}
-                    </div>
-                )}
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 mb-4">
+                    <span className="text-xl sm:text-3xl font-extrabold text-[#2E96FF]">{plan.price}</span>
+                    <span className="text-sm line-through text-gray-400">{plan.originalPrice}</span>
+                    <span className="text-sm text-green-600 font-bold">{plan.discountText}</span>
+                    {plan.govtFeeNote && <span className="text-xs text-gray-500">{plan.govtFeeNote}</span>}
+                </div>
 
-                <div className={`text-sm font-semibold mb-4 ${isPremiumPlan ? 'text-gray-900' : 'text-green-700'}`}>
+                <div className={`text-sm font-semibold mb-4 ${isPremiumPlan ? 'text-blue-700' : 'text-green-700'}`}>
                     {plan.cashbackText}
                 </div>
 
 
                 <button
                     className={`w-full py-2.5 sm:py-3 font-semibold rounded-lg transition-colors shadow-md ${isPremiumPlan
-                        ? 'bg-[#113C6D] text-white hover:bg-[#003C6D]'
+                        ? 'bg-blue-900 text-white hover:bg-blue-800'
                         : isProminent
                             ? 'bg-[#2E96FF] text-white hover:bg-[#0069D1]'
                             : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                         }`}
                     onClick={(e) => {
                         e.stopPropagation();
-                        if (!isPremiumPlan) setSelectedPlanId(plan.title);
+                        if (!isPremiumPlan) {
+                            setSelectedPlanId(plan.title);
+                        }
                     }}
                 >
                     {isPremiumPlan ? "Talk to Incorporation Expert" : "Get Started"}
@@ -266,6 +275,26 @@ const PvtLtdPlanCard = ({ plan, hoveredPlanId, setHoveredPlanId, selectedPlanId,
         </div>
     );
 };
+
+const ResourceLinkGroup = ({ title, items, icon: Icon }) => (
+    <div className="p-4 bg-white shadow-lg rounded-xl">
+        <h4 className="flex items-center gap-2 mb-3 text-xl font-bold text-gray-900">
+            {Icon && <Icon className="w-5 h-5 text-[#2E96FF]" />} {title}
+        </h4>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            {items.slice(0, 7).map((item, i) => (
+                <a key={i} href="#" className="text-sm text-gray-600 hover:text-[#2E96FF] transition truncate" title={item}>
+                    {item}
+                </a>
+            ))}
+        </div>
+        {items.length > 7 && (
+            <a href="#" className="text-sm text-[#2E96FF] font-semibold mt-2 block hover:underline">
+                View all ({items.length - 7} more)
+            </a>
+        )}
+    </div>
+);
 
 
 // --- SECTION COMPONENTS ---
@@ -311,14 +340,16 @@ const PvtProcessContent = () => (
             The registration process is regulated by the Ministry of Corporate Affairs (MCA) and ensures limited liability and separate legal entity status.
         </p>
 
-        <ol className="space-y-4 sm:space-y-5 list-none border-l-2 border-indigo-100 pl-4">
-            {pvtLtdProcess.map((step, i) => (
-                <ProcessStep key={i} stepNumber={i + 1} step={step} />
-            ))}
-        </ol>
-        <div className="mt-6 p-4 text-sm bg-yellow-50 text-yellow-800 rounded-lg border-l-4 border-yellow-500">
-            **Note:** The registration process for a Private Limited Company typically takes 7 to 10 days for application filing, with final COI issuance taking 14-35 days depending on package and MCA review.
+        <div className="flex justify-center">
+            <div className="flex flex-col">
+                {pvtLtdProcess.map((step, i) => (
+                    <ProcessStep key={i} stepNumber={i + 1} step={step.replace(/Step \d+: /, '')} isLast={i === pvtLtdProcess.length - 1} />
+                ))}
+            </div>
         </div>
+        <p className="mt-12 text-center text-xl font-bold text-indigo-700 bg-indigo-50 p-4 rounded-lg">
+            **Note:** The registration process for a Private Limited Company typically takes 7 to 10 days for application filing, with final COI issuance taking 14-35 days depending on package and MCA review.
+        </p>
     </section>
 );
 
@@ -372,53 +403,42 @@ const PvtComplianceContent = () => (
 
 // FAQ component logic is solid, using motion for animation
 const PvtFAQsContent = ({ faqs, faqOpen, setFaqOpen }) => (
-    <section id="pvt-faqs-content" className="py-8 sm:py-12 max-w-5xl mx-auto scroll-mt-24">
-        <h3 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-gray-800 text-center">FAQs on Company Registration</h3>
-
-        <div className="space-y-3 sm:space-y-4">
-            {faqs.map((f, i) => (
-                <div key={i} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-                    <button
-                        className={`w-full flex justify-between items-center p-4 sm:p-5 text-left transition ${faqOpen === i ? 'bg-[#E6F2FF] text-[#2E96FF]' : 'bg-white hover:bg-gray-50'}`}
-                        onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                    >
-                        <span className="font-semibold text-base sm:text-lg">{f.q}</span>
-                        <ChevronDown
-                            className={`w-5 h-5 sm:w-6 sm:h-6 transition-transform ${faqOpen === i ? "rotate-180 text-[#2E96FF]" : "text-gray-500"}`}
-                        />
-                    </button>
-                    <motion.div
-                        initial={false}
-                        animate={{ height: faqOpen === i ? "auto" : 0 }}
-                        transition={{ duration: 0.3 }}
-                        style={{ overflow: 'hidden' }}
-                    >
-                        <p className="px-4 sm:px-5 py-3 sm:py-4 text-sm sm:text-base text-gray-700 bg-white">{f.a}</p>
-                    </motion.div>
+    <section id="pvt-faqs-content" className="py-20 bg-white scroll-mt-24">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+                <div className="flex items-center gap-2 mb-4 font-semibold text-indigo-600">
+                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                    <span>FAQ’s</span>
+                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                 </div>
-            ))}
+                <h2 className="mb-4 text-4xl font-bold text-gray-900">FAQs on Company Registration</h2>
+                <p className="mb-8 text-gray-600">
+                    Find answers to common questions about Private Limited Company registration, compliance, and processes.
+                </p>
+                <a href="#" aria-label="FAQ page link" className="inline-flex items-center justify-center px-6 py-3 font-bold text-white uppercase transition-colors bg-indigo-700 rounded-lg text-sm hover:bg-indigo-800">
+                    <span>Check More Faq</span>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                </a>
+            </div>
+
+            <div className="space-y-4 lg:col-span-7">
+                {faqs.map((f, i) => (
+                    <div key={i} className="overflow-hidden bg-gray-100 rounded-lg">
+                        <button className="flex items-center justify-between w-full p-5 text-left" onClick={() => setFaqOpen(faqOpen === i ? null : i)}>
+                            <h3 className="text-lg font-semibold text-gray-800">{f.q}</h3>
+                            <span className={`flex items-center justify-center w-8 h-8 rounded-full transition-transform ${faqOpen === i ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}>
+                                <ChevronDown className={`w-5 h-5 transition-transform ${faqOpen === i ? 'rotate-180' : ''}`} />
+                            </span>
+                        </button>
+                        <motion.div initial={false} animate={{ height: faqOpen === i ? "auto" : 0, opacity: faqOpen === i ? 1 : 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
+                            <p className="px-5 pb-5 text-gray-600">{f.a}</p>
+                        </motion.div>
+                    </div>
+                ))}
+            </div>
         </div>
     </section>
 );
-
-// --- FOOTER COMPONENT (Updated with new links structure) ---
-
-const FooterColumn = ({ title, links }) => (
-    <div>
-        <h4 className="font-bold text-sm sm:text-base text-gray-900 mb-3">{title}</h4>
-        <ul className="space-y-2">
-            {links.map((link, i) => (
-                <li key={i}>
-                    <a href="#" className="text-xs sm:text-sm text-gray-600 hover:text-[#2E96FF] transition-colors">
-                        {link}
-                    </a>
-                </li>
-            ))}
-        </ul>
-    </div>
-);
-
-
 
 
 // --- MAIN COMPONENT ---
@@ -469,7 +489,7 @@ export default function LandingPageDesign() {
             window.removeEventListener('scroll', handleScroll);
         };
         // CORRECTION: pvtLtdTabs is a static constant, so we use an empty dependency array.
-    }, []); 
+    }, []);
 
     // Function to handle smooth scrolling when a tab is clicked
     const handleTabClick = (id) => {
@@ -484,95 +504,81 @@ export default function LandingPageDesign() {
     };
 
     return (
-        <div className="bg-white min-h-screen font-[Inter]">
-            {/* === HERO SECTION === */}
-            <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6]">
-                <div className="max-w-7xl mx-auto px-4 md:px-8 relative pt-12">
+        <div className="bg-white min-h-screen font-['DM_Sans',_sans-serif]">
+            <style>{`
+                .no-scrollbar::-webkit-scrollbar { display: none; }
+                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            `}</style>
+            {/* === HERO SECTION (New Design) === */}
+            <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6] mt-[10%]">
+                <div className="relative px-4 pt-12 mx-auto max-w-7xl md:px-8">
 
                     {/* Background Image */}
                     <div className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden">
                         <img
                             src={BackgroundImageSrc}
                             alt="Diagonal background graphic"
-                            className="absolute top-0 left-0 w-full h-full object-cover"
+                            className="absolute top-0 left-0 object-cover w-full h-full"
                         />
                     </div>
 
                     {/* Content and Form Wrapper */}
-                    <div className="relative flex flex-col lg:flex-row items-start pt-10 pb-12 lg:pb-0 z-20">
+                    <div className="relative z-20 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
 
                         {/* LEFT COLUMN - CONTENT */}
-                        <div className="w-full lg:w-3/5 text-black p-4 md:p-6 pb-20 relative z-20">
-
-                            {/* Breadcrumbs */}
-                            <p className="text-sm text-gray-700 mb-2">Home &gt; Company Registration &gt; Pvt Ltd Company Registration</p>
+                        <div className="relative z-20 w-full p-4 pb-20 text-white lg:w-3/5 md:p-6">
 
                             {/* Badge */}
-                            <div className="inline-flex bg-[#FFD700] text-black px-4 py-1 rounded-lg font-semibold text-xs md:text-sm mb-3 items-center gap-2">
-                                <span className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-black transform rotate-180"></span>
-                                #1 Legal Service Provider in India
-                            </div>
+                            <p className="flex items-center justify-center gap-2 mb-4 font-semibold text-white lg:justify-start">
+                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                <span>#1 Legal Service Provider In India</span>
+                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                            </p>
 
                             {/* Heading */}
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4">
-                                Private Limited Company Registration in India – Starting @ ₹999
+                            <h1 className="text-[#fff] mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl font-sans">
+                                Pvt Ltd Company Registration
                             </h1>
 
                             {/* Description */}
-                            <div className="space-y-2 mb-6">
-                                <p className="flex items-center gap-2 text-gray-800 text-sm">
-                                    <span className="w-2 h-2 bg-blue-600 block rounded-full"></span>
-                                    Expert assistance and filing in just 2 days for your growing business. <span className="italic text-gray-600">T&C apply</span>
-                                </p>
-                                <p className="flex items-center gap-2 text-gray-800 text-sm">
-                                    <span className="w-2 h-2 bg-blue-600 block rounded-full"></span>
-                                    Affordable, transparent pricing starting at ₹999 + Govt Fee with no hidden charges.
-                                </p>
-                                <p className="flex items-center gap-2 text-gray-800 text-sm">
-                                    <span className="w-2 h-2 bg-blue-600 block rounded-full"></span>
-                                    Complete compliance handling & post-incorporation and banking support.
-                                </p>
-                            </div>
+                            <p className="text-[#fff] text-lg max-w-lg mb-6">
+                                Register your Private Limited Company with expert assistance. Enjoy limited liability, legal recognition, and easier access to funding.
+                            </p>
 
-                            {/* Buttons */}
-                            <div className="flex gap-4 flex-wrap mb-6">
-                                <button className="flex items-center gap-2 bg-[#113C6D] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-indigo-900 transition">
-                                    🎥 Know about PVT in 60 sec
-                                </button>
-                                <button className="flex items-center gap-2 border border-[#113C6D] text-[#113C6D] px-6 py-3 rounded-lg font-semibold hover:bg-[#113C6D] hover:text-white transition">
-                                    🧾 View Package
-                                </button>
+                            {/* Bullet Points */}
+                            <div className="mb-8 space-y-1">
+                                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-green-500"></span> Expert assistance and filing in just 2 days.</p>
+                                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-indigo-500"></span> Complete compliance handling & post-incorporation support.</p>
                             </div>
-
                         </div>
 
                         {/* RIGHT COLUMN - FORM */}
-                        <div className="w-full lg:w-[350px] relative z-30 lg:mt-0 lg:ml-auto mt-[-100px] sm:mt-[-50px]">
+                        <div className="w-full lg:w-[400px] relative z-30 lg:mt-0 lg:ml-auto mt-[-20px] sm:mt-[-20px] mb-12 lg:mr-4">
                             <div
-                                className="w-full p-6 md:p-8 rounded-2xl shadow-xl bg-white"
+                                className="w-full p-6 bg-white shadow-xl md:p-8 rounded-2xl"
                                 style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
                             >
-                                <h2 className="text-xl font-semibold mb-6 text-gray-800">Register Your Pvt Ltd Company</h2>
-                                <form className="space-y-4">
+                                <h2 className="mb-4 text-xl font-semibold text-gray-800 font-sans">Register Your Pvt Ltd Company</h2>
+                                <form className="space-y-3">
                                     <input
-                                        className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                        className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         placeholder="Email"
                                         type="email" // Added type for semantic correctness
                                     />
                                     <input
-                                        className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                        className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         placeholder="Mobile Number"
                                         type="tel" // Added type for semantic correctness
                                     />
                                     <input
-                                        className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                        className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         placeholder="City / Pincode"
                                         type="text" // Added type for semantic correctness
                                     />
 
                                     <button
                                         type="submit"
-                                        className="w-full bg-[#113C6D] text-white py-3 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-4"
+                                        className="w-full bg-[#113C6D] text-white py-2.5 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-2"
                                     >
                                         Get Started Now
                                     </button>
@@ -582,7 +588,6 @@ export default function LandingPageDesign() {
                     </div>
                 </div>
             </section>
-
 
             {/* --- Pricing Section --- */}
             <section className="py-8 sm:py-16 px-4 md:px-8 bg-gray-50">
@@ -610,14 +615,20 @@ export default function LandingPageDesign() {
             </section>
 
             {/* === Main Content Tabs Navigation === */}
-            <section className="py-3 sm:py-4 md:py-10 px-4 md:px-8 bg-white border-b border-gray-200 sticky top-0 z-30 shadow-md">
+            <section className="sticky top-0 z-30 px-4 py-6 border-b border-gray-200 shadow-sm md:px-8 bg-gray-50">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center bg-white rounded-xl w-full text-xs sm:text-sm md:text-base overflow-x-scroll border border-gray-200">
+                    <div className="flex items-center w-full gap-x-2 overflow-x-auto text-sm md:text-base no-scrollbar">
                         {pvtLtdTabs.map((tab) => (
                             <a
                                 href={`#${tab.id}`} // Use href for better accessibility and deep linking
                                 key={tab.id}
-                                className={`flex flex-col flex-shrink-0 min-w-[100px] sm:min-w-[150px] py-3 sm:py-4 px-2 text-center font-bold cursor-pointer transition-all ${activeTab === tab.id ? 'bg-[#E6F2FF] border-b-4 border-[#2E96FF] text-[#2E96FF]' : 'text-gray-700 hover:bg-gray-50'}`}
+                                className={`
+                                    flex-shrink-0 py-3 px-5 min-w-[150px] text-center font-bold cursor-pointer transition-all rounded-full
+                                    ${activeTab === tab.id
+                                        ? 'bg-[#0069D1] text-white shadow-lg'
+                                        : 'text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                                    }
+                                `}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     handleTabClick(tab.id);
@@ -641,6 +652,19 @@ export default function LandingPageDesign() {
                 </div>
             </div>
 
+            {/* --- Resources & Links Footer Section --- */}
+            <section className="px-4 py-16 bg-[#F4F7FA] md:px-8">
+                <div className="mx-auto max-w-7xl">
+                    <h2 className="mb-12 text-3xl font-bold text-center text-gray-900 md:text-4xl font-sans">
+                        Explore Our Resources
+                    </h2>
+                    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {resourceLinks.map((group, i) => (
+                            <ResourceLinkGroup key={i} title={group.title} items={group.items} icon={group.icon} />
+                        ))}
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

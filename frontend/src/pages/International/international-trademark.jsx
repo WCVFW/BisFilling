@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 // Assume the path for your background image, updated for IP context
-import BackgroundImageSrc from '../../assets/business.png';
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg';
 
 
 // --- INTERNATIONAL TRADEMARK STATIC DATA DEFINITIONS ---

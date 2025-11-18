@@ -19,7 +19,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import BackgroundImageSrc from '../../assets/business.png';
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg';
 
 // --- UK INCORPORATION STATIC DATA DEFINITIONS ---
 
@@ -445,133 +445,65 @@ export default function UKInc() {
   return (
     <div className="bg-white min-h-screen font-[Inter]">
       {/* === HERO SECTION (UK Incorporation Specific) === */}
-      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6]">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 relative pt-12">
-          {/* Background Image */}
-          <div className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden">
+      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6] mt-[10%]">
+        <div className="relative px-4 pt-12 mx-auto max-w-7xl md:px-8">
+
+          <div
+            className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden"
+          >
             <img
               src={BackgroundImageSrc}
-              alt="UK company incorporation background"
-              className="absolute top-0 left-0 w-full h-full object-cover"
+              alt="Diagonal background graphic"
+              className="absolute top-0 left-0 object-cover w-full h-full"
             />
           </div>
 
-          {/* Content */}
-          <div className="relative flex flex-col lg:flex-row items-start pt-10 pb-12 lg:pb-0 z-20">
+          <div className="relative z-20 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
 
-            {/* Left Content */}
-            <div className="w-full lg:w-3/5 text-black p-4 md:p-6 pb-20 relative z-20">
-              {/* Breadcrumb */}
-              <nav className="text-sm text-gray-600 mb-3">
-                <span className="hover:underline cursor-pointer">Home</span> &gt;{" "}
-                <span className="font-semibold text-gray-800">
-                  Company Incorporation In UK
-                </span>
-              </nav>
+            <div className="relative z-20 w-full p-4 pb-20 text-white lg:w-3/5 md:p-6">
 
-              {/* Badge */}
-              <div className="inline-flex bg-[#FFD700] text-black px-4 py-1 rounded-lg font-semibold text-xs md:text-sm mb-3 items-center gap-2">
-                <img
-                  src="/badge-icon.png"
-                  alt="badge"
-                  className="w-4 h-4 object-contain"
-                />
-                #1 Legal Service Provider In India
-              </div>
+              <p className="flex items-center justify-center gap-2 mb-4 font-semibold text-white lg:justify-start">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <span>#1 UK Company Incorporation Service</span>
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </p>
 
-              {/* Title */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-black">
-                Company Incorporation In UK
+              <h1 className="text-[#fff] mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl font-sans">
+                Company Incorporation in UK
               </h1>
 
-              {/* Bullet Points */}
-              <div className="space-y-4 mb-8 text-sm lg:text-base text-gray-800">
-                <p className="flex items-start gap-3">
-                  <span className="w-4 h-4 bg-blue-500 rounded-full mt-1 flex-shrink-0"></span>
-                  Register your UK company online and establish a global business
-                  presence.
-                </p>
-                <p className="flex items-start gap-3">
-                  <span className="w-4 h-4 bg-blue-500 rounded-full mt-1 flex-shrink-0"></span>
-                  Complete your UK company registration remotely with zero paperwork
-                  and fast processing.
-                </p>
-                <p className="flex items-start gap-3">
-                  <span className="w-4 h-4 bg-blue-500 rounded-full mt-1 flex-shrink-0"></span>
-                  Get expert guidance to access UK banking, tax advantages, and
-                  international credibility.
-                </p>
-              </div>
+              <p className="text-[#fff] text-lg max-w-lg mb-6">
+                Register your UK company online and establish a global business presence. Enjoy a favorable tax regime, investor confidence, and easy access to global markets.
+              </p>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-4">
-                <button className="bg-[#113C6D] hover:bg-indigo-900 text-white font-medium px-6 py-3 rounded-lg shadow-md transition">
-                  🚀 Get Started
-                </button>
-                <button className="bg-white text-[#113C6D] font-medium px-6 py-3 rounded-lg shadow-md transition border border-[#113C6D]">
-                  📜 View Sample Incorporation Certificate
-                </button>
+              <div className="mb-8 space-y-1">
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-green-500"></span> Complete your UK company registration remotely with zero paperwork.</p>
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-indigo-500"></span> Get expert guidance to access UK banking and tax advantages.</p>
               </div>
             </div>
 
-            {/* Right Form */}
-            <div className="w-full lg:w-[350px] relative z-30 lg:mt-0 lg:ml-auto mt-[-100px] sm:mt-[-50px]">
+            <div className="w-full lg:w-[400px] relative z-30 lg:mt-0 lg:ml-auto mt-[-20px] sm:mt-[-20px] mb-12 lg:mr-4">
               <div
-                className="w-full p-6 md:p-8 rounded-2xl shadow-xl bg-white"
-                style={{ borderRadius: "24px", border: "1px solid #E0E0E0" }}
+                className="w-full p-6 bg-white shadow-xl md:p-8 rounded-2xl"
+                style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
               >
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    Get Started!
-                  </h2>
-                  <img
-                    src="/offer-image.png"
-                    alt="offer"
-                    className="w-10 h-10 object-contain"
-                  />
-                </div>
+                <h2 className="mb-4 text-xl font-semibold text-gray-800 font-sans">Incorporate in the UK</h2>
+                <form className="space-y-3">
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Your Name" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Email" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Mobile Number" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="City/Pincode" />
 
-                {/* Form */}
-                <form className="space-y-4">
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Email"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Mobile Number"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="City / Pincode"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Language"
-                  />
-
-                  {/* WhatsApp Toggle */}
-                  <div className="flex items-center justify-between pt-1 text-gray-700">
-                    <p className="text-xs md:text-sm font-medium">
-                      Get easy updates through WhatsApp
-                    </p>
+                  <div className="flex items-center justify-between text-gray-600">
+                    <p className="text-xs font-medium text-gray-700 md:text-sm">Get Easy Updates Through WhatsApp</p>
                     <div className="w-10 h-5 bg-gray-300 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors">
-                      <div className="w-4 h-4 bg-white rounded-full shadow-md transition-transform transform translate-x-0"></div>
+                      <div className="w-4 h-4 transition-transform transform translate-x-0 bg-white rounded-full shadow-md"></div>
                     </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full bg-[#113C6D] text-white py-3 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-4"
-                  >
+                  <button type="submit" className="w-full bg-[#113C6D] text-white py-2.5 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-2">
                     Consult an Expert
                   </button>
-
-                  <p className="text-xs text-gray-500 text-center mt-3 italic">
-                    No Spam. No Sharing. 100% Confidentiality.
-                  </p>
                 </form>
               </div>
             </div>

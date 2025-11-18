@@ -13,8 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 // NOTE: You must replace this path with a valid image path in your environment.
-// For example: import BackgroundImageSrc from './assets/business.png'
-import BackgroundImageSrc from "@/assets/business.png" 
+import BackgroundImageSrc from "@/assets1/img/hero-bg-1.svg" 
 
 // --- STATIC DATA DEFINITIONS (Startup India Registration Content) ---
 
@@ -477,109 +476,66 @@ export default function StartupLandingPageDesign() {
 
     return (
         <div className="bg-white min-h-screen font-[Inter]">
-            {/* === HERO SECTION === */}
-            <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6]">
-                <div className="max-w-7xl mx-auto px-4 md:px-8 relative pt-12">
+            {/* === HERO SECTION (New Design) === */}
+            <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6] mt-[10%]">
+                <div className="relative px-4 pt-12 mx-auto max-w-7xl md:px-8">
 
-                    {/* Background Image */}
-                    <div className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden">
+                    <div
+                        className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden"
+                    >
                         <img
                             src={BackgroundImageSrc}
-                            alt="Startup India graphic" 
-                            className="absolute top-0 left-0 w-full h-full object-cover"
+                            alt="Diagonal background graphic"
+                            className="absolute top-0 left-0 object-cover w-full h-full"
                         />
                     </div>
 
-                    {/* Content and Form Wrapper */}
-                    <div className="relative flex flex-col lg:flex-row items-start pt-10 pb-12 lg:pb-0 z-20">
+                    <div className="relative z-20 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
 
-                        {/* LEFT COLUMN - CONTENT */}
-                        <div className="w-full lg:w-3/5 text-black p-4 md:p-6 pb-20 relative z-20">
+                        <div className="relative z-20 w-full p-4 pb-20 text-white lg:w-3/5 md:p-6">
 
-                            {/* Breadcrumbs */}
-                            <p className="text-sm text-gray-700 mb-2">Home &gt; Government Schemes &gt; **Startup India Registration**</p>
+                            <p className="flex items-center justify-center gap-2 mb-4 font-semibold text-white lg:justify-start">
+                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                <span>#1 Startup India Registration Service</span>
+                                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                            </p>
 
-                            {/* Badge */}
-                            <div className="inline-flex bg-[#FFD700] text-black px-4 py-1 rounded-lg font-semibold text-xs md:text-sm mb-3 items-center gap-2">
-                                <span className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-black transform rotate-180"></span>
-                                #1 Legal Service Provider in India
-                            </div>
-
-                            {/* Heading */}
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4">
-                                Startup India DPIIT Recognition & Tax Exemption
+                            <h1 className="text-[#fff] mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl font-sans">
+                                Startup India Registration (DPIIT)
                             </h1>
 
-                            {/* Description */}
-                            <div className="space-y-2 mb-6">
-                                <p className="flex items-center gap-2 text-gray-800 text-sm">
-                                    <span className="w-2 h-2 bg-blue-600 block rounded-full"></span>
-                                    Get official **DPIIT-recognition** for your Private Ltd, LLP, or Partnership firm.
-                                </p>
-                                <p className="flex items-center gap-2 text-gray-800 text-sm">
-                                    <span className="w-2 h-2 bg-blue-600 block rounded-full"></span>
-                                    Access **3-year income tax exemption** and up to **80% IPR fee rebates**.
-                                </p>
-                                <p className="flex items-center gap-2 text-gray-800 text-sm">
-                                    <span className="w-2 h-2 bg-blue-600 block rounded-full"></span>
-                                    Complete your registration online with **zero government fee** for the application.
-                                </p>
-                            </div>
+                            <p className="text-[#fff] text-lg max-w-lg mb-6">
+                                Get official DPIIT recognition for your startup and unlock tax exemptions, funding opportunities, and IPR benefits.
+                            </p>
 
-                            {/* Buttons */}
-                            <div className="flex gap-4 flex-wrap mb-6">
-                                <button className="flex items-center gap-2 bg-[#113C6D] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-indigo-900 transition">
-                                    Know about Startup India Scheme in 60 sec
-                                </button>
-                                <button className="flex items-center gap-2 border border-[#113C6D] text-[#113C6D] px-6 py-3 rounded-lg font-semibold hover:bg-[#113C6D] hover:text-white transition">
-                                    🧾 View Sample DPIIT Certificate
-                                </button>
+                            <div className="mb-8 space-y-1">
+                                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-green-500"></span> Access 3-year income tax exemption and up to 80% IPR fee rebates.</p>
+                                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-indigo-500"></span> Complete your registration online with zero government fee for the application.</p>
                             </div>
-                            
                         </div>
 
-                        {/* RIGHT COLUMN - FORM */}
-                        <div className="w-full lg:w-[350px] relative z-30 lg:mt-0 lg:ml-auto mt-[-100px] sm:mt-[-50px]">
+                        <div className="w-full lg:w-[400px] relative z-30 lg:mt-0 lg:ml-auto mt-[-20px] sm:mt-[-20px] mb-12 lg:mr-4">
                             <div
-                                className="w-full p-6 md:p-8 rounded-2xl shadow-xl bg-white"
+                                className="w-full p-6 bg-white shadow-xl md:p-8 rounded-2xl"
                                 style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
                             >
-                                <h2 className="text-xl font-semibold mb-6 text-gray-800">Get DPIIT Recognition Today</h2>
-                                <form className="space-y-4">
-                                    <input
-                                        className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                        placeholder="Email"
-                                        type="email" 
-                                    />
-                                    <input
-                                        className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                        placeholder="Mobile Number"
-                                        type="tel" 
-                                    />
-                                    <input
-                                        className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                        placeholder="City / Pincode"
-                                        type="text" 
-                                    />
-                                    
-                                    {/* Whatsapp Toggle */}
-                                    <div className="flex items-center justify-between pt-2">
-                                        <span className="text-sm text-gray-600">Get easy updates through **Whatsapp**</span>
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" value="" className="sr-only peer" defaultChecked />
-                                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#2E96FF]"></div>
-                                        </label>
+                                <h2 className="mb-4 text-xl font-semibold text-gray-800 font-sans">Get DPIIT Recognition Today</h2>
+                                <form className="space-y-3">
+                                    <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Company/LLP/Firm Name" />
+                                    <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Email" />
+                                    <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Mobile Number" />
+                                    <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="City/Pincode" />
+
+                                    <div className="flex items-center justify-between text-gray-600">
+                                        <p className="text-xs font-medium text-gray-700 md:text-sm">Get Easy Updates Through Whatsapp</p>
+                                        <div className="w-10 h-5 bg-gray-300 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors">
+                                            <div className="w-4 h-4 transition-transform transform translate-x-0 bg-white rounded-full shadow-md"></div>
+                                        </div>
                                     </div>
 
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-[#113C6D] text-white py-3 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-4"
-                                    >
+                                    <button type="submit" className="w-full bg-[#113C6D] text-white py-2.5 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-2">
                                         Get Started Now
                                     </button>
-                                    <p className="text-xs text-center font-bold mt-2 text-gray-800">
-                                        Plans starting at **₹3,999**
-                                    </p>
                                 </form>
                             </div>
                         </div>

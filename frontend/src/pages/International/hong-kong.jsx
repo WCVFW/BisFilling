@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 // Assume the path for your background image, updated for Hong Kong context
-import BackgroundImageSrc from '../../assets/business.png';
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg';
 
 
 // --- HONG KONG REGISTRATION STATIC DATA DEFINITIONS ---

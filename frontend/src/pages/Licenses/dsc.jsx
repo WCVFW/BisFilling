@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 // Assume the path for your background image, updated for DSC context
-import BackgroundImageSrc from '../../assets/business.png';
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg';
 
 
 // --- DSC REGISTRATION STATIC DATA DEFINITIONS ---

@@ -75,12 +75,10 @@ export default function UsersPage() {
                     className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                   >
                     <td className="py-3 pr-6">
-                      {user.profileImagePath ? (
-                        <img
-                          src={`/uploads/profile-images/${user.profileImagePath}`}
-                          alt="Profile"
-                          className="object-cover w-10 h-10 rounded-full border border-gray-200"
-                        />
+                      {user.hasProfileImage ? (
+                        <div className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-200 rounded-full">
+                          <User size={16} className="text-gray-400" />
+                        </div>
                       ) : (
                         <div className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-200 rounded-full">
                           <User size={16} className="text-gray-400" />

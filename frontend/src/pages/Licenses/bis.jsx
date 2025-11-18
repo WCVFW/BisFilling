@@ -24,7 +24,7 @@ import {
     AlertTriangle // For BIS/National Standards Body
 } from "lucide-react";
 import { motion } from "framer-motion";
-import BackgroundImageSrc from '../../assets/business.png'; // Reusing a general business image
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg'; // Reusing a general business image
 
 // --- BIS REGISTRATION STATIC DATA DEFINITIONS ---
 

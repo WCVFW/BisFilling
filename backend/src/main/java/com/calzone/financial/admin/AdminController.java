@@ -9,6 +9,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 import java.io.IOException;
 
 @RestController
@@ -45,7 +47,7 @@ public class AdminController {
         try {
             String phoneVal = phone != null && !phone.isBlank() ? phone : (mobile != null ? mobile : "");
             User createdUser = adminService.createEmployee(email, fullName, phoneVal, password, role, address, profileImageFile);
-            return ResponseEntity.ok(java.util.Map.of("id", createdUser.getId()));
+            return ResponseEntity.ok(Map.of("id", createdUser.getId()));
         } catch (java.io.IOException e) {
             return ResponseEntity.status(500).body(Map.of("message", "Failed to process image file."));
         } catch (Exception e) {
@@ -56,9 +58,7 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/employees")
     public java.util.List<EmployeeDto> listEmployees() {
-        // Return users that have ADMIN or EMPLOYEE role (so admin can see employees and admins)
-        return users.findAll().stream()
-                .filter(u -> u.getRoles().stream().anyMatch(r -> r.getName().equals("EMPLOYEE") || r.getName().equals("ADMIN")))
+        return adminService.listEmployees().stream()
                 .map(AdminController::toDto)
                 .toList();
     }
@@ -84,7 +84,7 @@ public class AdminController {
         try {
             String phoneVal = phone != null ? phone : mobile;
             User updatedUser = adminService.updateEmployee(id, fullName, phoneVal, password, role, address, profileImageFile);
-            return ResponseEntity.ok(java.util.Map.of("id", updatedUser.getId()));
+            return ResponseEntity.ok(Map.of("id", updatedUser.getId()));
         } catch (java.io.IOException e) {
             return ResponseEntity.status(500).body(Map.of("message", "Failed to process image file."));
         } catch (IllegalArgumentException e) {
@@ -97,7 +97,7 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-        users.findById(id).ifPresent(u -> users.delete(u));
+        adminService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
     }
 }

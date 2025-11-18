@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 // Assume the path for your background image, updated for UAE context
-import BackgroundImageSrc from '../../assets/business.png';
+import BackgroundImageSrc from '@/assets1/img/hero-bg-1.svg';
 
 
 // --- UAE/DUBAI REGISTRATION STATIC DATA DEFINITIONS ---
@@ -496,112 +496,71 @@ export default function UAEDubaiInc() {
 
   return (
     <div className="bg-white min-h-screen font-[Inter]">
-      {/* === HERO SECTION (UAE/Dubai Setup Specific) === */}
-      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6]">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 relative pt-12">
+      {/* === HERO SECTION (New Design) === */}
+      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6] mt-[10%]">
+        <div className="relative px-4 pt-12 mx-auto max-w-7xl md:px-8">
 
-          {/* Background Image Section */}
-          <div className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden">
-            <img
-              src={BackgroundImageSrc}
-              alt="Dubai business setup background"
-              className="absolute top-0 left-0 w-full h-full object-cover"
-            />
-          </div>
+          <div
+            className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden"
+          >
+            <img
+              src={BackgroundImageSrc}
+              alt="Diagonal background graphic"
+              className="absolute top-0 left-0 object-cover w-full h-full"
+            />
+          </div>
 
-          {/* Main Content */}
-          <div className="relative flex flex-col lg:flex-row items-start pt-10 pb-12 lg:pb-0 z-20">
+          <div className="relative z-20 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
 
-            {/* Left Column - Text Content */}
-            <div className="w-full lg:w-3/5 text-black p-4 md:p-6 pb-20 relative z-20">
+            <div className="relative z-20 w-full p-4 pb-20 text-white lg:w-3/5 md:p-6">
 
-              {/* Breadcrumb */}
-              <nav className="text-sm text-gray-800 mb-3">
-                <span className="hover:underline cursor-pointer">Home</span> &gt;{" "}
-                <span className="hover:underline cursor-pointer">Company Registration</span> &gt;{" "}
-                <span className="font-semibold text-black">Setup Your Business in the UAE/Dubai</span>
-              </nav>
+              <p className="flex items-center justify-center gap-2 mb-4 font-semibold text-white lg:justify-start">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <span>#1 Business Setup Service in Dubai</span>
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </p>
 
-              {/* Badge */}
-              <div className="inline-flex bg-[#FFD700] text-black px-4 py-1 rounded-lg font-semibold text-xs md:text-sm mb-3 items-center gap-2">
-                <img
-                  src="/badge-icon.png"
-                  alt="badge"
-                  className="w-4 h-4 object-contain"
-                />
-                #1 Legal Service Provider In India
-              </div>
+              <h1 className="text-[#fff] mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl font-sans">
+                Business Setup in Dubai, UAE
+              </h1>
 
-              {/* Title */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-black">
-                Business Setup in Dubai UAE — Start Your Company with Experts
-              </h1>
+              <p className="text-[#fff] text-lg max-w-lg mb-6">
+                Register your company in Dubai with expert assistance. Enjoy 100% foreign ownership, tax exemptions, and access to a global market.
+              </p>
 
-              {/* Bullet Points with Blue Tick */}
-              <div className="space-y-4 mb-8 text-sm lg:text-base text-black">
-                <p className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-1" />
-                  Register your company name in Dubai under 24 hours and get a lifetime free visa.
-                </p>
-                <p className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-1" />
-                  Complete secrecy of operations with lower renewal charges & zero import or export duties.
-                </p>
-                <p className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-1" />
-                  Benefit from a **15-year renewable tax exemption** and **100% capital repatriation**.
-                </p>
-              </div>
-              <p className="text-sm font-semibold text-gray-700">Complete guide on Business setup in Dubai, UAE</p>
+              <div className="mb-8 space-y-1">
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-green-500"></span> Get your trade license and visa processed quickly.</p>
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-indigo-500"></span> Complete support for Mainland, Free Zone, and Offshore setup.</p>
+              </div>
+            </div>
 
-            </div>
+            <div className="w-full lg:w-[400px] relative z-30 lg:mt-0 lg:ml-auto mt-[-20px] sm:mt-[-20px] mb-12 lg:mr-4">
+              <div
+                className="w-full p-6 bg-white shadow-xl md:p-8 rounded-2xl"
+                style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
+              >
+                <h2 className="mb-4 text-xl font-semibold text-gray-800 font-sans">Start Your Dubai Company</h2>
+                <form className="space-y-3">
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Your Name" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Email" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Mobile Number" />
 
-            {/* Right Column - Form */}
-            <div className="w-full lg:w-[350px] relative z-30 lg:mt-0 lg:ml-auto mt-[-100px] sm:mt-[-50px]">
-              <div
-                className="w-full p-6 md:p-8 rounded-2xl shadow-xl bg-white"
-                style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
-              >
-                <h2 className="text-xl font-semibold mb-6 text-black text-center">Get Started !</h2>
+                  <div className="flex items-center justify-between text-gray-600">
+                    <p className="text-xs font-medium text-gray-700 md:text-sm">Get Easy Updates Through Whatsapp</p>
+                    <div className="w-10 h-5 bg-gray-300 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors">
+                      <div className="w-4 h-4 transition-transform transform translate-x-0 bg-white rounded-full shadow-md"></div>
+                    </div>
+                  </div>
 
-                {/* Form */}
-                <form className="space-y-4 text-black">
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-black placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Email"
-                  />
-                  <input
-                    className="w-full px-4 py-3 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-black placeholder-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="Mobile Number"
-                  />
-
-                  {/* WhatsApp Toggle */}
-                  <div className="flex items-center justify-between pt-1 text-black">
-                    <p className="text-xs md:text-sm font-medium">Get easy updates through Whatsapp</p>
-                    <div className="w-10 h-5 bg-gray-300 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors">
-                      <div className="w-4 h-4 bg-white rounded-full shadow-md transition-transform transform translate-x-0"></div>
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full bg-[#113C6D] text-white py-3 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-4"
-                  >
-                    Form My Company
-                  </button>
-                  
-                  {/* Confidentiality Note */}
-                  <p className="text-[11px] text-black text-center mt-3 italic">
-                    No Spam. No Sharing. 100% Confidentiality.
-                  </p>
-                </form>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
+                  <button type="submit" className="w-full bg-[#113C6D] text-white py-2.5 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-2">
+                    Form My Company
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* === Main Content Tabs Navigation (Sticky) === */}
       <section className="py-4 md:py-6 px-4 md:px-8 bg-white border-b border-gray-200 sticky top-0 z-30 shadow-md">

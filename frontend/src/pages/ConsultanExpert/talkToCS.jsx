@@ -3,11 +3,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   ChevronDown,
+  Mail,
   MapPin,
   Zap, // Used for the "Live Calls" stat
   Briefcase,
   ArrowRight,
-  Users,
   Star, // Used for ReviewBox
   CheckCircle,
   FileText,
@@ -15,6 +15,7 @@ import {
   Calculator,
   Download,
 } from "lucide-react";
+import BackgroundImageSrc from "@/assets1/img/hero-bg-1.svg"
 import { motion } from "framer-motion";
 
 // --- COMPANY SECRETARY (CS) STATIC DATA DEFINITIONS ---
@@ -82,6 +83,17 @@ const UpdatesTableData = [
   { activity: "Reconciliation of Share Capital Audit Report", form: "PAS-6", dueDate: "May 30, 2024 / November 29, 2024", period: "Oct 2023 – Mar 2024 / Apr 2024 – Sep 2024" },
 ];
 
+const resourceLinks = [
+  { title: "Trademark", icon: Briefcase, items: ["Trademark Search", "Trademark Registration", "Trademark Objection", "Trademark Infringement", "Well Known Trademark", "International Trademark Registration", "Trademark Class List"] },
+  { title: "GST", icon: Scale, items: ["HSN Code Finder", "Online GST Registration", "GST Return Filing", "GST Cancellation", "GST Revocation"] },
+  { title: "Company Registration", icon: Briefcase, items: ["Company Name Search", "Company Registration", "PVT LTD Company Registration", "LLP Registration", "Sole Proprietorship Registration", "OPC Registration", "Partnership Firm Registration", "Startup India Registration"] },
+  { title: "ITR, Patent & BNS", icon: FileText, items: ["IT Return Filing", "Patent Search", "Patent Registration", "Provisional Patent Application", "Patent Infringement", "BNS Sections"] },
+  { title: "Copyright & Experts", icon: CheckCircle, items: ["Copyright Registration", "Copyright Music Protection", "Copyright Infringement", "Online Lawyer Consultation", "Online CA Consultation", "Company Secretary Services", "Consumer Complaints", "Lawyer Services", "Intellectual Property Lawyers"] },
+  { title: "Calculators", icon: Calculator, items: ["GST Calculator", "TDS Calculator", "HRA Calculator", "Gratuity Calculator", "SIP Calculator", "NPS Calculator", "EPF Calculator", "Business Setup Calculator", "PPF Calculator", "Income Tax Calculator", "Simple Compound Interest Calculator", "Salary Calculator", "Retirement Planning Calculator", "RD Calculator", "Mutual Fund Calculator", "FD Calculator", "Home Loan EMI Calculator", "EMI Calculator", "Lumpsum Calculator"] },
+  { title: "Downloads", icon: Download, items: ["Rental Agreement Format", "GST Invoice Format", "Income Certificate Format", "Power of Attorney Format", "Affidavit Format", "Salary Slip Sample", "Appointment Letter Format", "Relieving Letter Format", "Legal Heir Certificate Format", "Generate Free Rent Receipt", "Commercial Rental Agreement", "Consent Letter for GST Registration Format", "No Objection Certificate (NOC) Format", "Partnership Deed Format", "Experience Letter Format", "Resignation Letter Format", "Offer Letter Format", "Bonafide Certificate Format", "Delivery Challan Format", "Authorised Signatory in GST"] },
+  { title: "Find Lawyers By City", icon: MapPin, items: ["Top Lawyers in Chennai", "Top Lawyers in Bangalore", "Top Lawyers in Mumbai", "Top Lawyers in Delhi", "Top Lawyers in Kolkata", "Top Lawyers in Gurgaon", "Search Lawyers in Other Cities"] },
+];
+
 
 const StatPill = ({ count, label, Icon }) => (
   <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md">
@@ -103,28 +115,35 @@ const ReviewBox = ({ score, reviews, source }) => (
   </div>
 );
 
-const BenefitItem = ({ title, description, color = 'green' }) => (
-  <div className="flex items-start gap-4 p-4 bg-white border-l-4 border-green-500 rounded-lg shadow-md">
-    <ArrowRight className={`w-5 h-5 text-${color}-600 mt-1 flex-shrink-0`} />
-    <div>
-      <h4 className="mb-1 text-lg font-semibold text-gray-800">{title}</h4>
-      <p className="text-sm text-gray-600">{description}</p>
+const BenefitItem = ({ title, description }) => (
+  <div className="p-6 transition-all duration-300 bg-white border border-gray-200 shadow-sm rounded-xl hover:shadow-lg hover:border-indigo-500 hover:-translate-y-1">
+    <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 bg-green-100 rounded-full">
+        <CheckCircle className="w-6 h-6 text-green-600" />
+      </div>
+      <h4 className="text-xl font-bold text-gray-800">{title}</h4>
     </div>
+    <p className="text-gray-600">{description}</p>
   </div>
 );
 
-const FooterColumn = ({ title, links }) => (
-  <div>
-    <h4 className="mb-3 text-base font-bold text-gray-900">{title}</h4>
-    <ul className="space-y-2">
-      {links.map((link, i) => (
-        <li key={i}>
-          <a href="#" className="text-sm text-gray-600 hover:text-[#2E96FF] transition-colors">
-            {link}
-          </a>
-        </li>
+const ResourceLinkGroup = ({ title, items, icon: Icon }) => (
+  <div className="p-4 bg-white shadow-lg rounded-xl">
+    <h4 className="flex items-center gap-2 mb-3 text-xl font-bold text-gray-900">
+      {Icon && <Icon className="w-5 h-5 text-[#2E96FF]" />} {title}
+    </h4>
+    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+      {items.slice(0, 7).map((item, i) => (
+        <a key={i} href="#" className="text-sm text-gray-600 hover:text-[#2E96FF] transition truncate" title={item}>
+          {item}
+        </a>
       ))}
-    </ul>
+    </div>
+    {items.length > 7 && (
+      <a href="#" className="text-sm text-[#2E96FF] font-semibold mt-2 block hover:underline">
+        View all ({items.length - 7} more)
+      </a>
+    )}
   </div>
 );
 
@@ -228,31 +247,47 @@ const CSWhyVakilsearchContent = () => (
 );
 
 const CSFAQsContent = ({ faqs, faqOpen, setFaqOpen }) => (
-  <section id="cs-faqs-content" className="max-w-5xl py-12 mx-auto scroll-mt-24">
-    <h3 className="mb-8 text-3xl font-bold text-center text-gray-800">Company Secretary FAQs</h3>
-
-    <div className="space-y-4">
-      {faqs.map((f, i) => (
-        <div key={i} className="overflow-hidden border border-gray-200 shadow-sm rounded-xl">
-          <button
-            className={`w-full flex justify-between items-center p-5 text-left transition ${faqOpen === i ? 'bg-[#E6F2FF] text-[#2E96FF]' : 'bg-white hover:bg-gray-50'}`}
-            onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-          >
-            <span className="text-lg font-semibold">{f.q}</span>
-            <ChevronDown
-              className={`w-6 h-6 transition-transform ${faqOpen === i ? "rotate-180 text-[#2E96FF]" : "text-gray-500"}`}
-            />
-          </button>
-          <motion.div
-            initial={false}
-            animate={{ height: faqOpen === i ? "auto" : 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ overflow: 'hidden' }}
-          >
-            <p className="px-5 py-4 text-gray-700 bg-white">{f.a}</p>
-          </motion.div>
+  <section id="cs-faqs-content" className="py-20 bg-white scroll-mt-24">
+    <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+      <div className="lg:col-span-5">
+        <div className="flex items-center gap-2 mb-4 font-semibold text-indigo-600">
+          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+          <span>FAQ’s</span>
+          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
         </div>
-      ))}
+        <h2 className="mb-4 text-4xl font-bold text-gray-900">Company Secretary FAQs</h2>
+        <p className="mb-8 text-gray-600">
+          Find answers to common questions about our online Company Secretary services, compliance, and processes.
+        </p>
+        <a href="#" aria-label="FAQ page link" className="inline-flex items-center justify-center px-6 py-3 font-bold text-white uppercase transition-colors bg-indigo-700 rounded-lg text-sm hover:bg-indigo-800">
+          <span>Check More Faq</span>
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </a>
+      </div>
+
+      <div className="space-y-4 lg:col-span-7">
+        {faqs.map((f, i) => (
+          <div key={i} className="overflow-hidden bg-gray-100 rounded-lg">
+            <button
+              className="flex items-center justify-between w-full p-5 text-left"
+              onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+            >
+              <h3 className="text-lg font-semibold text-gray-800">{f.q}</h3>
+              <span className={`flex items-center justify-center w-8 h-8 rounded-full transition-transform ${faqOpen === i ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600'}`}>
+                <ChevronDown className={`w-5 h-5 transition-transform ${faqOpen === i ? 'rotate-180' : ''}`} />
+              </span>
+            </button>
+            <motion.div
+              initial={false}
+              animate={{ height: faqOpen === i ? "auto" : 0, opacity: faqOpen === i ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <p className="px-5 pb-5 text-gray-600">{f.a}</p>
+            </motion.div>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 );
@@ -314,94 +349,73 @@ export default function CompanySecretaryPage() {
   };
 
   return (
-    <div className="bg-white min-h-screen font-[Inter]">
-      {/* === HERO SECTION (CS Specific) === */}
-      <section className="relative w-full overflow-hidden min-h-[700px] md:min-h-[700px] bg-white">
+    <div className="bg-white min-h-screen font-['DM_Sans',_sans-serif]">
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+      {/* === HERO SECTION (New Design) === */}
+      <section className="relative w-full overflow-hidden min-h-[650px] bg-[#E6F0F6] mt-[10%]">
         <div className="relative px-4 pt-12 mx-auto max-w-7xl md:px-8">
 
-          {/* Dark Blue Background Card */}
           <div
-            className="absolute top-0 left-0 w-full h-[550px] md:h-[600px] bg-[#113C6D] shadow-2xl overflow-hidden"
-            style={{
-              clipPath: 'polygon(0 0, calc(100% - 60px) 0, 90% 48px, 40% 100%, 0 100%, 0 0)',
-              borderRadius: '24px',
-            }}
-          />
+            className="absolute top-0 left-0 w-full h-[600px] rounded-[24px] overflow-hidden"
+          >
+            <img
+              src={BackgroundImageSrc}
+              alt="Diagonal background graphic"
+              className="absolute top-0 left-0 object-cover w-full h-full"
+            />
+          </div>
 
-          {/* Content + Form Wrapper */}
-          <div className="relative z-10 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
+          <div className="relative z-20 flex flex-col items-start pt-10 pb-12 lg:flex-row lg:pb-0">
 
-            {/* Left Column (Content) */}
             <div className="relative z-20 w-full p-4 pb-20 text-white lg:w-3/5 md:p-6">
 
-              {/* Badge */}
-              <div className="inline-flex bg-[#FFD700] text-black px-3 py-1 rounded-full font-bold text-xs md:text-sm mb-4">
-                #1 Company Secretary Service Provider in India
-              </div>
+              <p className="flex items-center justify-center gap-2 mb-4 font-semibold text-white lg:justify-start">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <span>#1 CS Service Provider In India</span>
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </p>
 
-              {/* H1 Title */}
-              <h1 className="mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
+              <h1 className="text-[#fff] mb-4 text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl font-sans">
                 Company Secretary Services Online
               </h1>
 
-              {/* Description Text */}
-              <p className="max-w-xl mb-4 text-base text-white/80 lg:text-lg">
+              <p className="text-[#fff] text-lg max-w-lg mb-6">
                 Consult 200+ verified company secretaries for expert compliance guidance.
               </p>
 
-              {/* Bullet Points */}
-              <div className="mb-8 space-y-2 text-white">
-                <p className="flex items-start gap-3">
-                  <CheckCircle className="flex-shrink-0 w-5 h-5 mt-1 text-green-400" />
-                  Clear, hassle-free advice to keep your business compliant at every step
-                </p>
-                <p className="flex items-start gap-3">
-                  <CheckCircle className="flex-shrink-0 w-5 h-5 mt-1 text-green-400" />
-                  Transparent pricing with no hidden fees and satisfaction guaranteed
-                </p>
+              <div className="mb-8 space-y-1">
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-green-500"></span> Clear, hassle-free advice to keep your business compliant.</p>
+                <p className="flex items-center gap-2 text-[#fff] text-sm"><span className="block w-2 h-2 bg-indigo-500"></span> Transparent pricing with no hidden fees.</p>
               </div>
             </div>
 
-            {/* Right Column (Form & Pricing) */}
-            <div className="w-full lg:w-[400px] relative z-30 lg:mt-[-50px] mt-[-100px] sm:mt-[-50px]">
+            <div className="w-full lg:w-[400px] relative z-30 lg:mt-0 lg:ml-auto mt-[-20px] sm:mt-[-20px] mb-12 lg:mr-4">
               <div
-                className="w-full p-6 bg-white shadow-2xl md:p-8 rounded-2xl"
+                className="w-full p-6 bg-white shadow-xl md:p-8 rounded-2xl"
                 style={{ borderRadius: '24px', border: '1px solid #E0E0E0' }}
               >
-                <h2 className="mb-3 text-xl font-semibold text-gray-800">Get Started</h2>
+                <h2 className="mb-4 text-xl font-semibold text-gray-800 font-sans">Get Expert CS Consultation</h2>
+                <form className="space-y-3">
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Email" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Mobile Number" />
+                  <input className="w-full px-4 py-2 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-500 placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="City/Pincode" />
 
-                {/* Pricing Box */}
-                <div className="p-3 mb-4 border-l-4 border-green-500 rounded-lg bg-green-50">
-                  <p className="text-lg font-bold text-green-700">
-                    ₹999 for a 30-min Expert Consultation
-                  </p>
-                </div>
-
-                {/* Form */}
-                <form className="space-y-2.5">
-                  {['Email', 'Mobile Number', 'City/Pincode', 'Language', 'Problem Type'].map((placeholder) => (
-                    <input
-                      key={placeholder}
-                      placeholder={placeholder}
-                      className="w-full px-3 py-2.5 bg-[#F4F4F4] border border-[#E0E0E0] rounded-lg text-sm text-gray-700 placeholder-gray-500 focus:border-[#2E96FF] focus:ring-1 focus:ring-[#2E96FF]"
-                    />
-                  ))}
-
-                  {/* WhatsApp Toggle */}
-                  <div className="flex items-center justify-between pt-1 text-gray-600">
-                    <p className="text-xs font-medium text-gray-700 md:text-sm">
-                      Get easy updates through Whatsapp
-                    </p>
-                    <div className="w-9 h-4.5 bg-green-500 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors justify-end">
-                      <div className="w-3.5 h-3.5 bg-white rounded-full shadow-md transition-transform transform translate-x-0"></div>
+                  <div className="flex items-center justify-between text-gray-600">
+                    <p className="text-xs font-medium text-gray-700 md:text-sm">Get Easy Updates Through Whatsapp</p>
+                    <div className="w-10 h-5 bg-gray-300 rounded-full relative cursor-pointer flex items-center p-0.5 transition-colors">
+                      <div className="w-4 h-4 transition-transform transform translate-x-0 bg-white rounded-full shadow-md"></div>
                     </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full bg-[#2E96FF] text-white py-2.5 text-sm font-semibold rounded-lg transition-colors hover:bg-[#0069D1] shadow-md mt-3"
-                  >
+                  <button type="submit" className="w-full bg-[#113C6D] text-white py-2.5 font-semibold rounded-lg transition-colors hover:bg-indigo-900 text-base shadow-md mt-2">
                     Book An Appointment Now
                   </button>
                 </form>
@@ -412,13 +426,26 @@ export default function CompanySecretaryPage() {
       </section>
 
       {/* === Main Content Tabs Navigation (Sticky) === */}
-      <section className="sticky top-0 z-30 px-4 py-4 bg-white border-b border-gray-200 shadow-md md:py-6 md:px-8">
+      <section className="sticky top-0 z-30 px-4 py-6 border-b border-gray-200 shadow-sm md:px-8 bg-gray-50">
         <div className="mx-auto max-w-7xl">
-          <div className="flex items-center w-full overflow-x-auto text-sm bg-white border border-gray-200 rounded-xl md:text-base">
+          <div className="flex items-center w-full gap-x-2 overflow-x-auto text-sm md:text-base no-scrollbar">
             {csTabs.map((tab) => (
               <a
                 key={tab.id}
-                className={`flex flex-col flex-shrink-0 min-w-[140px] py-3 md:py-4 px-2 text-center font-bold cursor-pointer transition-all ${activeTab === tab.id ? 'bg-[#E6F0F6] border-b-4 border-[#022B50] text-[#022B50]' : 'text-gray-700 hover:bg-gray-50'}`}
+                className={`
+            flex-shrink-0    
+            py-3 px-5         
+            min-w-[150px]     
+            text-center       
+            font-bold         
+            cursor-pointer    
+            transition-all    
+            rounded-full      
+            ${activeTab === tab.id
+                    ? 'bg-[#0069D1] text-white shadow-lg'
+                    : 'text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                  }
+          `}
                 onClick={(e) => {
                   e.preventDefault();
                   handleTabClick(tab.id);
@@ -432,7 +459,7 @@ export default function CompanySecretaryPage() {
       </section>
 
       {/* === All Tab Content Sections Rendered Sequentially === */}
-      <div className="px-4 py-2 md:py-4 md:px-8">
+      <div className="px-4 py-2 mt-8 md:py-4 md:px-8">
         <div className="mx-auto max-w-7xl">
           <CSExpertiseContent />
           <CSUpdatesTable />
@@ -441,6 +468,20 @@ export default function CompanySecretaryPage() {
           <CSFAQsContent faqs={csFAQs} faqOpen={faqOpen} setFaqOpen={setFaqOpen} />
         </div>
       </div>
+
+      {/* --- Resources & Links Footer Section --- */}
+      <section className="px-4 py-16 bg-[#F4F7FA] md:px-8">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="mb-12 text-3xl font-bold text-center text-gray-900 md:text-4xl font-sans">
+            Explore Our Resources
+          </h2>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {resourceLinks.map((group, i) => (
+              <ResourceLinkGroup key={i} title={group.title} items={group.items} icon={group.icon} />
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
