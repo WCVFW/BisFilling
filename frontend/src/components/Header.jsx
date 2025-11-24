@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { X, Menu, ChevronDown, ArrowRight } from "lucide-react"; // Using Lucide icons for reliability, or replace with your font-awesome/svgs
+import { X, Menu, ChevronDown, ArrowRight, LogOut } from "lucide-react"; // Using Lucide icons for reliability, or replace with your font-awesome/svgs
+import { useNavigate } from "react-router-dom";
+import { getAuth, clearAuth } from "../lib/auth";
 // Ensure these paths are correct for your project
-import logo from "../assets1/img/logo.png";
+import logo from "../assets1/img/Logo.png";
 import headerShape from "../assets1/img/header-shape.svg";
 
 // --- Navigation Data ---
@@ -228,8 +230,9 @@ const MobileSubMenu = ({ dropdown, isMegaMenu }) => {
 };
 
 export default function Header() {
+  const navigate = useNavigate();
   const [showHeader, setShowHeader] = useState(true);
-  
+
   // Desktop State
   const [activeMenu, setActiveMenu] = useState(null);
   const [menuConfig, setMenuConfig] = useState({
@@ -238,13 +241,36 @@ export default function Header() {
     width: 0,
     isMegaMenu: false,
   });
-  
+
   // Mobile State
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedMobileItem, setExpandedMobileItem] = useState(null);
 
+  // User State
+  const [user, setUser] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  console.log(user)
   const lastScrollYRef = useRef(0);
   let leaveTimeout = useRef(null);
+
+  // --- 0. Load User from Auth ---
+  useEffect(() => {
+    const authData = getAuth();
+    if (authData && authData.user) {
+      setUser(authData.user);
+    }
+  }, []);
+
+  // --- Close Profile Menu on Outside Click ---
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showProfileMenu && !e.target.closest('[data-profile-menu]')) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [showProfileMenu]);
 
   // --- 1. Body Scroll Lock for Mobile ---
   useEffect(() => {
@@ -304,6 +330,14 @@ export default function Header() {
     setExpandedMobileItem(expandedMobileItem === id ? null : id);
   };
 
+  // --- Logout Handler ---
+  const handleLogout = () => {
+    clearAuth();
+    setUser(null);
+    setShowProfileMenu(false);
+    navigate("/login");
+  };
+
   return (
     <>
       {/* Header Container */}
@@ -351,29 +385,84 @@ export default function Header() {
 
             {/* 3. Right Actions */}
             <div className="flex items-center gap-3 md:gap-4 z-10">
-              
-              {/* Auth Buttons (Hidden on Mobile < 1024px to save space, shown in drawer) */}
-              <div className="hidden lg:flex items-center gap-3">
-                <a
-                  href="/login"
-                  className="text-sm font-bold uppercase transition duration-300 hover:text-[#1A7F7D]"
-                >
-                  Login
-                </a>
-                <a
-                  href="/signup"
-                  className="text-sm px-5 py-2.5 font-bold text-white uppercase rounded-full transition-all duration-300 hover:shadow-lg flex items-center gap-2"
-                  style={{
-                    background: "radial-gradient(circle at center, #1A7F7D 0%, #23938D 100%)"
-                  }}
-                >
-                  <span>Sign Up</span>
-                  <ArrowRight size={16} />
-                </a>
-              </div>
+
+              {/* Auth Buttons / User Profile (Hidden on Mobile < 1024px to save space, shown in drawer) */}
+              {!user ? (
+                <div className="hidden lg:flex items-center gap-3">
+                  <a
+                    href="/login"
+                    className="text-sm font-bold uppercase transition duration-300 hover:text-[#1A7F7D]"
+                  >
+                    Login
+                  </a>
+                  <a
+                    href="/signup"
+                    className="text-sm px-5 py-2.5 font-bold text-white uppercase rounded-full transition-all duration-300 hover:shadow-lg flex items-center gap-2"
+                    style={{
+                      background: "radial-gradient(circle at center, #1A7F7D 0%, #23938D 100%)"
+                    }}
+                  >
+                    <span>Sign Up</span>
+                    <ArrowRight size={16} />
+                  </a>
+                </div>
+              ) : (
+                <div className="hidden lg:flex items-center gap-4 relative" data-profile-menu>
+                  {/* User Profile Button */}
+                  <button
+                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    data-profile-menu
+                  >
+                    {user.profileImageUrl ? (
+                      <img
+                        src={user.profileImageUrl}
+                        alt={user.name || user.fullName || "Profile"}
+                        className="w-8 h-8 rounded-full object-cover border-2 border-[#1A7F7D]"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-[#1A7F7D] text-white flex items-center justify-center text-sm font-bold">
+                        {(user.name || user.fullName || "U")[0].toUpperCase()}
+                      </div>
+                    )}
+                    <div className="text-left hidden sm:block">
+                      <p className="text-sm font-semibold text-gray-800">
+                        {user.name || user.fullName || "User"}
+                      </p>
+                      {/* <p className="text-xs text-gray-500">{user.email}</p> */}
+                    </div>
+                    <ChevronDown size={16} className={`transition-transform ${showProfileMenu ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {/* Profile Dropdown Menu */}
+                  {showProfileMenu && (
+                    <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <a
+                        href="/dashboard/user/account"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        My Account
+                      </a>
+                      <a
+                        href="/dashboard"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        Dashboard
+                      </a>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-gray-100"
+                      >
+                        <LogOut size={16} />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Mobile Toggle (Visible < 1024px) */}
-              <button 
+              <button
                 className="lg:hidden p-2 text-gray-800 focus:outline-none z-50"
                 onClick={toggleMobileMenu}
                 aria-label="Toggle menu"
@@ -399,7 +488,7 @@ export default function Header() {
       )}
 
       {/* --- Mobile Navigation Drawer --- */}
-      <div 
+      <div
         className={`fixed inset-0 bg-white z-[8999] overflow-y-auto transition-transform duration-300 lg:hidden
         ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ paddingTop: "80px" }} // Add padding to clear the fixed header
@@ -408,7 +497,7 @@ export default function Header() {
           <div className="flex flex-col space-y-1">
             {navLinks.map((item) => (
               <div key={item.id} className="border-b border-gray-50 last:border-0">
-                <button 
+                <button
                   onClick={() => toggleMobileSubmenu(item.id)}
                   className="w-full flex items-center justify-between py-4 text-left font-semibold text-gray-800"
                 >
@@ -419,19 +508,20 @@ export default function Header() {
                 </button>
 
                 {/* Accordion Body */}
-                <div 
+                <div
                   className={`overflow-hidden transition-all duration-300 ease-in-out 
                   ${expandedMobileItem === item.id ? 'max-h-[1500px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}
                 >
-                   <MobileSubMenu dropdown={item.dropdown} isMegaMenu={item.isMegaMenu} />
+                  <MobileSubMenu dropdown={item.dropdown} isMegaMenu={item.isMegaMenu} />
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Mobile Auth Buttons (Shown here on small screens) */}
-          <div className="mt-8 pt-6 border-t border-gray-100 grid grid-cols-2 gap-4">
-             <a
+          {/* Mobile Auth Section (Shown here on small screens) */}
+          {!user ? (
+            <div className="mt-8 pt-6 border-t border-gray-100 grid grid-cols-2 gap-4">
+              <a
                 href="/login"
                 className="flex items-center justify-center py-3 font-bold uppercase border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
               >
@@ -446,13 +536,56 @@ export default function Header() {
               >
                 Sign Up
               </a>
-          </div>
+            </div>
+          ) : (
+            <div className="mt-8 pt-6 border-t border-gray-100 space-y-4">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                {user.profileImageUrl ? (
+                  <img
+                    src={user.profileImageUrl}
+                    alt={user.name || user.fullName || "Profile"}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-[#1A7F7D]"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-[#1A7F7D] text-white flex items-center justify-center text-lg font-bold">
+                    {(user.name || user.fullName || "U")[0].toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <p className="font-semibold text-gray-800">{user.name || user.fullName || "User"}</p>
+                  {/* <p className="text-xs text-gray-500">{user.email}</p> */}
+                </div>
+              </div>
+              <a
+                href="/dashboard/user/account"
+                className="block w-full py-2 px-4 text-center text-sm font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                My Account
+              </a>
+              <a
+                href="/dashboard"
+                className="block w-full py-2 px-4 text-center text-sm font-semibold text-white rounded-lg"
+                style={{
+                  background: "radial-gradient(circle at center, #1A7F7D 0%, #23938D 100%)"
+                }}
+              >
+                Dashboard
+              </a>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 py-2 px-4 text-sm font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
-      
+
       {/* Overlay for background dimming (Optional, adds polish) */}
       {isMobileMenuOpen && (
-         <div className="fixed inset-0 bg-black/20 z-[8000] lg:hidden" onClick={toggleMobileMenu} aria-hidden="true" />
+        <div className="fixed inset-0 bg-black/20 z-[8000] lg:hidden" onClick={toggleMobileMenu} aria-hidden="true" />
       )}
     </>
   );

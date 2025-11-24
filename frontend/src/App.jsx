@@ -10,41 +10,47 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import TalkToCA from "./pages/ConsultanExpert/talkToCA";
 import TalkToIP from "./pages/ConsultanExpert/talkToIP";
-import ServiceOrder from "./pages/Dashboard/ServiceOrder";
+import ServiceOrder from "./pages/Dashboard/userDSB/ServiceOrder";
 
 /* ---------------------- Dashboard Pages ---------------------- */
 import DashboardIndex from "./pages/DashboardIndex";
-import CompliancesPage from "./pages/Dashboard/CompliancesPage";
+import CompliancesPage from "./pages/Dashboard/userDSB/CompliancesPage";
 import CrmPage from "./pages/Dashboard/CrmPage";
-import CalendarPage from "./pages/Dashboard/CalendarPage";
-import DocumentsPage from "./pages/Dashboard/DocumentsPage";
-import ReportsPage from "./pages/Dashboard/ReportsPage";
-import ConsultPage from "./pages/Dashboard/ConsultPage";
-import ServicesHub from "./pages/Dashboard/ServiceHub";
-import UserHome from "./pages/Dashboard/HomePage";
+import CalendarPage from "./pages/Dashboard/userDSB/CalendarPage";
+import DocumentsPage from "./pages/Dashboard/userDSB/DocumentsPage";
+import ReportsPage from "./pages/Dashboard/userDSB/ReportsPage";
+import ConsultPage from "./pages/Dashboard/userDSB/ConsultPage";
+import ServicesHub from "./pages/Dashboard/userDSB/ServiceHub";
+import UserHome from "./pages/Dashboard/userDSB/HomePage";
 import MyAccount from "./pages/MyAccount";
 
 /* ---------------------- Dashboards ---------------------- */
-import AdminDashboard from "./pages/Dashboard/AdminDashboard";
+import AdminDashboard from "./pages/Dashboard/AdminDSB/AdminDashboard";
 import EmployeeDashboard from "./pages/Dashboard/EmployeeDashboard";
-import UserDashboard from "./pages/Dashboard/UserDashboard";
-import OrderDetailPage from "./pages/Dashboard/OrderDetailPage";
-import AdminReports from "./pages/Dashboard/AdminReports";
-import AdminOrdersPage from "./pages/Dashboard/AdminOrdersPage";
+import UserDashboard from "./pages/Dashboard/userDSB/UserDashboard";
+import OrderDetailPage from "./pages/Dashboard/userDSB/OrderDetailPage";
+import AdminReports from "./pages/Dashboard/AdminDSB/AdminReports";
+import AdminOrdersPage from "./pages/Dashboard/AdminDSB/AdminOrdersPage";
 import EmployeeTasksPage from "./pages/Dashboard/EmployeeTasksPage";
 import EmployeeHomePage from "./pages/Dashboard/EmployeeHomePage";
-import AdminHome from "./pages/Dashboard/AdminHome";
+import AdminHome from "./pages/Dashboard/AdminDSB/AdminHome";
 
 /* ---------------------- Admin Modules ---------------------- */
-const AdminEmployees = React.lazy(() => import("./pages/Dashboard/AdminEmployees"));
-const AdminAttendance = React.lazy(() => import("./pages/Dashboard/AdminAttendance"));
-const AdminPerformance = React.lazy(() => import("./pages/Dashboard/AdminPerformance"));
-const AdminCustomerLifecycle = React.lazy(() => import("./pages/Dashboard/AdminCustomerLifecycle"));
-const AdminSalesReports = React.lazy(() => import("./pages/Dashboard/AdminSalesReports"));
-const AdminSettings = React.lazy(() => import("./pages/Dashboard/AdminSettings"));
-const AdminLeadReport = React.lazy(() => import("./pages/Dashboard/AdminLeadReport"));
-const AdminDealReport = React.lazy(() => import("./pages/Dashboard/AdminDealReport"));
-const AdminEmployeeAttendanceReport = React.lazy(() => import("./pages/Dashboard/AdminEmployeeAttendanceReport"));
+const AdminEmployees = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminEmployees"));
+const AdminAttendance = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminAttendance"));
+const AdminPerformance = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminPerformance"));
+const AdminCustomerLifecycle = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminCustomerLifecycle"));
+const AdminSalesReports = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminSalesReports"));
+const AdminSettings = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminSettings"));
+const AdminLeadReport = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminLeadReport"));
+const AdminDealReport = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminDealReport"));
+const AdminNotifications = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminNotifications"));
+const AdminEmployeeAttendanceReport = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminEmployeeAttendanceReport"));
+const AdminLeads = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminLeads"));
+const AdminDeals = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminDeals"));
+const AdminCrmDashboard = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminCrm/AdminCrmDashboard"));
+const AdminCustomerList = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminCrm/AdminCustomerList"));
+const AdminCustomerDetail = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminCrm/AdminCustomerDetail"));
 
 /* ---------------------- Components ---------------------- */
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -78,6 +84,39 @@ export default function App() {
     window.addEventListener("auth:update", handler);
     return () => window.removeEventListener("auth:update", handler);
   }, []);
+
+  /* ---------------------- Location & Notification on Load ---------------------- */
+  useEffect(() => {
+    // 1. Geolocation Request
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log('User location:', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          // You can now use these coordinates, e.g., send them to your backend.
+        },
+        (error) => {
+          console.error('Error getting user location:', error.message);
+        }
+      );
+    } else {
+      console.log('Geolocation is not supported by this browser.');
+    }
+
+    // 2. Notification Request
+    if ('Notification' in window) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+          new Notification('Welcome to BisFilling!', {
+            body: 'We are glad to have you here. We can now send you important updates.',
+          });
+        }
+      });
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount.
 
   /* ---------------------- Logout Function ---------------------- */
   const logout = () => {
@@ -118,8 +157,8 @@ export default function App() {
           isDashboard
             ? "flex-1 w-full" // ✅ Full-width for dashboard
             : isHome
-            ? "flex-1 w-full"
-            : "container flex-1 mx-auto px-4"
+              ? "flex-1 w-full"
+              : "container flex-1 mx-auto px-4"
         }
       >
         <Routes>
@@ -251,6 +290,35 @@ export default function App() {
             />
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="profile" element={<MyAccount />} />
+            <Route
+              path="notifications"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminNotifications />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="leads"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminLeads />
+                </React.Suspense>
+              }
+            />
+            <Route
+              path="deals"
+              element={
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AdminDeals />
+                </React.Suspense>
+              }
+            />
+
+            {/* CRM Module Routes */}
+            <Route path="crm" element={<React.Suspense fallback={<ServiceLoader />}><AdminCrmDashboard /></React.Suspense>} />
+            <Route path="crm/customers" element={<React.Suspense fallback={<ServiceLoader />}><AdminCustomerList /></React.Suspense>} />
+            <Route path="crm/customer/:id" element={<React.Suspense fallback={<ServiceLoader />}><AdminCustomerDetail /></React.Suspense>} />
           </Route>
 
           {/* ---------------------- EMPLOYEE DASHBOARD ---------------------- */}

@@ -2,9 +2,9 @@ package com.calzone.financial;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
@@ -22,7 +22,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
         "com.calzone.financial.sms",
         "com.calzone.financial.process",
         "com.calzone.financial.compliance",
-        "com.calzone.financial.servicehub"
+        "com.calzone.financial.servicehub",
+        "com.calzone.financial.notification",
+        "com.calzone.financial.crm" // CRM repositories
     },
     basePackageClasses = {
         com.calzone.financial.order.OrderRepository.class,
@@ -43,8 +45,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
     "com.calzone.financial.sms",
     "com.calzone.financial.process",
     "com.calzone.financial.servicehub",
-    // --- THIS LINE WAS MISSING/INCORRECT IN YOUR ORIGINAL CODE ---
-    "com.calzone.financial.compliance" // <-- ADDED/CORRECTED THIS
+    "com.calzone.financial.compliance",
+    "com.calzone.financial.notification",
+    "com.calzone.financial.crm" // CRM entities
     })
 public class BackendApplication {
 

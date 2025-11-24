@@ -33,6 +33,12 @@ public class LeadController {
         return ResponseEntity.ok(leadService.findAll(user));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<LeadResponse> findById(@PathVariable Long id,
+                                                 @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(leadService.findById(id, user));
+    }
+
     @PostMapping
     public ResponseEntity<LeadResponse> create(@Valid @RequestBody LeadRequest request,
                                                @AuthenticationPrincipal User user) {

@@ -56,37 +56,96 @@ const AdminLayout = ({ children, logout }) => {
 
   const navItems = [
     { path: "/dashboard/admin", label: "Dashboard", Icon: LayoutDashboard },
-    { path: "/dashboard/admin/customers", label: "Customers", Icon: Users },
+    {
+      label: "CRM",
+      Icon: Users,
+      children: [
+        { path: "/dashboard/admin/crm", label: "Dashboard", Icon: LayoutDashboard },
+        { path: "/dashboard/admin/crm/customers", label: "Customers", Icon: Users },
+        { path: "/dashboard/admin/leads", label: "Leads", Icon: Zap },
+        { path: "/dashboard/admin/deals", label: "Deals", Icon: Gift },
+      ],
+    },
     { path: "/dashboard/admin/attendance", label: "Attendance", Icon: Calendar },
     { path: "/dashboard/admin/employees", label: "Employees", Icon: Users2 },
     { path: "/dashboard/admin/performance", label: "Performance", Icon: TrendingUp },
     { path: "/dashboard/admin/sales-reports", label: "Sales Reports", Icon: BarChart },
     { path: "/dashboard/admin/orders", label: "Orders", Icon: ShoppingCart },
     { path: "/dashboard/admin/reports", label: "Reports", Icon: FileText },
-    { path: "/dashboard/admin/deal", label: "Deal", Icon: Gift },
-    { path: "/dashboard/admin/lead", label: "Lead", Icon: Zap },
   ];
 
   const isActive = (path) => location.pathname === path;
 
-  const NavLink = ({ to, label, Icon, isActive, onClick }) => (
-    <Link
-      to={to}
-      onClick={onClick}
-      className={`flex items-center py-2.5 rounded-md transition-all duration-200 text-[15px]
-        ${isActive ? "bg-[#046487] text-white font-semibold" : "text-white hover:bg-[#046487]/80"}
-        ${isSidebarExpanded ? "px-5 gap-3" : "px-0 gap-0 justify-center w-[52px] mx-auto"}
-      `}
-    >
-      <Icon size={20} className="shrink-0" />
-      <span
-        className={`truncate transition-opacity duration-200 ${isSidebarExpanded ? "opacity-100" : "opacity-0 h-0 hidden"
-          }`}
+  const NavLink = ({ item, onClick }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const hasChildren = item.children && item.children.length > 0;
+    const isChildActive = hasChildren && item.children.some(child => isActive(child.path));
+
+    useEffect(() => {
+      if (isChildActive) setIsOpen(true);
+    }, [isChildActive]);
+
+    if (hasChildren) {
+      return (
+        <div className="flex flex-col">
+          <button
+            onClick={() => {
+              if (isSidebarExpanded) setIsOpen(!isOpen);
+            }}
+            className={`flex items-center py-2.5 rounded-md transition-all duration-200 text-[15px] w-full text-left
+              ${isChildActive ? "text-white font-semibold" : "text-white hover:bg-[#046487]/80"}
+              ${isSidebarExpanded ? "px-5 gap-3" : "px-0 gap-0 justify-center w-[52px] mx-auto"}
+            `}
+          >
+            <item.Icon size={20} className="shrink-0" />
+            <span
+              className={`truncate flex-1 transition-opacity duration-200 ${isSidebarExpanded ? "opacity-100" : "opacity-0 h-0 hidden"}`}
+            >
+              {item.label}
+            </span>
+            {isSidebarExpanded && (
+              <span className="text-xs ml-auto">{isOpen ? "▼" : "▶"}</span>
+            )}
+          </button>
+
+          {/* Submenu */}
+          <div className={`overflow-hidden transition-all duration-300 ${isOpen && isSidebarExpanded ? "max-h-96" : "max-h-0"}`}>
+            {item.children.map((child) => (
+              <Link
+                key={child.path}
+                to={child.path}
+                onClick={onClick}
+                className={`flex items-center py-2 pl-12 pr-4 rounded-md transition-all duration-200 text-[14px]
+                  ${isActive(child.path) ? "text-white font-bold bg-[#046487]" : "text-white/80 hover:text-white hover:bg-[#046487]/50"}
+                `}
+              >
+                <child.Icon size={16} className="shrink-0 mr-2" />
+                <span className="truncate">{child.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <Link
+        to={item.path}
+        onClick={onClick}
+        className={`flex items-center py-2.5 rounded-md transition-all duration-200 text-[15px]
+          ${isActive(item.path) ? "bg-[#046487] text-white font-semibold" : "text-white hover:bg-[#046487]/80"}
+          ${isSidebarExpanded ? "px-5 gap-3" : "px-0 gap-0 justify-center w-[52px] mx-auto"}
+        `}
       >
-        {label}
-      </span>
-    </Link>
-  );
+        <item.Icon size={20} className="shrink-0" />
+        <span
+          className={`truncate transition-opacity duration-200 ${isSidebarExpanded ? "opacity-100" : "opacity-0 h-0 hidden"}`}
+        >
+          {item.label}
+        </span>
+      </Link>
+    );
+  };
 
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "unset";
@@ -149,13 +208,10 @@ const AdminLayout = ({ children, logout }) => {
         >
           <style>{`nav::-webkit-scrollbar { display: none; }`}</style>
           <div className="flex flex-col gap-0.5 px-0 pt-4">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <NavLink
-                key={item.path}
-                to={item.path}
-                label={item.label}
-                Icon={item.Icon}
-                isActive={isActive(item.path)}
+                key={index}
+                item={item}
                 onClick={() => setSidebarOpen(false)}
               />
             ))}
@@ -257,10 +313,10 @@ const AdminLayout = ({ children, logout }) => {
 
           {/* Right Section (Icons) */}
           <div className="flex items-center gap-4 pr-2">
-            <div className="relative cursor-pointer">
+            <Link to="/dashboard/admin/notifications" className="relative cursor-pointer p-2 rounded-full hover:bg-gray-100">
               <Bell size={20} className="text-gray-600" />
               <span className="absolute top-[-4px] right-[-3px] h-2 w-2 rounded-full bg-red-500 border border-white"></span>
-            </div>
+            </Link>
             <Settings size={20} className="text-gray-600 cursor-pointer" />
             {/* <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#0189BB] text-white cursor-pointer">
               <User size={16} />

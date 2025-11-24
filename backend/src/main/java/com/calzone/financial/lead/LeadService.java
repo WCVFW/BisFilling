@@ -1,15 +1,16 @@
 package com.calzone.financial.lead;
 
-import com.calzone.financial.lead.dto.LeadRequest;
-import com.calzone.financial.lead.dto.LeadResponse;
-import com.calzone.financial.lead.dto.LeadUpdateRequest;
-import com.calzone.financial.user.User;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import com.calzone.financial.lead.dto.LeadRequest;
+import com.calzone.financial.lead.dto.LeadResponse;
+import com.calzone.financial.lead.dto.LeadUpdateRequest;
+import com.calzone.financial.user.User;
 
 @Service
 public class LeadService {
@@ -26,6 +27,13 @@ public class LeadService {
                 .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public LeadResponse findById(Long id, User owner) {
+        return leadRepository.findByIdAndOwner(id, owner)
+                .map(this::toResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lead not found"));
     }
 
     @Transactional

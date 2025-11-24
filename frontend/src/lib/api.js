@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // This should typically be set to your backend server URL (e.g., http://localhost:8080)
-const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8080' : ""); 
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8080' : "");
 
 // Create the custom Axios instance
 const api = axios.create({
@@ -22,7 +22,7 @@ api.interceptors.request.use((config) => {
     } else {
         // Clear any stale session and notify if token is invalid
         clearAuth();
-        try { window.dispatchEvent(new Event('auth:update')); } catch (e) {}
+        try { window.dispatchEvent(new Event('auth:update')); } catch (e) { }
         // Helpful dev warning when making API requests without a token
         if (import.meta.env.DEV && String(config.url || "").startsWith('/api')) {
             // console.warn('No valid auth token available for API request:', config.method, config.url);
@@ -40,10 +40,10 @@ api.interceptors.response.use(
             if (status === 401 || status === 403) {
                 // Clear local session and notify other parts of the app
                 clearAuth();
-                try { window.dispatchEvent(new Event('auth:update')); } catch (e) {}
+                try { window.dispatchEvent(new Event('auth:update')); } catch (e) { }
 
                 // Redirect the user to login (best-effort)
-                try { window.location.href = '/login'; } catch (e) {}
+                try { window.location.href = '/login'; } catch (e) { }
             }
         } catch (err) {
             // ignore
@@ -69,7 +69,6 @@ export const authAPI = {
 export const userAPI = {
     me: () => api.get("/api/user/me"),
     all: () => api.get("/api/user/all"),
-    // Ensure multipart/form-data is set when sending FormData with PUT
     update: (formData) => api.put("/api/user/me", formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
     profileImage: () => api.get("/api/user/me/profile-image", { responseType: 'blob' }),
 };
@@ -112,7 +111,6 @@ export const orderAPI = {
     create: (payload) => api.post("/api/orders", payload),
     update: (id, payload) => api.put(`/api/orders/${id}`, payload),
     delete: (id) => api.delete(`/api/orders/${id}`),
-    // Documents
     addDocument: (orderId, file) => {
         const fd = new FormData();
         fd.append('file', file);
@@ -120,11 +118,8 @@ export const orderAPI = {
     },
     listDocuments: (orderId) => api.get(`/api/orders/${orderId}/documents`),
     verifyDocument: (orderId, docId) => api.post(`/api/orders/${orderId}/documents/${docId}/verify`),
-    // Download
     downloadDocument: (orderId, docId) => api.get(`/api/orders/${orderId}/documents/${docId}/download`, { responseType: 'blob' }),
-    // Payment
     pay: (orderId, payload) => api.post(`/api/orders/${orderId}/pay`, payload),
-    // Assign
     assign: (orderId, payload) => api.post(`/api/orders/${orderId}/assign`, payload),
     listAssigned: (assigneeEmail) => api.get(`/api/orders/assigned${assigneeEmail ? `?assigneeEmail=${encodeURIComponent(assigneeEmail)}` : ''}`),
 };
@@ -147,11 +142,15 @@ export const caseAPI = {
     delete: (id) => api.delete(`/api/cases/${id}`),
 };
 
+// Notifications
+export const notificationAPI = {
+    getAll: () => api.get("/api/notifications"),
+    markAsRead: (id) => api.put(`/api/notifications/${id}/read`),
+};
+
 // Documents / S3
 export const docsAPI = {
-    // Upload file directly to server (stores in MySQL blob)
     upload: (formData) => api.post(`/api/docs/upload`, formData),
-    // Download document bytes
     downloadDocument: (documentId) => api.get(`/api/docs/${documentId}/download`, { responseType: 'blob' }),
     listMyDocs: () => api.get(`/api/docs/my-docs`),
 };
@@ -166,25 +165,44 @@ export const paymentsAPI = {
 
 // Admin
 export const adminAPI = {
-    createEmployee: (formData) => api.post(`/api/admin/employees`, formData), // formData for file uploads
+    // Create a new employee using multipart/form-data as expected by the backend
+    createEmployee: (data) => {
+        const fd = new FormData();
+        fd.append('fullName', data.fullName);
+        fd.append('email', data.email);
+        fd.append('password', data.password);
+        fd.append('role', data.role);
+        // Optional fields can be added here if needed, e.g., phone, address, profileImageFile
+        return api.post(`/api/admin/employees`, fd);
+    },
     listEmployees: () => api.get(`/api/admin/employees`),
     getEmployee: (id) => api.get(`/api/admin/employees/${id}`),
-    updateEmployee: (id, formData) => api.put(`/api/admin/employees/${id}`, formData), // formData for file uploads
+    // Update employee using multipart/form-data to match backend expectations
+    updateEmployee: (id, data) => {
+        const fd = new FormData();
+        fd.append('fullName', data.fullName);
+        fd.append('email', data.email);
+        fd.append('role', data.role);
+        return api.put(`/api/admin/employees/${id}`, fd);
+    },
     deleteEmployee: (id) => api.delete(`/api/admin/employees/${id}`),
+    listLeads: () => api.get(`/api/admin/leads`),
+    getDashboardStats: () => api.get(`/api/admin/dashboard-stats`),
+    listCrmLeads: () => api.get(`/api/admin/crm-leads`),
+    getCustomerLifecycleData: () => api.get("/api/admin/customer-lifecycle"),
 };
 
-// Service hub - aggregated dashboard/status for admin and employee
+// Service hub
 export const serviceHubAPI = {
     status: (role, email) => api.get(`/api/servicehub/status?role=${encodeURIComponent(role)}${email ? `&email=${encodeURIComponent(email)}` : ''}`),
     myOrders: (service) => api.get(`/api/servicehub/my-orders${service ? `?service=${encodeURIComponent(service)}` : ''}`),
     orders: (service) => api.get(`/api/servicehub/orders${service ? `?service=${encodeURIComponent(service)}` : ''}`),
 };
 
-// Services API (e.g., GST registration)
+// Services API
 export const serviceAPI = {
     createGSTOrder: (payload) => api.post(`/api/services/gst/register`, payload),
 };
-
 
 // Process
 export const processAPI = {
@@ -212,5 +230,39 @@ export const aiAPI = {
     triageObjection: (payload) => api.post(`/api/ai/triage/objection`, payload),
 };
 
-// Export the custom Axios instance
+// CRM APIs
+export const crmAPI = {
+    // Customer Profile
+    createProfile: (data) => api.post("/api/crm/customer-profile", data),
+    getMyProfile: () => api.get("/api/crm/customer-profile/me"),
+    getAllProfiles: () => api.get("/api/crm/customer-profiles"),
+    updateProfile: (id, data) => api.put(`/api/crm/customer-profile/${id}`, data),
+
+    // Service Requests
+    createServiceRequest: (data) => api.post("/api/crm/service-request", data),
+    getServiceRequestsByCustomer: (customerProfileId) => api.get(`/api/crm/service-requests/customer/${customerProfileId}`),
+    getAllServiceRequests: () => api.get("/api/crm/service-requests"),
+    updateServiceRequest: (id, data) => api.put(`/api/crm/service-request/${id}`, data),
+
+    // Documents
+    uploadDocument: (data) => api.post("/api/crm/document", data),
+    getDocumentsByCustomer: (customerProfileId) => api.get(`/api/crm/documents/customer/${customerProfileId}`),
+    deleteDocument: (id) => api.delete(`/api/crm/document/${id}`),
+
+    // Support Tickets
+    createTicket: (data) => api.post("/api/crm/support-ticket", data),
+    getTicketsByCustomer: (customerProfileId) => api.get(`/api/crm/support-tickets/customer/${customerProfileId}`),
+    getAllTickets: () => api.get("/api/crm/support-tickets"),
+    updateTicketStatus: (id, status) => api.put(`/api/crm/support-ticket/${id}/status`, { status }),
+
+    // Wallet
+    getWallet: (customerProfileId) => api.get(`/api/crm/wallet/customer/${customerProfileId}`),
+    addMoney: (data) => api.post("/api/crm/wallet/add-money", data),
+    deductMoney: (data) => api.post("/api/crm/wallet/deduct", data),
+    getWalletTransactions: (walletId) => api.get(`/api/crm/wallet/${walletId}/transactions`),
+
+    // Dashboard
+    getDashboardStats: () => api.get("/api/crm/dashboard-stats"),
+};
+
 export default api;

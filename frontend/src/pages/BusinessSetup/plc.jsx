@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BackgroundImageSrc from "@/assets1/img/hero-bg-1.svg"
+import StarIcon from "@/assets1/img/icons/star-1.svg";
+import FreeIcon from "@/assets1/img/icons/free.svg";
+import DiamondIcon from "@/assets1/img/icons/dimond.svg";
 
 // NOTE: BackgroundImageSrc is imported from a relative path, ensure it exists in your project.
 // import BackgroundImageSrc from "@/assets/business.png" 
@@ -181,100 +184,6 @@ const RequirementItem = ({ icon: Icon, title, description }) => (
         </div>
     </div>
 );
-
-// --- PVT LTD Plan Card (Updated) ---
-const PvtLtdPlanCard = ({ plan, hoveredPlanId, setHoveredPlanId, selectedPlanId, setSelectedPlanId }) => {
-
-    const isSelected = plan.title === selectedPlanId;
-    const isHovered = plan.title === hoveredPlanId;
-
-    // The plan is 'prominent' if it's explicitly selected OR currently hovered OR it's the 
-    // default recommended plan and nothing has been selected or hovered yet.
-    const isProminent = isSelected || isHovered || (plan.isRecommended && !selectedPlanId && !hoveredPlanId);
-    const isPremiumPlan = plan.isPremium;
-
-    const baseClasses = `relative p-4 sm:p-6 rounded-xl shadow-lg flex flex-col justify-between h-full transition-all duration-300 cursor-pointer ${isPremiumPlan ? 'bg-gray-100 border-2 border-gray-300' : ''}`;
-
-    const activeClasses = isProminent && !isPremiumPlan
-        ? 'bg-[#E6F2FF] border-2 border-[#2E96FF] scale-[1.03] shadow-2xl'
-        : isProminent && isPremiumPlan
-            ? 'bg-gray-200 border-2 border-gray-400 scale-[1.03] shadow-2xl'
-            : 'bg-white border border-gray-200 hover:shadow-xl hover:scale-[1.02]';
-
-    const handleClick = (e) => {
-        // Only allow selection for the three standard packages
-        if (!isPremiumPlan) {
-            setSelectedPlanId(plan.title);
-        }
-    }
-
-    // Determine the badge text
-    let badgeText = '';
-    if (isSelected) {
-        badgeText = 'Selected Plan';
-    } else if (plan.isRecommended && !selectedPlanId) {
-        badgeText = 'Recommended Plan';
-    }
-
-    return (
-        <div
-            className={`${baseClasses} ${activeClasses}`}
-            onMouseEnter={() => setHoveredPlanId(plan.title)}
-            onMouseLeave={() => setHoveredPlanId(null)}
-            onClick={handleClick}
-        >
-            {(isProminent || isSelected) && badgeText && (
-                <div className="absolute top-0 right-0 bg-[#2E96FF] text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-xl">
-                    {badgeText}
-                </div>
-            )}
-
-            <div>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900 mb-1">{plan.title}</h3>
-                <p className={`text-sm mb-4 ${isPremiumPlan ? 'text-gray-700 font-semibold' : 'text-gray-500'}`}>{plan.description}</p>
-
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 mb-4">
-                    <span className="text-xl sm:text-3xl font-extrabold text-[#2E96FF]">{plan.price}</span>
-                    <span className="text-sm line-through text-gray-400">{plan.originalPrice}</span>
-                    <span className="text-sm text-green-600 font-bold">{plan.discountText}</span>
-                    {plan.govtFeeNote && <span className="text-xs text-gray-500">{plan.govtFeeNote}</span>}
-                </div>
-
-                <div className={`text-sm font-semibold mb-4 ${isPremiumPlan ? 'text-blue-700' : 'text-green-700'}`}>
-                    {plan.cashbackText}
-                </div>
-
-
-                <button
-                    className={`w-full py-2.5 sm:py-3 font-semibold rounded-lg transition-colors shadow-md ${isPremiumPlan
-                        ? 'bg-blue-900 text-white hover:bg-blue-800'
-                        : isProminent
-                            ? 'bg-[#2E96FF] text-white hover:bg-[#0069D1]'
-                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                        }`}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        if (!isPremiumPlan) {
-                            setSelectedPlanId(plan.title);
-                        }
-                    }}
-                >
-                    {isPremiumPlan ? "Talk to Incorporation Expert" : "Get Started"}
-                </button>
-
-                <h4 className="font-bold text-gray-800 mt-4 sm:mt-6 mb-3 border-t pt-3">What you'll get:</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                    {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
-                            <span>{feature}</span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
-    );
-};
 
 const ResourceLinkGroup = ({ title, items, icon: Icon }) => (
     <div className="p-4 bg-white shadow-lg rounded-xl">
@@ -589,29 +498,74 @@ export default function LandingPageDesign() {
                 </div>
             </section>
 
-            {/* --- Pricing Section --- */}
-            <section className="py-8 sm:py-16 px-4 md:px-8 bg-gray-50">
-                <div className="max-w-7xl mx-auto">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 text-center">
-                        Right Plan for Your Business
-                    </h2>
-                    <p className="text-sm sm:text-lg text-gray-600 mb-8 sm:mb-10 text-center">
-                        Vakilsearch's incorporation experts register over 1500+ companies every month.
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8 items-stretch">
-                        {pvtLtdPlans.map((plan, i) => (
-                            <PvtLtdPlanCard
-                                key={i}
-                                plan={plan}
-                                hoveredPlanId={hoveredPlanId}
-                                setHoveredPlanId={setHoveredPlanId}
-                                selectedPlanId={selectedPlanId}
-                                setSelectedPlanId={setSelectedPlanId}
-                            />
+            {/* --- New Pricing Section --- */}
+            <section className="position-relative">
+                <div className="cs_height_120 cs_height_lg_80"></div>
+                <div className="container">
+                    <div className="cs_section_heading cs_style_1 cs_center_column cs_mb_60 text-center">
+                        <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
+                            <img src={StarIcon} alt="Star icon" />
+                            <span>Our Pricing</span>
+                            <img src={StarIcon} alt="Star icon" />
+                        </div>
+                        <h2 className="cs_section_title cs_fs_48 cs_semibold cs_mb_20 text-capitalize">Right Plan for Your Business</h2>
+                        <p className="mb-0">Vakilsearch's incorporation experts register over 1500+ companies every month.</p>
+                    </div>
+                    <div className="row cs_row_gap_30 cs_gap_y_30 align-items-end">
+                        {pvtLtdPlans.map((plan, index) => (
+                            <div className="col-lg-3" key={plan.title}>
+                                <div className={`cs_pricing_table cs_style_1 cs_gray_bg_2 cs_radius_30 ${plan.isRecommended ? 'cs_active' : ''}`}>
+                                    {plan.isRecommended && (
+                                        <>
+                                            <div className="cs_pricing_table_shape position-absolute">
+                                                <img src="assets/img/pricing-shape-1.svg" alt="Shape" />
+                                            </div>
+                                            <div className="cs_pricing_badge cs_accent_bg cs_medium cs_white_color text-center position-absolute">Most Popular</div>
+                                        </>
+                                    )}
+                                    <div className="cs_pricing_table_heading cs_mb_3">
+                                        <h2 className="cs_plan_title cs_fs_24 cs_semibold mb-0">{plan.title}</h2>
+                                        <span className="cs_plan_icon">
+                                            <img src={index === 0 ? FreeIcon : DiamondIcon} alt="Pricing plan icon" />
+                                        </span>
+                                    </div>
+                                    <div className="cs_pricing_info cs_mb_20">
+                                        <div className="cs_price cs_fs_48 cs_semibold cs_heading_color cs_heading_font cs_mb_4">
+                                            {plan.price}
+                                            <small>
+                                                <del className="text-gray-400 text-lg ml-2">{plan.originalPrice}</del>
+                                            </small>
+                                        </div>
+                                        <p className="mb-0">{plan.description}</p>
+                                    </div>
+                                    <div className="cs_separator cs_mb_22"></div>
+                                    <div className="cs_feature_wrapper cs_mb_30">
+                                        <ul className="cs_pricing_feature_list cs_mp_0">
+                                            {plan.features.map((feature, i) => (
+                                                <li key={i}>
+                                                    <span className="cs_feature_icon cs_green_color">
+                                                        <svg width="14" height="11" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M12.2442 0.289465L5.02298 7.10457L2.68046 4.6782C1.1639 3.21126 -0.947636 5.40321 0.466273 6.97165L3.86805 10.4952C3.89139 10.5194 3.93805 10.5701 3.96372 10.5919C4.57501 11.1719 5.52228 11.1284 6.08225 10.4952L13.7211 1.81682C14.5914 0.787306 13.2358 -0.611965 12.2465 0.289465H12.2442Z" fill="currentColor" />
+                                                        </svg>
+                                                    </span>
+                                                    <span className="cs_feature_title cs_heading_color">{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <a href="#" aria-label="Buy service button" className="cs_btn cs_style_1 cs_fs_14 cs_bold cs_heading_color text-uppercase">
+                                        <span>{plan.isPremium ? "Talk to Expert" : "Get Started"}</span>
+                                        <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
+                                    </a>
+                                </div>
+                            </div>
                         ))}
                     </div>
+                     <p className="text-xs text-gray-500 mt-6 text-center">
+                        **Note:** Government fees for incorporation are extra and it varies from state to state. T&C
+                    </p>
                 </div>
+                <div className="cs_height_120 cs_height_lg_80"></div>
             </section>
 
             {/* === Main Content Tabs Navigation === */}

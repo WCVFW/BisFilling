@@ -15,6 +15,27 @@ function ok(data, status = 200) {
   };
 }
 
+// --- Notification Helpers (for mock) ---
+function getStoredNotifications() {
+  try {
+    const raw = localStorage.getItem("mock_notifications");
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setStoredNotifications(notifications) {
+  localStorage.setItem("mock_notifications", JSON.stringify(notifications));
+}
+
+function addNotification(notification) {
+  const notifications = getStoredNotifications();
+  const newNotification = { id: Date.now(), ...notification, time: new Date().toISOString(), read: false };
+  notifications.unshift(newNotification); // Add to the top
+  setStoredNotifications(notifications);
+}
+
 function err(status, message) {
   const error = new Error(message || "Request failed");
   error.response = {
@@ -137,6 +158,12 @@ axios.defaults.adapter = async function mockAdapter(config) {
       createdAt: new Date().toISOString(),
     };
     setStoredUser(user);
+
+    // Add a notification for the admin
+    addNotification({
+      message: `New user "${user.name || user.email}" has signed up.`,
+    });
+
     return ok({ message: "Signup successful (mock)." });
   }
 
@@ -240,6 +267,12 @@ axios.defaults.adapter = async function mockAdapter(config) {
       { id: 3, name: "Charlie", service: "MSME", status: "Closed" },
     ];
     return ok({ leads });
+  }
+
+  // Notifications (demo)
+  if (url === "/api/notifications" && method === "get") {
+    const notifications = getStoredNotifications();
+    return ok({ notifications });
   }
 
   return err(404, "Endpoint not mocked");

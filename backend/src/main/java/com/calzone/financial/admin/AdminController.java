@@ -9,12 +9,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.calzone.financial.lead.dto.LeadResponse;
 import java.util.Map;
+import java.util.HashMap;
 
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/admin")
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class AdminController {
     private final UserRepository users;
     private final AdminService adminService;
@@ -57,10 +59,43 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/employees")
-    public java.util.List<EmployeeDto> listEmployees() {
-        return adminService.listEmployees().stream()
+    public ResponseEntity<Map<String, Object>> listEmployees() {
+        java.util.List<EmployeeDto> employees = adminService.listEmployees().stream()
                 .map(AdminController::toDto)
                 .toList();
+        Map<String, Object> stats = adminService.getEmployeeStats();
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("employees", employees);
+        response.put("stats", stats);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/dashboard-stats")
+    public ResponseEntity<Map<String, Object>> getDashboardStats() {
+        return ResponseEntity.ok(adminService.getDashboardStats());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/crm-leads")
+    public ResponseEntity<java.util.List<LeadResponse>> listCrmLeads() {
+        return ResponseEntity.ok(adminService.listCrmLeads());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/leads")
+    public java.util.List<EmployeeDto> listLeads() {
+        return adminService.listLeads().stream()
+                .map(AdminController::toDto)
+                .toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/customer-lifecycle")
+    public ResponseEntity<Map<String, Object>> getCustomerLifecycleData() {
+        return ResponseEntity.ok(adminService.getCustomerLifecycleData());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -98,6 +133,13 @@ public class AdminController {
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         adminService.deleteEmployee(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/leads/{id}")
+    public ResponseEntity<Void> deleteLead(@PathVariable Long id) {
+        adminService.deleteEmployee(id); // Re-using the same service method which deletes a user by ID
         return ResponseEntity.noContent().build();
     }
 }

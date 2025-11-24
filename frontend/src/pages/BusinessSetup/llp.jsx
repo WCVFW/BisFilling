@@ -13,6 +13,9 @@ import {
     Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import StarIcon from "@/assets1/img/icons/star-1.svg";
+import FreeIcon from "@/assets1/img/icons/free.svg";
+import DiamondIcon from "@/assets1/img/icons/dimond.svg";
 import BackgroundImageSrc from "@/assets1/img/hero-bg-1.svg"
 import ServiceTemplate from "@/components/ServiceTemplate";
 
@@ -571,37 +574,78 @@ export default function LandingPageDesign() {
       </section>
 
 
-            {/* --- Pricing Section --- */}
-            <section className="py-8 sm:py-16 px-4 md:px-8 bg-gray-50">
-                <div className="max-w-7xl mx-auto">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4 text-center">
-                        Right Plan for Your Business
-                    </h2>
-                    <p className="text-sm sm:text-lg text-gray-600 mb-8 sm:mb-10 text-center">
-                        Vakilsearch's incorporation experts register over 1500+ companies every month.
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
-                        {llpPlans.map((plan, i) => (
-                            <LlpPlanCard
-                                key={i}
-                                plan={plan}
-                                hoveredPlanId={hoveredPlanId}
-                                setHoveredPlanId={setHoveredPlanId}
-                                selectedPlanId={selectedPlanId}
-                                setSelectedPlanId={setSelectedPlanId}
-                            />
+            {/* --- New Pricing Section --- */}
+            <section className="position-relative">
+                <div className="cs_height_120 cs_height_lg_80"></div>
+                <div className="container">
+                    <div className="cs_section_heading cs_style_1 cs_center_column cs_mb_60 text-center">
+                        <div className="cs_section_subtitle cs_fs_18 cs_heading_color cs_mb_22">
+                            <img src={StarIcon} alt="Star icon" />
+                            <span>Our Pricing</span>
+                            <img src={StarIcon} alt="Star icon" />
+                        </div>
+                        <h2 className="cs_section_title cs_fs_48 cs_semibold cs_mb_20 text-capitalize">Starter Plan For Everyone</h2>
+                        <p className="mb-0">Choose the perfect plan to get your Limited Liability Partnership registered with expert help.</p>
+                    </div>
+                    <div className="row cs_row_gap_30 cs_gap_y_30 align-items-end">
+                        {llpPlans.map((plan, index) => (
+                            <div className="col-lg-4" key={plan.title}>
+                                <div className={`cs_pricing_table cs_style_1 cs_gray_bg_2 cs_radius_30 ${plan.isRecommended ? 'cs_active' : ''}`}>
+                                    {plan.isRecommended && (
+                                        <>
+                                            <div className="cs_pricing_table_shape position-absolute">
+                                                <img src="assets/img/pricing-shape-1.svg" alt="Shape" />
+                                            </div>
+                                            <div className="cs_pricing_badge cs_accent_bg cs_medium cs_white_color text-center position-absolute">Most Popular</div>
+                                        </>
+                                    )}
+                                    <div className="cs_pricing_table_heading cs_mb_3">
+                                        <h2 className="cs_plan_title cs_fs_24 cs_semibold mb-0">{plan.title}</h2>
+                                        <span className="cs_plan_icon">
+                                            <img src={index === 0 ? FreeIcon : DiamondIcon} alt="Pricing plan icon" />
+                                        </span>
+                                    </div>
+                                    <div className="cs_pricing_info cs_mb_20">
+                                        <div className="cs_price cs_fs_48 cs_semibold cs_heading_color cs_heading_font cs_mb_4">
+                                            {plan.price}
+                                            <small>
+                                                <del className="text-gray-400 text-lg ml-2">{plan.originalPrice}</del>
+                                            </small>
+                                        </div>
+                                        <p className="mb-0">{plan.description}</p>
+                                    </div>
+                                    <div className="cs_separator cs_mb_22"></div>
+                                    <div className="cs_feature_wrapper cs_mb_30">
+                                        <ul className="cs_pricing_feature_list cs_mp_0">
+                                            {plan.features.map((feature, i) => (
+                                                <li key={i}>
+                                                    <span className="cs_feature_icon cs_green_color">
+                                                        <svg width="14" height="11" viewBox="0 0 14 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M12.2442 0.289465L5.02298 7.10457L2.68046 4.6782C1.1639 3.21126 -0.947636 5.40321 0.466273 6.97165L3.86805 10.4952C3.89139 10.5194 3.93805 10.5701 3.96372 10.5919C4.57501 11.1719 5.52228 11.1284 6.08225 10.4952L13.7211 1.81682C14.5914 0.787306 13.2358 -0.611965 12.2465 0.289465H12.2442Z" fill="currentColor" />
+                                                        </svg>
+                                                    </span>
+                                                    <span className="cs_feature_title cs_heading_color">{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <a href="#" aria-label="Buy service button" className="cs_btn cs_style_1 cs_fs_14 cs_bold cs_heading_color text-uppercase">
+                                        <span>Get Started</span>
+                                        <span className="cs_btn_icon"><i className="fa-solid fa-arrow-right"></i></span>
+                                    </a>
+                                </div>
+                            </div>
                         ))}
                     </div>
-                    {/* Govt Fee Note (Added based on LLP source text structure) */}
-                    <p className="text-xs text-gray-500 mt-6 text-center">
+                     <p className="text-xs text-gray-500 mt-6 text-center">
                         **Note:** Government fees for incorporation are extra and it varies from state to state. T&C
                     </p>
                 </div>
+                <div className="cs_height_120 cs_height_lg_80"></div>
             </section>
 
             {/* === Main Content Tabs Navigation === */}
-            <section className="py-3 sm:py-4 md:py-10 px-4 md:px-8 bg-white border-b border-gray-200 sticky top-0 z-30 shadow-md">
+            <section className="py-3 sm:py-4 md:py-10 px-4 md:px-8 bg-white border-b border-gray-200 sticky top-[80px] z-30 shadow-md">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center bg-white rounded-xl w-full text-xs sm:text-sm md:text-base overflow-x-scroll border border-gray-200">
                         {llpTabs.map((tab) => (
