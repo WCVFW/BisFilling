@@ -1,4 +1,4 @@
-Project Overview — Vakilsearch AI Demo
+Project Overview — BisFilling AI Demo
 
 Summary
 - Full-stack demo combining a Spring Boot backend and an existing React frontend (Vite). The backend provides core platform modules (auth, CRM/lead intake, case management, document metadata, AI mock endpoints) and serves a simple static demo UI at / (backend demo index.html).
