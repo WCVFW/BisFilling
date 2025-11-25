@@ -26,14 +26,22 @@ import MyAccount from "./pages/MyAccount";
 
 /* ---------------------- Dashboards ---------------------- */
 import AdminDashboard from "./pages/Dashboard/AdminDSB/AdminDashboard";
-import EmployeeDashboard from "./pages/Dashboard/EmployeeDashboard";
+import EmployeeDashboard from "./pages/Dashboard/EmployeeDSB/EmployeeDashboard";
 import UserDashboard from "./pages/Dashboard/userDSB/UserDashboard";
 import OrderDetailPage from "./pages/Dashboard/userDSB/OrderDetailPage";
 import AdminReports from "./pages/Dashboard/AdminDSB/AdminReports";
 import AdminOrdersPage from "./pages/Dashboard/AdminDSB/AdminOrdersPage";
-import EmployeeTasksPage from "./pages/Dashboard/EmployeeTasksPage";
-import EmployeeHomePage from "./pages/Dashboard/EmployeeHomePage";
+import EmployeeTasksPage from "./pages/Dashboard/EmployeeDSB/EmployeeTasksPage";
+import EmployeeHomePage from "./pages/Dashboard/EmployeeDSB/EmployeeHomePage";
 import AdminHome from "./pages/Dashboard/AdminDSB/AdminHome";
+
+// --- Import the new Employee Dashboard pages ---
+import EmployeeAttendancePage from "./pages/Dashboard/EmployeeDSB/EmployeeAttendancePage";
+import EmployeeSalesPage from "./pages/Dashboard/EmployeeDSB/EmployeeSalesPage";
+import EmployeeReportsPage from "./pages/Dashboard/EmployeeDSB/EmployeeReportsPage";
+import EmployeeContactPage from "./pages/Dashboard/EmployeeDSB/EmployeeContactPage";
+import EmployeeCompanyPage from "./pages/Dashboard/EmployeeDSB/EmployeeCompanyPage";
+import EmployeeCalendarPage from "./pages/Dashboard/EmployeeDSB/EmployeeCalendarPage";
 
 /* ---------------------- Admin Modules ---------------------- */
 const AdminEmployees = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminEmployees"));
@@ -51,6 +59,12 @@ const AdminDeals = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminDeal
 const AdminCrmDashboard = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminCrm/AdminCrmDashboard"));
 const AdminCustomerList = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminCrm/AdminCustomerList"));
 const AdminCustomerDetail = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminCrm/AdminCustomerDetail"));
+
+/* ---------------------- Agent Modules ---------------------- */
+const AgentDashboard = React.lazy(() => import("./pages/Dashboard/AgentDSB/AgentDashboard"));
+const AgentHome = React.lazy(() => import("./pages/Dashboard/AgentDSB/AgentHome"));
+const AgentWallet = React.lazy(() => import("./pages/Dashboard/AgentDSB/AgentWallet"));
+const AgentOrders = React.lazy(() => import("./pages/Dashboard/AgentDSB/AgentOrders"));
 
 /* ---------------------- Components ---------------------- */
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -326,13 +340,39 @@ export default function App() {
             path="/dashboard/employee"
             element={
               <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
-                <EmployeeDashboard />
+                <EmployeeDashboard user={user} />
               </ProtectedRoute>
             }
           >
             <Route index element={<EmployeeHomePage />} />
-            <Route path="assigned" element={<EmployeeTasksPage />} />
-            <Route path="task/:orderId" element={<OrderDetailPage />} />
+            {/* Changed 'assigned' to 'tasks' to match the sidebar link */}
+            <Route path="tasks" element={<EmployeeTasksPage />} />
+            {/* Added route for a single task with :taskId as requested */}
+            <Route path="task/:taskId" element={<OrderDetailPage />} />
+            <Route path="profile" element={<MyAccount />} />
+            {/* --- Add routes for the new pages --- */}
+            <Route path="attendance" element={<EmployeeAttendancePage />} />
+            <Route path="sales" element={<EmployeeSalesPage />} />
+            <Route path="reports" element={<EmployeeReportsPage />} />
+            <Route path="contact" element={<EmployeeContactPage />} />
+            <Route path="company" element={<EmployeeCompanyPage />} />
+            <Route path="calendar" element={<EmployeeCalendarPage />} />
+          </Route>
+
+          {/* ---------------------- AGENT DASHBOARD ---------------------- */}
+          <Route
+            path="/dashboard/agent"
+            element={
+              <ProtectedRoute allowedRoles={["AGENT"]}>
+                <React.Suspense fallback={<ServiceLoader />}>
+                  <AgentDashboard user={user} />
+                </React.Suspense>
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<React.Suspense fallback={<ServiceLoader />}><AgentHome /></React.Suspense>} />
+            <Route path="wallet" element={<React.Suspense fallback={<ServiceLoader />}><AgentWallet /></React.Suspense>} />
+            <Route path="orders" element={<React.Suspense fallback={<ServiceLoader />}><AgentOrders /></React.Suspense>} />
             <Route path="profile" element={<MyAccount />} />
           </Route>
 
@@ -369,7 +409,9 @@ function DashboardRouter({ user }) {
     case "ADMIN":
       return <AdminDashboard />;
     case "EMPLOYEE":
-      return <EmployeeDashboard />;
+      return <EmployeeDashboard user={user} />;
+    case "AGENT":
+      return <React.Suspense fallback={<ServiceLoader />}><AgentDashboard user={user} /></React.Suspense>;
     case "USER":
       return <UserDashboard />;
     default:

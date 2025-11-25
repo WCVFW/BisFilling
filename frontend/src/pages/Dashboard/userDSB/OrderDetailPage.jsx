@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftIcon,
@@ -17,8 +17,11 @@ import {
   CheckIcon,
   XCircleIcon,
   SparklesIcon,
+  CloudArrowUpIcon,
+  ShieldCheckIcon
 } from "@heroicons/react/24/outline";
 import { orderAPI, workflowAPI, userAPI } from "@/lib/api";
+import { toast } from "react-hot-toast";
 
 const WorkflowEventTimeline = ({ events }) => {
   if (!events || events.length === 0) {
@@ -45,15 +48,14 @@ const WorkflowEventTimeline = ({ events }) => {
                   {event.stage || "Stage"}
                 </h3>
                 <span
-                  className={`text-xs font-bold px-3 py-1 rounded-full ${
-                    event.status === "COMPLETED"
+                  className={`text-xs font-bold px-3 py-1 rounded-full ${event.status === "COMPLETED"
                       ? "bg-green-100 text-green-800"
                       : event.status === "IN_PROGRESS"
                         ? "bg-blue-100 text-blue-800"
                         : event.status === "FAILED"
                           ? "bg-red-100 text-red-800"
                           : "bg-gray-100 text-gray-800"
-                  }`}
+                    }`}
                 >
                   {event.status?.replace(/_/g, " ") || "PENDING"}
                 </span>
@@ -95,10 +97,11 @@ const StageActionButtons = ({ currentStage, orderId, onRefresh }) => {
         nextStage,
         description: `Advanced to ${nextStage}`,
       });
+      toast.success(`Advanced to ${nextStage}`);
       onRefresh();
     } catch (error) {
       console.error("Error advancing stage:", error);
-      alert("Failed to advance stage");
+      toast.error("Failed to advance stage");
     } finally {
       setLoading(false);
     }
@@ -111,10 +114,11 @@ const StageActionButtons = ({ currentStage, orderId, onRefresh }) => {
         stage: currentStage,
         description: `Completed ${currentStage} stage`,
       });
+      toast.success(`Completed ${currentStage}`);
       onRefresh();
     } catch (error) {
       console.error("Error completing stage:", error);
-      alert("Failed to complete stage");
+      toast.error("Failed to complete stage");
     } finally {
       setLoading(false);
     }
@@ -161,7 +165,7 @@ const StageActionButtons = ({ currentStage, orderId, onRefresh }) => {
   );
 };
 
-const DocumentCard = ({ doc, onDownload, loading }) => {
+const DocumentCard = ({ doc, onDownload, onVerify, loading, isEmployee }) => {
   const formatFileSize = (bytes) => {
     if (!bytes) return "0 B";
     const k = 1024;
@@ -199,7 +203,7 @@ const DocumentCard = ({ doc, onDownload, loading }) => {
             <span>
               {new Date(doc.uploadedAt).toLocaleDateString("en-IN")}
             </span>
-            {doc.verified && (
+            {doc.verified ? (
               <>
                 <span>•</span>
                 <span className="flex items-center gap-1 font-medium text-green-600">
@@ -207,18 +211,40 @@ const DocumentCard = ({ doc, onDownload, loading }) => {
                   Verified
                 </span>
               </>
+            ) : (
+              isEmployee && (
+                <>
+                  <span>•</span>
+                  <span className="flex items-center gap-1 font-medium text-amber-600">
+                    <ExclamationTriangleIcon className="w-3 h-3" />
+                    Pending Verification
+                  </span>
+                </>
+              )
             )}
           </div>
         </div>
       </div>
-      <button
-        onClick={() => onDownload(doc.id)}
-        disabled={loading}
-        className="flex items-center flex-shrink-0 gap-1 px-3 py-2 ml-3 text-sm font-medium text-indigo-600 transition rounded-lg hover:text-indigo-700 hover:bg-indigo-50"
-      >
-        <ArrowDownTrayIcon className="w-4 h-4" />
-        Download
-      </button>
+      <div className="flex items-center gap-2">
+        {isEmployee && !doc.verified && (
+          <button
+            onClick={() => onVerify(doc.id)}
+            disabled={loading}
+            className="p-2 text-green-600 transition rounded-lg hover:bg-green-50"
+            title="Verify Document"
+          >
+            <ShieldCheckIcon className="w-5 h-5" />
+          </button>
+        )}
+        <button
+          onClick={() => onDownload(doc.id)}
+          disabled={loading}
+          className="flex items-center flex-shrink-0 gap-1 px-3 py-2 ml-3 text-sm font-medium text-indigo-600 transition rounded-lg hover:text-indigo-700 hover:bg-indigo-50"
+        >
+          <ArrowDownTrayIcon className="w-4 h-4" />
+          Download
+        </button>
+      </div>
     </div>
   );
 };
@@ -232,9 +258,21 @@ export default function OrderDetailPage() {
   const [events, setEvents] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [user, setUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloadingDocId, setDownloadingDocId] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("authUser");
+    if (userStr) {
+      setCurrentUser(JSON.parse(userStr));
+    }
+  }, []);
+
+  const isEmployee = currentUser?.role === "EMPLOYEE" || currentUser?.role === "ADMIN";
 
   const fetchData = async () => {
     setLoading(true);
@@ -303,9 +341,38 @@ export default function OrderDetailPage() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error downloading document:", err);
-      alert("Failed to download document. Please try again.");
+      toast.error("Failed to download document.");
     } finally {
       setDownloadingDocId(null);
+    }
+  };
+
+  const handleVerifyDocument = async (docId) => {
+    try {
+      await orderAPI.verifyDocument(orderId, docId);
+      toast.success("Document verified successfully");
+      fetchData(); // Refresh list
+    } catch (err) {
+      console.error("Error verifying document:", err);
+      toast.error("Failed to verify document");
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      await orderAPI.addDocument(orderId, file);
+      toast.success("Document uploaded successfully");
+      fetchData();
+    } catch (err) {
+      console.error("Error uploading document:", err);
+      toast.error("Failed to upload document");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -438,11 +505,10 @@ export default function OrderDetailPage() {
               <p className="mb-1 text-sm text-gray-600">Order Status</p>
               <div className="flex items-center gap-2">
                 <span
-                  className={`inline-block w-3 h-3 rounded-full ${
-                    order?.status === "PAYMENT_COMPLETED"
+                  className={`inline-block w-3 h-3 rounded-full ${order?.status === "PAYMENT_COMPLETED"
                       ? "bg-green-500"
                       : "bg-yellow-500"
-                  }`}
+                    }`}
                 ></span>
                 <span className="font-semibold text-gray-900">
                   {order?.status?.replace(/_/g, " ") || "Unknown"}
@@ -451,7 +517,7 @@ export default function OrderDetailPage() {
             </div>
 
             {/* Stage Actions */}
-            {progress && (
+            {progress && isEmployee && (
               <StageActionButtons
                 currentStage={progress.currentStage}
                 orderId={orderId}
@@ -462,15 +528,39 @@ export default function OrderDetailPage() {
 
           {/* Documents Section */}
           <div className="p-8 bg-white border border-gray-100 shadow-lg rounded-2xl">
-            <div className="flex items-center gap-2 mb-6">
-              <DocumentTextIcon className="w-6 h-6 text-indigo-600" />
-              <h2 className="text-2xl font-bold text-gray-900">
-                Uploaded Documents
-              </h2>
-              {documents.length > 0 && (
-                <span className="px-3 py-1 ml-auto text-xs font-bold text-indigo-700 bg-indigo-100 rounded-full">
-                  {documents.length} file{documents.length !== 1 ? "s" : ""}
-                </span>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <DocumentTextIcon className="w-6 h-6 text-indigo-600" />
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Uploaded Documents
+                </h2>
+                {documents.length > 0 && (
+                  <span className="px-3 py-1 ml-2 text-xs font-bold text-indigo-700 bg-indigo-100 rounded-full">
+                    {documents.length}
+                  </span>
+                )}
+              </div>
+              {isEmployee && (
+                <div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileUpload}
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                  >
+                    {uploading ? (
+                      <span className="animate-spin">⌛</span>
+                    ) : (
+                      <CloudArrowUpIcon className="w-4 h-4" />
+                    )}
+                    Upload
+                  </button>
+                </div>
               )}
             </div>
 
@@ -481,7 +571,9 @@ export default function OrderDetailPage() {
                     key={doc.id}
                     doc={doc}
                     onDownload={handleDocumentDownload}
+                    onVerify={handleVerifyDocument}
                     loading={downloadingDocId === doc.id}
+                    isEmployee={isEmployee}
                   />
                 ))}
               </div>
@@ -553,13 +645,13 @@ export default function OrderDetailPage() {
                     <p className="text-sm font-medium text-gray-900">
                       {order?.createdAt
                         ? new Date(order.createdAt).toLocaleDateString(
-                            "en-IN",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            }
-                          )
+                          "en-IN",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }
+                        )
                         : "N/A"}
                     </p>
                   </div>
@@ -578,13 +670,12 @@ export default function OrderDetailPage() {
                 {progress.stages.map((stage) => (
                   <div
                     key={stage.stage}
-                    className={`p-4 rounded-lg border-l-4 transition ${
-                      stage.status === "COMPLETED"
+                    className={`p-4 rounded-lg border-l-4 transition ${stage.status === "COMPLETED"
                         ? "bg-green-50 border-l-green-500"
                         : stage.status === "IN_PROGRESS"
                           ? "bg-blue-50 border-l-blue-500"
                           : "bg-gray-50 border-l-gray-300"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       {stage.status === "COMPLETED" ? (
@@ -599,13 +690,12 @@ export default function OrderDetailPage() {
                           {stage.sequence}. {stage.label}
                         </p>
                         <p
-                          className={`text-xs mt-1 font-medium ${
-                            stage.status === "COMPLETED"
+                          className={`text-xs mt-1 font-medium ${stage.status === "COMPLETED"
                               ? "text-green-600"
                               : stage.status === "IN_PROGRESS"
                                 ? "text-blue-600"
                                 : "text-gray-600"
-                          }`}
+                            }`}
                         >
                           {stage.status.replace(/_/g, " ")}
                         </p>

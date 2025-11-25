@@ -32,17 +32,9 @@ const AddDealModal = ({ isOpen, onClose, onDealAdded }) => {
 
         try {
             const { token } = getAuth();
-            // Assuming a deals endpoint. If not, this will fail, but for now we are setting up the frontend structure.
-            // I'll use a mock response if the endpoint is not ready in the real app, but here I'll try to post.
-            // Since I haven't created a DealController, this will likely 404.
-            // However, the user asked to "add CRM inside the Lead and Deal add".
-            // I'll simulate success for now if the endpoint fails, or just try to hit it.
-            // Actually, to avoid breaking the user experience, I'll just simulate it if I know it doesn't exist.
-            // But I should try to implement it properly.
-            // For now, let's assume /api/deals exists or will exist.
-            const res = await api.post("/deals", formData, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            // Use the dealAPI
+            const { dealAPI } = await import("../lib/api");
+            const res = await dealAPI.create(formData);
             onDealAdded(res.data);
             onClose();
             setFormData({

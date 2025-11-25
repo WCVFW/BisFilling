@@ -10,4 +10,14 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    proxy: {
+      // Proxy API requests to the backend server
+      '/api': {
+        target: 'http://localhost:8080', // Your Spring Boot backend URL
+        changeOrigin: true, // Recommended for virtual-hosted sites
+        secure: false,      // Set to false if your backend is not using HTTPS
+      },
+    },
+  },
 });

@@ -1,6 +1,7 @@
 package com.calzone.financial.auth;
 
 import com.calzone.financial.email.EmailVerificationService;
+import com.calzone.financial.notification.NotificationService;
 import com.calzone.financial.user.User;
 import com.calzone.financial.user.UserRepository;
 import org.slf4j.Logger;
@@ -22,17 +23,20 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
     private final EmailVerificationService emailVerificationService;
+    private final NotificationService notificationService;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder encoder,
             JwtService jwtService,
-            EmailVerificationService emailVerificationService
+            EmailVerificationService emailVerificationService,
+            NotificationService notificationService
     ) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.jwtService = jwtService;
         this.emailVerificationService = emailVerificationService;
+        this.notificationService = notificationService;
     }
 
     // ==================== REGISTER ====================
@@ -79,6 +83,9 @@ public class AuthService {
 
         // Send verification email
         emailVerificationService.sendCode(email);
+
+        // Create notification for Admin
+        notificationService.createNotification("New user signup: " + email + " (" + fullName + ")");
 
         // Return success response
         Map<String, Object> response = new HashMap<>();

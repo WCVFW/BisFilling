@@ -128,4 +128,18 @@ public class UserController {
             return ResponseEntity.status(500).body(Map.of("message", "An unexpected error occurred."));
         }
     }
+    // ==================== GET USER BY ID ====================
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(u -> new UserProfile(
+                        u.getId(),
+                        u.getFullName(),
+                        u.getEmail(),
+                        u.getPhone(),
+                        u.hasProfileImage()
+                ))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

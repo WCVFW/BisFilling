@@ -19,11 +19,13 @@ public class OrderController {
     private final OrderRepository orderRepository;
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
+    private final com.calzone.financial.wallet.WalletService walletService;
 
-    public OrderController(OrderRepository orderRepository, DocumentRepository documentRepository, UserRepository userRepository) {
+    public OrderController(OrderRepository orderRepository, DocumentRepository documentRepository, UserRepository userRepository, com.calzone.financial.wallet.WalletService walletService) {
         this.orderRepository = orderRepository;
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
+        this.walletService = walletService;
     }
 
     @PostMapping
@@ -228,6 +230,22 @@ public class OrderController {
         if (body.containsKey("paymentId"))
             order.setPaymentId(String.valueOf(body.get("paymentId")));
         orderRepository.save(order);
+
+        // Commission Logic
+        if (order.getUserId() != null) {
+            userRepository.findById(order.getUserId()).ifPresent(user -> {
+                boolean isAgent = user.getRoles().stream()
+                        .anyMatch(role -> role.getName().equalsIgnoreCase("AGENT"));
+                
+                if (isAgent && order.getTotalAmount() > 0) {
+                    java.math.BigDecimal commission = java.math.BigDecimal.valueOf(order.getTotalAmount())
+                            .multiply(new java.math.BigDecimal("0.10")); // 10% commission
+                    
+                    walletService.credit(user.getId(), commission, "Commission for Order #" + order.getId());
+                }
+            });
+        }
+
         return ResponseEntity.ok(Map.of("message", "Payment processed", "orderId", order.getId()));
     }
 

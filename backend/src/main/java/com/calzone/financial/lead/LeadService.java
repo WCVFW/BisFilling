@@ -40,6 +40,8 @@ public class LeadService {
     public LeadResponse create(LeadRequest request, User owner) {
         Lead lead = new Lead();
         lead.setName(request.name().trim());
+        lead.setEmail(request.email() != null ? request.email().trim() : null);
+        lead.setPhone(request.phone() != null ? request.phone().trim() : null);
         lead.setService(request.service() == null ? null : request.service().trim());
         lead.setStatus(normalizeStatus(request.status()));
         lead.setOwner(owner);
@@ -55,6 +57,12 @@ public class LeadService {
         if (!request.isEmpty()) {
             if (request.name() != null && !request.name().isBlank()) {
                 lead.setName(request.name().trim());
+            }
+            if (request.email() != null && !request.email().isBlank()) {
+                lead.setEmail(request.email().trim());
+            }
+            if (request.phone() != null && !request.phone().isBlank()) {
+                lead.setPhone(request.phone().trim());
             }
             if (request.service() != null) {
                 lead.setService(request.service().isBlank() ? null : request.service().trim());
@@ -78,14 +86,17 @@ public class LeadService {
         return new LeadResponse(
                 lead.getId(),
                 lead.getName(),
+                lead.getEmail(),
+                lead.getPhone(),
                 lead.getService(),
                 lead.getStatus(),
+                lead.getOwner() != null ? lead.getOwner().getFullName() : "Unknown",
                 lead.getCreatedAt(),
                 lead.getUpdatedAt()
         );
     }
 
     private String normalizeStatus(String status) {
-        return status.trim();
+        return status != null ? status.trim() : "New";
     }
 }

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 import com.calzone.financial.lead.LeadRepository;
 import com.calzone.financial.lead.dto.LeadResponse;
@@ -120,16 +121,45 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public List<LeadResponse> listCrmLeads() {
-        return leadRepository.findAll().stream()
+        // 1. Fetch manual leads
+        List<LeadResponse> manualLeads = leadRepository.findAll().stream()
                 .map(lead -> new LeadResponse(
                         lead.getId(),
                         lead.getName(),
+                        lead.getEmail(),
+                        lead.getPhone(),
                         lead.getService(),
                         lead.getStatus(),
+                        lead.getOwner() != null ? lead.getOwner().getFullName() : "Unknown",
                         lead.getCreatedAt(),
                         lead.getUpdatedAt()
                 ))
                 .toList();
+
+        // 2. Fetch user leads (signups)
+        List<LeadResponse> userLeads = userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "USER".equals(r.getName()) || "CLIENT".equals(r.getName())))
+                .map(user -> new LeadResponse(
+                        -user.getId(), // Use negative ID to distinguish
+                        user.getFullName(),
+                        user.getEmail(),
+                        user.getPhone(),
+                        "Website Signup",
+                        "New",
+                        "Unassigned",
+                        user.getCreatedAt(),
+                        user.getUpdatedAt()
+                ))
+                .toList();
+
+        // 3. Combine and sort
+        List<LeadResponse> allLeads = new ArrayList<>(manualLeads);
+        allLeads.addAll(userLeads);
+        
+        // Sort by CreatedAt descending
+        allLeads.sort((l1, l2) -> l2.createdAt().compareTo(l1.createdAt()));
+        
+        return allLeads;
     }
 
     @Transactional(readOnly = true)
@@ -181,7 +211,7 @@ public class AdminService {
         stats.put("churnRate", "0%"); // Mock
 
         // Mock chart data
-        List<Map<String, Object>> lifecycleData = new java.util.ArrayList<>();
+        List<Map<String, Object>> lifecycleData = new ArrayList<>();
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun"};
         for (String m : months) {
             lifecycleData.add(Map.of(

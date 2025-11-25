@@ -36,7 +36,7 @@ const AddLeadModal = ({ isOpen, onClose, onLeadAdded }) => {
             // But based on AdminController, there is no createLead endpoint exposed to Admin directly?
             // LeadController has createLead but it might be for users.
             // I'll try /api/leads which LeadController exposes.
-            const res = await api.post("/leads", formData, {
+            const res = await api.post("/api/leads", formData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             onLeadAdded(res.data);

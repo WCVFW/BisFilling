@@ -128,8 +128,8 @@ const AdminLeads = () => {
           { key: "name", label: "Name" },
           { key: "email", label: "Email" },
           { key: "phone", label: "Phone" },
-          { key: "source", label: "Source" },
-          { key: "assignedTo", label: "Assigned To" },
+          { key: "service", label: "Source/Service" },
+          { key: "ownerName", label: "Assigned To" },
           {
             key: "status",
             label: "Status",

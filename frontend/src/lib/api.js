@@ -71,6 +71,7 @@ export const userAPI = {
     all: () => api.get("/api/user/all"),
     update: (formData) => api.put("/api/user/me", formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
     profileImage: () => api.get("/api/user/me/profile-image", { responseType: 'blob' }),
+    getById: (id) => api.get(`/api/user/${id}`),
 };
 
 // Workflow APIs
@@ -131,6 +132,14 @@ export const leadAPI = {
     create: (payload) => api.post("/api/leads", payload),
     update: (id, payload) => api.put(`/api/leads/${id}`, payload),
     delete: (id) => api.delete(`/api/leads/${id}`),
+};
+
+// Deals
+export const dealAPI = {
+    getAll: () => api.get("/api/deals"),
+    create: (payload) => api.post("/api/deals", payload),
+    update: (id, payload) => api.put(`/api/deals/${id}`, payload),
+    delete: (id) => api.delete(`/api/deals/${id}`),
 };
 
 // Cases
@@ -263,6 +272,21 @@ export const crmAPI = {
 
     // Dashboard
     getDashboardStats: () => api.get("/api/crm/dashboard-stats"),
+};
+
+// Wallet
+export const walletAPI = {
+    getWallet: () => api.get("/api/wallet"),
+    getTransactions: () => api.get("/api/wallet/transactions"),
+};
+
+// Tasks
+export const taskAPI = {
+    getAll: () => api.get("/api/tasks"),
+    getMyTasks: () => api.get("/api/tasks/my-tasks"),
+    create: (payload) => api.post("/api/tasks", payload),
+    update: (id, payload) => api.put(`/api/tasks/${id}`, payload),
+    delete: (id) => api.delete(`/api/tasks/${id}`),
 };
 
 export default api;

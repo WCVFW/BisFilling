@@ -18,7 +18,8 @@ public record LeadRequest(
  String email,
 
  @Size(max = 20, message = "Phone number can be at most 20 characters")
- String phoneNumber,
+ String phone,
+
  @Size(max = 40, message = "Status can be at most 40 characters")
  String status
 ) {}

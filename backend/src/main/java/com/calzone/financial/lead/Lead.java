@@ -16,7 +16,7 @@ import jakarta.persistence.UniqueConstraint;
 
 import java.time.Instant;
 
-@Entity(name = "com_calzone_financial_lead_Lead")
+@Entity(name = "com_calzone.financial_lead_Lead")
 @Table(name = "leads", uniqueConstraints = @UniqueConstraint(name = "uk_leads_name_owner", columnNames = {"name", "owner_id"}))
 public class Lead {
 
@@ -26,6 +26,12 @@ public class Lead {
 
     @Column(nullable = false)
     private String name;
+
+    @Column
+    private String email;
+
+    @Column
+    private String phone;
 
     @Column
     private String service;
@@ -65,6 +71,22 @@ public class Lead {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getService() {
