@@ -11,16 +11,66 @@ import java.util.List;
 public class DealService {
 
     private final DealRepository dealRepository;
+    private final com.calzone.financial.order.OrderRepository orderRepository;
+    private final com.calzone.financial.user.UserRepository userRepository;
 
-    public DealService(DealRepository dealRepository) {
+    public DealService(DealRepository dealRepository, com.calzone.financial.order.OrderRepository orderRepository, com.calzone.financial.user.UserRepository userRepository) {
         this.dealRepository = dealRepository;
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional(readOnly = true)
     public List<DealResponse> getAllDeals() {
-        return dealRepository.findAllByOrderByCreatedAtDesc().stream()
+        List<DealResponse> manualDeals = dealRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(this::toResponse)
                 .toList();
+        
+        List<DealResponse> orderDeals = orderRepository.findAll().stream()
+                .map(order -> {
+                    String custName = order.getCustomerEmail();
+                    if (order.getUserId() != null) {
+                         custName = userRepository.findById(order.getUserId())
+                            .map(u -> u.getFullName() + " (" + u.getEmail() + ")")
+                            .orElse(order.getCustomerEmail());
+                    } else if (order.getCustomerEmail() != null) {
+                         custName = userRepository.findByEmail(order.getCustomerEmail())
+                            .map(u -> u.getFullName() + " (" + u.getEmail() + ")")
+                            .orElse(order.getCustomerEmail());
+                    }
+                    
+                    // Convert LocalDateTime to Instant
+                    java.time.Instant createdInstant = order.getCreatedAt() != null 
+                        ? order.getCreatedAt().atZone(java.time.ZoneId.systemDefault()).toInstant()
+                        : null;
+                    
+                    return new DealResponse(
+                        order.getId(),
+                        "Order: " + order.getServiceName(),
+                        custName,
+                        String.valueOf(order.getTotalAmount()),
+                        order.getStatus(),
+                        100, // Probability
+                        order.getAssigneeEmail() != null ? order.getAssigneeEmail() : "System",
+                        null, // Due date
+                        createdInstant,
+                        createdInstant // Fallback to createdAt since updatedAt is missing
+                    );
+                })
+                .collect(java.util.stream.Collectors.toList());
+
+        // Combine lists
+        java.util.List<DealResponse> allDeals = new java.util.ArrayList<>();
+        allDeals.addAll(manualDeals);
+        allDeals.addAll(orderDeals);
+        
+        // Sort by created at desc
+        allDeals.sort((d1, d2) -> {
+             if (d1.createdAt() == null || d2.createdAt() == null) return 0;
+             return d2.createdAt().compareTo(d1.createdAt());
+        });
+        
+        return allDeals;
     }
 
     @Transactional

@@ -17,7 +17,11 @@ const AssignEmployeeModal = ({ isOpen, onClose, deal, onAssigned }) => {
     const fetchEmployees = async () => {
         try {
             const res = await adminAPI.listEmployees();
-            setEmployees(res.data || []);
+            // Handle response structure { employees: [...], stats: ... }
+            const employeesList = Array.isArray(res.data)
+                ? res.data
+                : (res.data?.employees || []);
+            setEmployees(employeesList);
         } catch (err) {
             console.error("Failed to fetch employees:", err);
             setError("Failed to load employees");

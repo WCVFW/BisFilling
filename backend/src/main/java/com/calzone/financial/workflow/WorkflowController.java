@@ -16,28 +16,19 @@ public class WorkflowController {
         events.add(Map.of(
             "id", 1L,
             "orderId", orderId,
-            "stage", "WEB",
+            "stage", "APP_REC",
             "status", "COMPLETED",
-            "description", "Order created successfully",
+            "description", "Application received successfully",
             "details", "Customer initiated the service order",
             "createdAt", LocalDateTime.now().minusDays(5).toString()
         ));
         events.add(Map.of(
             "id", 2L,
             "orderId", orderId,
-            "stage", "CRM",
-            "status", "COMPLETED",
-            "description", "Customer routed to CRM system",
-            "details", "Order details recorded in CRM database",
-            "createdAt", LocalDateTime.now().minusDays(3).toString()
-        ));
-        events.add(Map.of(
-            "id", 3L,
-            "orderId", orderId,
-            "stage", "SALES",
+            "stage", "DOC_VER",
             "status", "IN_PROGRESS",
-            "description", "Sales processing in progress",
-            "details", "Awaiting payment confirmation",
+            "description", "Document verification in progress",
+            "details", "Expert reviewing uploaded documents",
             "createdAt", LocalDateTime.now().minusDays(1).toString()
         ));
         return ResponseEntity.ok(events);
@@ -46,20 +37,19 @@ public class WorkflowController {
     @GetMapping("/orders/{orderId}/progress")
     public ResponseEntity<Map<String, Object>> progress(@PathVariable Long orderId) {
         List<Map<String, Object>> stages = new ArrayList<>();
-        stages.add(Map.of("sequence", 1, "stage", "WEB", "label", "Web/App", "status", "COMPLETED"));
-        stages.add(Map.of("sequence", 2, "stage", "CRM", "label", "CRM Routing", "status", "COMPLETED"));
-        stages.add(Map.of("sequence", 3, "stage", "SALES", "label", "Sales & Payment", "status", "IN_PROGRESS"));
-        stages.add(Map.of("sequence", 4, "stage", "ONBD", "label", "Onboarding", "status", "PENDING"));
-        stages.add(Map.of("sequence", 5, "stage", "CASE", "label", "Case Management", "status", "PENDING"));
-        stages.add(Map.of("sequence", 6, "stage", "EXEC", "label", "Execution", "status", "PENDING"));
-        stages.add(Map.of("sequence", 7, "stage", "GOVT", "label", "Government Portal", "status", "PENDING"));
-        stages.add(Map.of("sequence", 8, "stage", "QA", "label", "QA & Compliance", "status", "PENDING"));
-        stages.add(Map.of("sequence", 9, "stage", "DEL", "label", "Delivery", "status", "PENDING"));
+        stages.add(Map.of("sequence", 1, "stage", "APP_REC", "label", "Application Received", "status", "COMPLETED"));
+        stages.add(Map.of("sequence", 2, "stage", "DOC_VER", "label", "Document Verification", "status", "IN_PROGRESS"));
+        stages.add(Map.of("sequence", 3, "stage", "PROC", "label", "Processing", "status", "PENDING"));
+        stages.add(Map.of("sequence", 4, "stage", "DRAFT", "label", "Drafting", "status", "PENDING"));
+        stages.add(Map.of("sequence", 5, "stage", "FILING", "label", "Filing", "status", "PENDING"));
+        stages.add(Map.of("sequence", 6, "stage", "GOVT_REV", "label", "Govt Review", "status", "PENDING"));
+        stages.add(Map.of("sequence", 7, "stage", "APPR", "label", "Approval", "status", "PENDING"));
+        stages.add(Map.of("sequence", 8, "stage", "DEL", "label", "Delivery", "status", "PENDING"));
 
         Map<String, Object> prog = new HashMap<>();
         prog.put("orderId", orderId);
-        prog.put("currentStage", "SALES");
-        prog.put("completionPercentage", 33);
+        prog.put("currentStage", "DOC_VER");
+        prog.put("completionPercentage", 25);
         prog.put("stages", stages);
         return ResponseEntity.ok(prog);
     }

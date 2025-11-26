@@ -122,7 +122,7 @@ export const orderAPI = {
     downloadDocument: (orderId, docId) => api.get(`/api/orders/${orderId}/documents/${docId}/download`, { responseType: 'blob' }),
     pay: (orderId, payload) => api.post(`/api/orders/${orderId}/pay`, payload),
     assign: (orderId, payload) => api.post(`/api/orders/${orderId}/assign`, payload),
-    listAssigned: (assigneeEmail) => api.get(`/api/orders/assigned${assigneeEmail ? `?assigneeEmail=${encodeURIComponent(assigneeEmail)}` : ''}`),
+    listAssigned: (assigneeEmail) => api.get(`/api/orders/assigned?assigneeEmail=${encodeURIComponent(assigneeEmail || '')}`),
 };
 
 // Leads
@@ -169,6 +169,7 @@ export const paymentsAPI = {
     createOrder: (payload) => api.post(`/api/payments/order`, payload),
     confirm: (payload) => api.post(`/api/payments/confirm`, payload),
     myPayments: () => api.get(`/api/payments/mine`),
+    getKey: () => api.get(`/api/payments/key`),
     webhook: (payload, signature) => api.post(`/api/payments/webhook`, payload, { headers: { "X-Razorpay-Signature": signature } }),
 };
 

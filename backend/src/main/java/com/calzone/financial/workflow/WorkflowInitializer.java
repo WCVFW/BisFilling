@@ -29,38 +29,38 @@ public class WorkflowInitializer {
                 // Create sample workflow events
                 WorkflowEvent event1 = new WorkflowEvent(
                         sampleOrderId,
-                        WorkflowStage.WEB,
+                        WorkflowStage.APP_REC,
                         WorkflowStatus.COMPLETED,
-                        "Lead captured from website form"
+                        "Application received successfully"
                 );
-                event1.setDetails("Customer filled registration form on website");
+                event1.setDetails("Customer submitted application details");
                 eventRepository.save(event1);
 
                 WorkflowEvent event2 = new WorkflowEvent(
                         sampleOrderId,
-                        WorkflowStage.CRM,
+                        WorkflowStage.DOC_VER,
                         WorkflowStatus.COMPLETED,
-                        "Lead scored and routed to sales team"
+                        "Documents verified successfully"
                 );
-                event2.setDetails("Lead score: 85/100, High priority");
+                event2.setDetails("All required documents are valid");
                 eventRepository.save(event2);
 
                 WorkflowEvent event3 = new WorkflowEvent(
                         sampleOrderId,
-                        WorkflowStage.SALES,
+                        WorkflowStage.PROC,
                         WorkflowStatus.COMPLETED,
-                        "Customer approved quote and made payment"
+                        "Processing initiated"
                 );
-                event3.setDetails("Payment of ₹4,999 received");
+                event3.setDetails("Application moved to processing stage");
                 eventRepository.save(event3);
 
                 WorkflowEvent event4 = new WorkflowEvent(
                         sampleOrderId,
-                        WorkflowStage.ONBD,
+                        WorkflowStage.DRAFT,
                         WorkflowStatus.IN_PROGRESS,
-                        "Documents being uploaded and verified"
+                        "Drafting legal documents"
                 );
-                event4.setDetails("Waiting for PAN card and Aadhar verification");
+                event4.setDetails("Preparing MOA/AOA");
                 eventRepository.save(event4);
 
                 // Create sample alert

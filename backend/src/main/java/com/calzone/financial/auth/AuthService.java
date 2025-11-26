@@ -24,19 +24,22 @@ public class AuthService {
     private final JwtService jwtService;
     private final EmailVerificationService emailVerificationService;
     private final NotificationService notificationService;
+    private final com.calzone.financial.lead.LeadRepository leadRepository;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder encoder,
             JwtService jwtService,
             EmailVerificationService emailVerificationService,
-            NotificationService notificationService
+            NotificationService notificationService,
+            com.calzone.financial.lead.LeadRepository leadRepository
     ) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.jwtService = jwtService;
         this.emailVerificationService = emailVerificationService;
         this.notificationService = notificationService;
+        this.leadRepository = leadRepository;
     }
 
     // ==================== REGISTER ====================
@@ -80,6 +83,20 @@ public class AuthService {
 
         // Save user to database
         userRepository.save(user);
+
+        // Create Lead for this user
+        try {
+            com.calzone.financial.lead.Lead lead = new com.calzone.financial.lead.Lead();
+            lead.setName(fullName);
+            lead.setEmail(email);
+            lead.setPhone(phone);
+            lead.setStatus("New");
+            lead.setService("Signup");
+            lead.setOwner(null); // Unassigned initially
+            leadRepository.save(lead);
+        } catch (Exception e) {
+            LOGGER.error("Failed to create lead for new user: {}", email, e);
+        }
 
         // Send verification email
         emailVerificationService.sendCode(email);

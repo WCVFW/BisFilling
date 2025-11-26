@@ -55,11 +55,23 @@ export default function AdminOrderDetailModal({
         // Fetch employees list
         try {
           const empRes = await adminAPI.listEmployees();
-          setEmployees(empRes.data || []);
+          console.log("AdminOrderDetailModal: Fetched employees response:", empRes);
+
+          // Handle response structure { employees: [...], stats: ... }
+          let employeesList = [];
+          if (empRes.data && Array.isArray(empRes.data.employees)) {
+            employeesList = empRes.data.employees;
+          } else if (Array.isArray(empRes.data)) {
+            employeesList = empRes.data;
+          }
+
+          console.log("AdminOrderDetailModal: Parsed employees list:", employeesList);
+          setEmployees(employeesList);
         } catch (err) {
-          console.warn("Could not fetch employees:", err);
+          console.error("AdminOrderDetailModal: Could not fetch employees:", err);
           setEmployees([]);
         }
+
       } catch (error) {
         console.error("Error fetching order details:", error);
       } finally {

@@ -23,6 +23,7 @@ import ConsultPage from "./pages/Dashboard/userDSB/ConsultPage";
 import ServicesHub from "./pages/Dashboard/userDSB/ServiceHub";
 import UserHome from "./pages/Dashboard/userDSB/HomePage";
 import MyAccount from "./pages/MyAccount";
+import MyOrdersPage from "./pages/Dashboard/userDSB/MyOrdersPage";
 
 /* ---------------------- Dashboards ---------------------- */
 import AdminDashboard from "./pages/Dashboard/AdminDSB/AdminDashboard";
@@ -205,11 +206,11 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<DashboardIndex />} />
+            <Route index element={<UserHome />} />
+            <Route path="home" element={<UserHome />} />
             <Route path="compliances" element={<CompliancesPage />} />
-            <Route path="Home" element={<UserHome />} />
             <Route path="servicehub" element={<ServicesHub />} />
-            <Route path="my-orders" element={<DashboardIndex />} />
+            <Route path="my-orders" element={<MyOrdersPage />} />
             <Route path="service-order" element={<ServiceOrder />} />
             <Route path="crm" element={<CrmPage />} />
             <Route path="calendar" element={<CalendarPage />} />
@@ -217,6 +218,7 @@ export default function App() {
             <Route path="reports" element={<ReportsPage />} />
             <Route path="consult" element={<ConsultPage />} />
             <Route path="profile" element={<MyAccount />} />
+            <Route path="order/:orderId" element={<OrderDetailPage />} />
           </Route>
 
           {/* ---------------------- ADMIN DASHBOARD ---------------------- */}
@@ -403,7 +405,7 @@ export default function App() {
  🔹 ROLE-BASED DASHBOARD ROUTER
  =============================== */
 function DashboardRouter({ user }) {
-  if (!user) return <DashboardIndex />;
+  if (!user) return <UserDashboard />;
 
   switch (user.role) {
     case "ADMIN":

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.razorpay.RazorpayException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -29,14 +30,38 @@ public class PaymentController {
     }
 
     @PostMapping("/order")
-    public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest req,
-                                                           @AuthenticationPrincipal User user) throws Exception {
-        return ResponseEntity.ok(service.createOrder(req, user));
+    public ResponseEntity<?> createOrder(@Valid @RequestBody CreateOrderRequest req,
+                                                           @AuthenticationPrincipal User user) {
+        try {
+            return ResponseEntity.ok(service.createOrder(req, user));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(new CreateOrderResponse() {{
+                description = e.getMessage();
+                status = "error";
+            }});
+        } catch (RazorpayException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new CreateOrderResponse() {{
+                description = "Razorpay Error: " + e.getMessage();
+                status = "error";
+            }});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(new CreateOrderResponse() {{
+                description = "Payment initialization failed: " + e.getMessage();
+                status = "error";
+            }});
+        }
     }
 
     @GetMapping("/mine")
     public List<Payment> myPayments(@AuthenticationPrincipal User user) {
         return repo.findByUserOrderByCreatedAtDesc(user);
+    }
+
+    @GetMapping("/key")
+    public ResponseEntity<String> getKey() {
+        return ResponseEntity.ok(service.getKeyId());
     }
 
     @Value("${razorpay.webhook_secret:}")

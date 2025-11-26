@@ -5,7 +5,7 @@ import java.time.Instant;
 
 /**
  * Entity representing a single stage in a process pipeline.
- * Example stages: WEB, CRM, SALES, ONBD, CASE, EXEC, GOVT, QA, DEL, PF, MD, GO, SLAB, CR.
+ * Example stages: APP_REC, DOC_VER, PROC, DRAFT, FILING, GOVT_REV, APPR, DEL, PF, MD, GO, SLAB, CR.
  */
 @Entity
 @Table(

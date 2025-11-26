@@ -13,39 +13,59 @@ import {
   ArrowRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { orderAPI, serviceHubAPI } from "@/lib/api";
+import { orderAPI, serviceHubAPI, userAPI } from "@/lib/api";
+import { getAuth } from "@/lib/auth";
 
 export default function EmployeeHomePage() {
   const [employee, setEmployee] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null);
   const [stats, setStats] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userStr = localStorage.getItem("authUser");
-    const user = userStr ? JSON.parse(userStr) : null;
-    setEmployee(user);
+    const fetchProfileData = async () => {
+      const auth = getAuth();
+      const user = auth?.user;
+      setEmployee(user);
 
-    if (user?.email) {
-      fetchDashboardData(user.email);
-    } else {
-      setLoading(false);
-      // Optional: Redirect to login if no user found, but this page should be protected by route anyway
-    }
+      if (user?.hasProfileImage) {
+        try {
+          const res = await userAPI.profileImage();
+          const url = URL.createObjectURL(res.data);
+          setAvatarUrl(url);
+        } catch (error) {
+          console.error("Failed to load profile image", error);
+        }
+      }
+
+      if (user?.email) {
+        fetchDashboardData(user.email);
+      } else {
+        setLoading(false);
+      }
+    };
+    fetchProfileData();
   }, []);
 
   const fetchDashboardData = async (email) => {
     try {
       setLoading(true);
+      console.log("EmployeeHomePage: Fetching data for email:", email);
       // Fetch stats and tasks in parallel
       const [statsRes, tasksRes] = await Promise.all([
         serviceHubAPI.status("EMPLOYEE", email),
         orderAPI.listAssigned(email)
       ]);
 
+      console.log("EmployeeHomePage: Stats response:", statsRes);
+      console.log("EmployeeHomePage: Tasks response:", tasksRes);
+
       setStats(statsRes.data);
-      setTasks(tasksRes.data || []);
+      // Ensure we extract the array correctly from the response
+      const tasksList = Array.isArray(tasksRes.data) ? tasksRes.data : [];
+      setTasks(tasksList);
     } catch (err) {
       console.error("Failed to fetch dashboard data:", err);
     } finally {
@@ -87,7 +107,7 @@ export default function EmployeeHomePage() {
               </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              Welcome back, {employee?.name?.split(' ')[0] || "Employee"}! 👋
+              Welcome back, {employee?.fullName?.split(' ')[0] || "Employee"}! 👋
             </h1>
             <p className="text-purple-100 text-lg max-w-xl">
               You have <span className="font-bold text-white">{inProgress} active tasks</span> requiring your attention today.
@@ -96,12 +116,12 @@ export default function EmployeeHomePage() {
 
           <div className="flex items-center gap-4 bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/10">
             <img
-              src={employee?.avatar || "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/wgo6e9kp_expires_30_days.png"}
+              src={avatarUrl || "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/wgo6e9kp_expires_30_days.png"}
               alt="Profile"
               className="w-14 h-14 rounded-full border-2 border-white/50 object-cover"
             />
             <div className="hidden sm:block">
-              <p className="font-semibold text-white">{employee?.name}</p>
+              <p className="font-semibold text-white">{employee?.fullName}</p>
               <p className="text-sm text-purple-200">{employee?.email}</p>
             </div>
           </div>

@@ -15,32 +15,28 @@ public class WorkflowService {
     }
 
     public WorkflowEvent createEvent(Long orderId, WorkflowStage stage, WorkflowStatus status, String description, String details) {
-        // NOTE: Assuming WorkflowEvent and its constructor are correctly defined
         WorkflowEvent event = new WorkflowEvent(orderId, stage, status, description);
         event.setDetails(details);
         return eventRepository.save(event);
     }
 
     public List<WorkflowEvent> getOrderTimeline(Long orderId) {
-        // NOTE: Assuming findByOrderIdOrderByCreatedAtDesc exists in repository
         return eventRepository.findByOrderIdOrderByCreatedAtDesc(orderId);
     }
 
     public WorkflowStage getCurrentStage(Long orderId) {
         List<WorkflowEvent> events = eventRepository.findByOrderIdOrderByCreatedAtDesc(orderId);
-        if (events.isEmpty()) return WorkflowStage.WEB;
+        if (events.isEmpty()) return WorkflowStage.APP_REC;
 
-        // NOTE: Assuming WorkflowStage.isMainStage() and WorkflowStatus.FAILED exist
         for (WorkflowEvent event : events) {
             if (event.getStage().isMainStage() && event.getStatus() != WorkflowStatus.FAILED) {
                 return event.getStage();
             }
         }
-        return WorkflowStage.WEB;
+        return WorkflowStage.APP_REC;
     }
 
     public List<WorkflowEvent> getStageHistory(Long orderId, WorkflowStage stage) {
-        // NOTE: Assuming findByOrderIdAndStageOrderByCreatedAtDesc exists in repository
         return eventRepository.findByOrderIdAndStageOrderByCreatedAtDesc(orderId, stage);
     }
 
@@ -61,7 +57,6 @@ public class WorkflowService {
 
         // Build stage details
         List<WorkflowProgressDTO.StageProgress> stages = new ArrayList<>();
-        // NOTE: Assuming WorkflowStage is an enum with isMainStage(), getLabel(), getDescription(), getSequence()
         for (WorkflowStage mainStage : WorkflowStage.values()) {
             if (!mainStage.isMainStage()) continue;
 
@@ -83,7 +78,6 @@ public class WorkflowService {
 
         // Collect exceptions
         List<WorkflowEvent> exceptions = allEvents.stream()
-                // NOTE: Assuming isException() exists on WorkflowStage
                 .filter(e -> e.getStage().isException())
                 .collect(Collectors.toList());
         progress.setExceptions(exceptions);
@@ -95,36 +89,30 @@ public class WorkflowService {
     }
 
     private int calculateCompletion(Map<WorkflowStage, WorkflowStatus> stageStatus) {
-        // NOTE: Assuming WorkflowStatus.COMPLETED exists
         int completed = (int) stageStatus.values().stream()
                 .filter(s -> s == WorkflowStatus.COMPLETED)
                 .count();
-        int total = 9; // 9 main stages
+        int total = 8; // 8 main stages now
         return total > 0 ? (completed * 100) / total : 0;
     }
 
     public void advanceStage(Long orderId, WorkflowStage nextStage, String description) {
-        // NOTE: Assuming WorkflowStatus.IN_PROGRESS exists
         createEvent(orderId, nextStage, WorkflowStatus.IN_PROGRESS, description, null);
     }
 
     public void completeStage(Long orderId, WorkflowStage stage, String description) {
-        // NOTE: Assuming WorkflowStatus.COMPLETED exists
         createEvent(orderId, stage, WorkflowStatus.COMPLETED, description, null);
     }
 
     public void failStage(Long orderId, WorkflowStage stage, String description) {
-        // NOTE: Assuming WorkflowStatus.FAILED exists
         createEvent(orderId, stage, WorkflowStatus.FAILED, description, null);
     }
 
     public void addException(Long orderId, WorkflowStage exceptionType, String description, String details) {
-        // NOTE: Assuming WorkflowStatus.BLOCKED exists
         createEvent(orderId, exceptionType, WorkflowStatus.BLOCKED, description, details);
     }
 
     public List<WorkflowEvent> getActiveExceptions(Long orderId) {
-        // NOTE: Assuming isException(), BLOCKED, and PENDING exist
         List<WorkflowEvent> exceptions = eventRepository.findByOrderIdOrderByCreatedAtDesc(orderId).stream()
                 .filter(e -> e.getStage().isException())
                 .filter(e -> e.getStatus() == WorkflowStatus.BLOCKED || e.getStatus() == WorkflowStatus.PENDING)

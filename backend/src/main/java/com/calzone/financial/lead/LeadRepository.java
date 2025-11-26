@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface LeadRepository extends JpaRepository<Lead, Long> {
     List<Lead> findAllByOwnerOrderByCreatedAtDesc(User owner);
     Optional<Lead> findByIdAndOwner(Long id, User owner);
+    Optional<Lead> findByEmail(String email);
+    List<Lead> findAllByOrderByCreatedAtDesc();
 }

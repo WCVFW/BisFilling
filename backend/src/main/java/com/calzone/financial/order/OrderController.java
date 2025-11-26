@@ -20,12 +20,14 @@ public class OrderController {
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final com.calzone.financial.wallet.WalletService walletService;
+    private final com.calzone.financial.lead.LeadRepository leadRepository;
 
-    public OrderController(OrderRepository orderRepository, DocumentRepository documentRepository, UserRepository userRepository, com.calzone.financial.wallet.WalletService walletService) {
+    public OrderController(OrderRepository orderRepository, DocumentRepository documentRepository, UserRepository userRepository, com.calzone.financial.wallet.WalletService walletService, com.calzone.financial.lead.LeadRepository leadRepository) {
         this.orderRepository = orderRepository;
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.walletService = walletService;
+        this.leadRepository = leadRepository;
     }
 
     @PostMapping
@@ -64,6 +66,16 @@ public class OrderController {
             }
         }
         Order saved = orderRepository.save(o);
+
+        // Delete lead if exists (converted to customer)
+        if (o.getCustomerEmail() != null) {
+            try {
+                leadRepository.findByEmail(o.getCustomerEmail()).ifPresent(leadRepository::delete);
+            } catch (Exception e) {
+                // Ignore error during lead deletion
+            }
+        }
+
         return ResponseEntity.ok(saved);
     }
 
@@ -118,9 +130,15 @@ public class OrderController {
 
     @GetMapping("/assigned")
     public ResponseEntity<List<Order>> listAssigned(@RequestParam(required = false) String assigneeEmail) {
-        if (assigneeEmail == null)
-            return ResponseEntity.ok(orderRepository.findByAssigneeEmailNotNull());
-        return ResponseEntity.ok(orderRepository.findByAssigneeEmail(assigneeEmail));
+        System.out.println("OrderController: listAssigned called with email: " + assigneeEmail);
+        if (assigneeEmail == null || assigneeEmail.trim().isEmpty()) {
+             List<Order> allAssigned = orderRepository.findByAssigneeEmailNotNull();
+             System.out.println("OrderController: Returning all assigned orders, count: " + allAssigned.size());
+             return ResponseEntity.ok(allAssigned);
+        }
+        List<Order> orders = orderRepository.findByAssigneeEmailIgnoreCase(assigneeEmail);
+        System.out.println("OrderController: Found " + orders.size() + " orders for " + assigneeEmail);
+        return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{id}")

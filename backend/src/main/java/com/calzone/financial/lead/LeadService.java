@@ -16,17 +16,70 @@ import com.calzone.financial.user.User;
 public class LeadService {
 
     private final LeadRepository leadRepository;
+    private final com.calzone.financial.user.UserRepository userRepository;
+    private final com.calzone.financial.order.OrderRepository orderRepository;
 
-    public LeadService(LeadRepository leadRepository) {
+    public LeadService(LeadRepository leadRepository, com.calzone.financial.user.UserRepository userRepository, com.calzone.financial.order.OrderRepository orderRepository) {
         this.leadRepository = leadRepository;
+        this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
     }
 
     @Transactional(readOnly = true)
     public List<LeadResponse> findAll(User owner) {
-        return leadRepository.findAllByOwnerOrderByCreatedAtDesc(owner)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        boolean isAdmin = owner.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+
+        List<LeadResponse> responses = new java.util.ArrayList<>();
+
+        // 1. Get Manual Leads
+        List<Lead> leads;
+        if (isAdmin) {
+            leads = leadRepository.findAllByOrderByCreatedAtDesc();
+        } else {
+            leads = leadRepository.findAllByOwnerOrderByCreatedAtDesc(owner);
+        }
+        responses.addAll(leads.stream().map(this::toResponse).toList());
+
+        // 2. Get Users without Orders (Only for Admin)
+        if (isAdmin) {
+            List<User> allUsers = userRepository.findAll();
+            // Get user IDs who have orders
+            java.util.Set<Long> userIdsWithOrders = orderRepository.findAll().stream()
+                    .filter(o -> o.getUserId() != null)
+                    .map(com.calzone.financial.order.Order::getUserId)
+                    .collect(java.util.stream.Collectors.toSet());
+            
+            // Also check by email for orders without userId
+            java.util.Set<String> emailsWithOrders = orderRepository.findAll().stream()
+                    .filter(o -> o.getCustomerEmail() != null)
+                    .map(com.calzone.financial.order.Order::getCustomerEmail)
+                    .collect(java.util.stream.Collectors.toSet());
+
+            List<LeadResponse> userLeads = allUsers.stream()
+                    .filter(u -> !userIdsWithOrders.contains(u.getId()))
+                    .filter(u -> !emailsWithOrders.contains(u.getEmail()))
+                    // Filter out users who already have a Lead entry to avoid duplicates (by email)
+                    .filter(u -> leads.stream().noneMatch(l -> l.getEmail() != null && l.getEmail().equalsIgnoreCase(u.getEmail())))
+                    .map(u -> new LeadResponse(
+                            u.getId(), // Use User ID (might overlap with Lead ID, but okay for display)
+                            u.getFullName(),
+                            u.getEmail(),
+                            u.getPhone(),
+                            "Signup", // Service
+                            "New", // Status
+                            "System", // Owner
+                            u.getCreatedAt() != null ? u.getCreatedAt() : java.time.Instant.now(),
+                            u.getUpdatedAt() != null ? u.getUpdatedAt() : java.time.Instant.now()
+                    ))
+                    .toList();
+            responses.addAll(userLeads);
+        }
+
+        // Sort by created at desc
+        responses.sort((r1, r2) -> r2.createdAt().compareTo(r1.createdAt()));
+
+        return responses;
     }
 
     @Transactional(readOnly = true)

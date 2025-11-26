@@ -32,18 +32,21 @@ public class AdminService {
     private final LeadRepository leadRepository;
     private final OrderRepository orderRepository;
     private final CaseRepository caseRepository;
+    private final com.calzone.financial.lead.LeadService leadService;
 
     // Define a constant for the maximum image size (e.g., 5MB)
     private static final long MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
     public AdminService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder,
-                        LeadRepository leadRepository, OrderRepository orderRepository, CaseRepository caseRepository) {
+                        LeadRepository leadRepository, OrderRepository orderRepository, CaseRepository caseRepository,
+                        com.calzone.financial.lead.LeadService leadService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.leadRepository = leadRepository;
         this.orderRepository = orderRepository;
         this.caseRepository = caseRepository;
+        this.leadService = leadService;
     }
 
     @Transactional
@@ -120,46 +123,8 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public List<LeadResponse> listCrmLeads() {
-        // 1. Fetch manual leads
-        List<LeadResponse> manualLeads = leadRepository.findAll().stream()
-                .map(lead -> new LeadResponse(
-                        lead.getId(),
-                        lead.getName(),
-                        lead.getEmail(),
-                        lead.getPhone(),
-                        lead.getService(),
-                        lead.getStatus(),
-                        lead.getOwner() != null ? lead.getOwner().getFullName() : "Unknown",
-                        lead.getCreatedAt(),
-                        lead.getUpdatedAt()
-                ))
-                .toList();
-
-        // 2. Fetch user leads (signups)
-        List<LeadResponse> userLeads = userRepository.findAll().stream()
-                .filter(u -> u.getRoles().stream().anyMatch(r -> "USER".equals(r.getName()) || "CLIENT".equals(r.getName())))
-                .map(user -> new LeadResponse(
-                        -user.getId(), // Use negative ID to distinguish
-                        user.getFullName(),
-                        user.getEmail(),
-                        user.getPhone(),
-                        "Website Signup",
-                        "New",
-                        "Unassigned",
-                        user.getCreatedAt(),
-                        user.getUpdatedAt()
-                ))
-                .toList();
-
-        // 3. Combine and sort
-        List<LeadResponse> allLeads = new ArrayList<>(manualLeads);
-        allLeads.addAll(userLeads);
-        
-        // Sort by CreatedAt descending
-        allLeads.sort((l1, l2) -> l2.createdAt().compareTo(l1.createdAt()));
-        
-        return allLeads;
+    public List<LeadResponse> listCrmLeads(User user) {
+        return leadService.findAll(user);
     }
 
     @Transactional(readOnly = true)

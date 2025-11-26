@@ -16,6 +16,23 @@ const AddDealModal = ({ isOpen, onClose, onDealAdded }) => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [users, setUsers] = useState([]);
+    const [isNewCustomer, setIsNewCustomer] = useState(false);
+
+    React.useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                // Dynamic import to avoid circular dependencies if any, or just use api import
+                const { userAPI } = await import("../lib/api");
+                const res = await userAPI.getAll();
+                setUsers(res.data.users || []);
+            } catch (err) {
+                console.error("Failed to fetch users", err);
+            }
+        };
+        fetchUsers();
+    }, []);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -87,14 +104,56 @@ const AddDealModal = ({ isOpen, onClose, onDealAdded }) => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Customer</label>
-                        <input
-                            type="text"
-                            name="customer"
-                            value={formData.customer}
-                            onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            required
-                        />
+                        {!isNewCustomer ? (
+                            <div className="flex gap-2">
+                                <select
+                                    name="customer"
+                                    value={formData.customer}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                    required
+                                >
+                                    <option value="">Select a customer...</option>
+                                    {users.map(u => (
+                                        <option key={u.id} value={u.email}>
+                                            {u.fullName} ({u.email})
+                                        </option>
+                                    ))}
+                                </select>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsNewCustomer(true);
+                                        setFormData(prev => ({ ...prev, customer: "" }));
+                                    }}
+                                    className="mt-1 px-3 py-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 text-sm whitespace-nowrap"
+                                >
+                                    + New
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                <input
+                                    type="text"
+                                    name="customer"
+                                    placeholder="Customer Name/Email"
+                                    value={formData.customer}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsNewCustomer(false);
+                                        setFormData(prev => ({ ...prev, customer: "" }));
+                                    }}
+                                    className="text-sm text-blue-600 hover:underline"
+                                >
+                                    Select Existing
+                                </button>
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Amount</label>

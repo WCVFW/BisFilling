@@ -1,17 +1,75 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { orderAPI } from "@/lib/api"; // Assuming orderAPI is correctly configured
-import { CloudArrowUpIcon, CheckCircleIcon, CurrencyRupeeIcon, DocumentTextIcon, XCircleIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { orderAPI, paymentsAPI } from "@/lib/api";
+import {
+    CloudArrowUpIcon,
+    CheckCircleIcon,
+    CurrencyRupeeIcon,
+    ShieldCheckIcon,
+    ListBulletIcon,
+    ArrowDownTrayIcon
+} from "@heroicons/react/24/outline";
 import { getAuth } from "../../../lib/auth";
+
+const loadRazorpay = (src) => {
+    return new Promise((resolve) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
+};
+
+const REQUIRED_DOCS_MAP = {
+    "GST Registration": [
+        "PAN Card of Applicant/Directors",
+        "Aadhar Card of Applicant/Directors",
+        "Passport Size Photo",
+        "Business Address Proof (Electricity Bill / Rent Agreement + NOC)",
+        "Bank Account Statement / Cancelled Cheque"
+    ],
+    "MSME Registration": [
+        "Aadhar Card of Applicant",
+        "PAN Card of Applicant",
+        "Business Address Proof"
+    ],
+    "Trademark Registration": [
+        "Logo or Brand Name Representation",
+        "Signed Power of Attorney (Form 48)",
+        "Identity Proof of Applicant",
+        "Address Proof of Applicant"
+    ],
+    "Private Limited Company Registration": [
+        "PAN Card of all Directors",
+        "Aadhar Card/Passport/Voter ID of all Directors",
+        "Passport Size Photos",
+        "Business Address Proof (Utility Bill)",
+        "NOC from Owner"
+    ],
+    "Import Export Code Registration (IEC)": [
+        "PAN Card of Individual/Company",
+        "Aadhar Card/Voter ID/Passport",
+        "Cancelled Cheque of Current Account",
+        "Rent Agreement/Electricity Bill"
+    ]
+};
+
+const DEFAULT_DOCS = [
+    "Identity Proof (PAN/Aadhar)",
+    "Address Proof",
+    "Passport Size Photo"
+];
+
 export default function ServiceOrder() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const title = searchParams.get("title") || "Service";
-    const desc = searchParams.get("desc") || "Complete your service order by following the steps below.";
+    const desc = searchParams.get("desc") || "Complete your application.";
 
-    // Hardcoded for demonstration, in a real app, this should be dynamic
-    // and based on the 'title' lookup.
     const MOCK_PRICE = 499.0;
+
+    const orderIdParam = searchParams.get("orderId");
 
     // --- State ---
     const [filesToUpload, setFilesToUpload] = useState([]);
@@ -20,41 +78,78 @@ export default function ServiceOrder() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [currentStep, setCurrentStep] = useState(1);
+    const [agreementDownloaded, setAgreementDownloaded] = useState(false);
+    const [initAttempted, setInitAttempted] = useState(false);
 
     // --- Utility Functions ---
     const isOrderCreated = order && order.id;
-    const isPaymentCompleted = order && order.status === 'PAYMENT_COMPLETED';
     const areDocsUploaded = uploadedDocs.length > 0;
 
-    // Memoized function to fetch documents
+    // Use order service name if available, otherwise fallback to URL param
+    const displayTitle = order?.serviceName || title;
+    const requiredDocs = REQUIRED_DOCS_MAP[displayTitle] || DEFAULT_DOCS;
+
     const fetchDocs = useCallback(async () => {
         if (!order || !order.id) return;
         try {
             const r = await orderAPI.listDocuments(order.id);
             setUploadedDocs(r.data || []);
-            // Update step based on uploaded docs
-            if (currentStep < 3 && r.data && r.data.length > 0) {
-                setCurrentStep(3);
-            }
         } catch (err) {
             console.warn("Failed to fetch documents:", err);
         }
-    }, [order, currentStep]);
+    }, [order]);
+
+    // Auto-create OR fetch order on mount
+    useEffect(() => {
+        const initOrder = async () => {
+            if (initAttempted) return;
+            setInitAttempted(true);
+
+            const authData = getAuth();
+            if (!authData?.user?.email) {
+                setMessage("Please log in to continue.");
+                return;
+            }
+
+            setLoading(true);
+            try {
+                if (orderIdParam) {
+                    // Fetch existing order
+                    const r = await orderAPI.getById(orderIdParam);
+                    setOrder(r.data);
+                } else {
+                    // Create new order
+                    const r = await orderAPI.create({
+                        serviceName: title,
+                        customerEmail: authData.user.email,
+                        totalAmount: MOCK_PRICE
+                    });
+                    setOrder(r.data);
+                }
+            } catch (err) {
+                setMessage("Failed to load application. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (!order) {
+            initOrder();
+        }
+    }, [title, initAttempted, order, orderIdParam]);
 
     useEffect(() => {
-        // Automatically determine step and fetch docs on order update
         if (order) {
             fetchDocs();
-            if (isPaymentCompleted) {
+
+            // Determine step based on order state
+            if (order.status === 'PAYMENT_COMPLETED' || order.status === 'PLACED') {
                 setCurrentStep(4);
-            } else if (isOrderCreated && currentStep < 3) {
-                setCurrentStep(2); // Move to upload docs
+            } else if (order.status === 'PENDING_PAYMENT') {
+                setCurrentStep(3);
             }
         }
-        // NOTE: In a real app, you would check searchParams for an 'orderId'
-        // if the user navigates back to this page, and fetch the existing order.
-    }, [order, isOrderCreated, isPaymentCompleted, fetchDocs, currentStep]);
-
+    }, [order, fetchDocs]);
 
     // --- API Handlers ---
     const handleFiles = (e) => {
@@ -62,280 +157,381 @@ export default function ServiceOrder() {
         setFilesToUpload(f => [...f, ...selected]);
     };
 
-    const createOrder = async () => {
-        setLoading(true);
-        try {
-            const authData = getAuth();
-            if (!authData?.user?.email) {
-                throw new Error("User not logged in or email is missing.");
-            }
-
-            const r = await orderAPI.create({
-                serviceName: title,
-                customerEmail: authData.user.email,
-                totalAmount: MOCK_PRICE
-            });
-            setOrder(r.data);
-            setMessage(`Order #${r.data.id} created successfully. Proceed to upload documents.`);
-            setCurrentStep(2);
-        } catch (err) {
-            setMessage(err?.response?.data?.message || "Could not create order.");
-        } finally { setLoading(false); }
+    const downloadAgreement = () => {
+        const element = document.createElement("a");
+        const file = new Blob(["E-Agreement Content\n\nTerms and Conditions..."], { type: 'text/plain' });
+        element.href = URL.createObjectURL(file);
+        element.download = "Service_Agreement.txt";
+        document.body.appendChild(element);
+        element.click();
+        setAgreementDownloaded(true);
+        setMessage("Agreement downloaded.");
     };
 
     const uploadDocs = async () => {
-        if (!isOrderCreated) return setMessage("Error: Order not created.");
+        if (!isOrderCreated) return setMessage("Initializing... please wait.");
         if (filesToUpload.length === 0) return setMessage("Please select files to upload.");
 
         setLoading(true);
         try {
-            // Upload files sequentially (simpler logic)
             for (const f of filesToUpload) {
-                // The orderAPI.addDocument should handle the file upload logic
                 await orderAPI.addDocument(order.id, f);
             }
             setFilesToUpload([]);
-            await fetchDocs(); // Re-fetch to see uploaded files
-            setMessage("Documents uploaded successfully. You can now proceed to payment.");
+            await fetchDocs();
+            setMessage("Documents uploaded successfully.");
+        } catch (err) {
+            setMessage("Document upload failed.");
+        } finally { setLoading(false); }
+    };
+
+    const proceedToReview = () => {
+        if (!areDocsUploaded) return setMessage("Please upload the required documents.");
+        setCurrentStep(2);
+    };
+
+    const verifyAndSubmit = async () => {
+        try {
+            if (order && order.id) {
+                await orderAPI.update(order.id, { status: 'PENDING_PAYMENT' });
+            }
             setCurrentStep(3);
-        } catch (err) {
-            setMessage(err?.response?.data?.message || "Document upload failed.");
-        } finally { setLoading(false); }
+        } catch (e) {
+            console.error(e);
+            setCurrentStep(3);
+        }
     };
 
-    const pay = async () => {
-        if (!isOrderCreated) return setMessage("Create order first.");
-        if (currentStep < 3) return setMessage("Please upload documents first.");
-
+    // --- CORRECTED PAYMENT FUNCTION ---
+    const handleRazorpayPayment = async () => {
         setLoading(true);
         try {
-            // Mock payment completion
-            await orderAPI.pay(order.id, { paymentId: `MOCK-${Date.now()}` });
+            const res = await loadRazorpay("https://checkout.razorpay.com/v1/checkout.js");
+            if (!res) {
+                setMessage("Razorpay SDK failed to load.");
+                setLoading(false);
+                return;
+            }
 
-            // Refresh order status
-            const r = await orderAPI.getById(order.id);
-            setOrder(r.data);
+            const keyRes = await paymentsAPI.getKey();
+            const keyId = keyRes.data;
+            console.log("Razorpay Key ID:", keyId);
 
-            setMessage("Payment completed. Order submitted to the processing team.");
-            setCurrentStep(4);
+            if (!keyId || !keyId.startsWith("rzp_")) {
+                console.error("Invalid Razorpay Key Format:", keyId);
+                setMessage("System Error: Invalid Payment Configuration. Please contact support.");
+                setLoading(false);
+                return;
+            }
 
-            // Redirect after short delay to dashboard or order history
-            setTimeout(() => navigate('/dashboard/user/my-orders'), 1500);
+            // Fix: Use Math.round to avoid floating point issues
+            const orderRes = await paymentsAPI.createOrder({
+                amount: Math.round(MOCK_PRICE * 100),
+                currency: "INR",
+                description: `Payment for ${title}`
+            });
+
+            console.log("Order Response:", orderRes.data);
+            // We destructure amount and currency here, but DO NOT pass them to options below
+            const { orderId: razorpayOrderId } = orderRes.data;
+
+            if (!razorpayOrderId) {
+                throw new Error("Invalid order ID received from backend");
+            }
+
+            const options = {
+                key: keyId,
+                // Fix: REMOVED amount and currency. Passing them with order_id causes 500 Error.
+                // amount: amount.toString(), 
+                // currency: currency,
+
+                name: "Calzone Financial",
+                description: title,
+                order_id: razorpayOrderId, // This locks the amount automatically
+
+                handler: async function (response) {
+                    try {
+                        console.log("Payment Success:", response);
+                        await paymentsAPI.confirm({
+                            orderId: razorpayOrderId,
+                            paymentId: response.razorpay_payment_id
+                        });
+
+                        await orderAPI.pay(order.id, { paymentId: response.razorpay_payment_id });
+
+                        const r = await orderAPI.getById(order.id);
+                        setOrder(r.data);
+                        setCurrentStep(4);
+                        setMessage("Payment Successful! Application Submitted.");
+                    } catch (err) {
+                        console.error("Payment Confirmation Failed:", err);
+                        setMessage("Payment verification failed.");
+                    }
+                },
+                modal: {
+                    ondismiss: function () {
+                        setLoading(false);
+                        setMessage("Payment cancelled.");
+                    }
+                },
+                prefill: {
+                    email: getAuth()?.user?.email,
+                },
+                theme: {
+                    color: "#2563EB",
+                },
+            };
+
+            console.log("Razorpay Options:", options);
+            const paymentObject = new window.Razorpay(options);
+
+            paymentObject.on('payment.failed', function (response) {
+                console.error("Payment Failed:", response.error);
+                setMessage(`Payment Failed: ${response.error.description}`);
+                setLoading(false);
+            });
+
+            paymentObject.open();
+
         } catch (err) {
-            setMessage("Payment failed. Please try again.");
-        } finally { setLoading(false); }
+            setMessage("Payment initiation failed. See console for details.");
+            console.error("Payment Init Error:", err);
+            setLoading(false);
+        }
     };
-
-    const downloadInvoice = async () => {
-        if (!order || !isPaymentCompleted) return setMessage("Payment not completed.");
-        setLoading(true);
-        try {
-            // Conceptual API call to fetch the invoice as a Blob (PDF/File)
-            const r = await orderAPI.downloadInvoice(order.id);
-
-            // This part handles the file download in the browser
-            const contentType = r.headers['content-type'] || 'application/pdf';
-            const blob = new Blob([r.data], { type: contentType });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Invoice-${order.id}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-            setMessage("Invoice download started.");
-
-        } catch (err) {
-            setMessage('Failed to download invoice. Please check server logs.');
-        } finally { setLoading(false); }
-    };
-
 
     // --- Render Helpers ---
     const steps = [
-        { id: 1, title: "Create Order", icon: DocumentTextIcon },
-        { id: 2, title: "Upload Documents", icon: CloudArrowUpIcon },
-        { id: 3, title: "Pay & Submit", icon: CurrencyRupeeIcon },
-        { id: 4, title: "Order Completed", icon: CheckCircleIcon },
+        { id: 1, title: "Upload Documents", icon: CloudArrowUpIcon },
+        { id: 2, title: "Review Application", icon: ShieldCheckIcon },
+        { id: 3, title: "Payment", icon: CurrencyRupeeIcon },
+        { id: 4, title: "Success", icon: CheckCircleIcon },
     ];
 
     const StepIndicator = ({ stepId, title, icon: Icon }) => (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center z-10">
             <div
                 className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 ${currentStep === stepId
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg'
-                        : currentStep > stepId
-                            ? 'bg-green-500 border-green-500 text-white'
-                            : 'bg-white border-gray-300 text-gray-500'
+                    ? 'bg-blue-600 border-blue-600 text-white shadow-lg scale-110'
+                    : currentStep > stepId
+                        ? 'bg-green-500 border-green-500 text-white'
+                        : 'bg-white border-gray-300 text-gray-400'
                     }`}
             >
                 {currentStep > stepId ? <CheckCircleIcon className="w-6 h-6" /> : <Icon className="w-5 h-5" />}
             </div>
-            <p className={`mt-2 text-xs font-medium text-center whitespace-nowrap ${currentStep >= stepId ? 'text-gray-800' : 'text-gray-500'}`}>{title}</p>
+            <p className={`mt-2 text-xs font-medium text-center whitespace-nowrap ${currentStep >= stepId ? 'text-gray-800' : 'text-gray-400'}`}>{title}</p>
         </div>
     );
 
     return (
-        <div className="max-w-4xl p-6 mx-auto antialiased shadow-2xl bg-gray-50 rounded-xl">
-            <div className="p-4 mb-6 bg-white border-l-4 border-blue-600 rounded-lg shadow">
-                <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-                <p className="mt-1 text-sm text-gray-600">{desc}</p>
-                {isOrderCreated && (
-                    <div className="mt-3 text-sm font-medium text-blue-700">
-                        Current Order ID: <span className="font-bold">#{order.id}</span> | Status: <span className="font-bold">{order.status.replace('_', ' ')}</span>
-                    </div>
-                )}
+        <div className="max-w-5xl p-6 mx-auto antialiased shadow-2xl bg-gray-50 rounded-xl min-h-[80vh]">
+            <div className="p-6 mb-8 bg-white border-l-4 border-blue-600 rounded-lg shadow-sm">
+                <h2 className="text-3xl font-bold text-gray-900">{displayTitle}</h2>
+                <p className="mt-2 text-gray-600">{desc}</p>
             </div>
 
-            {/* Step Indicators Bar */}
-            <div className="flex items-start justify-between p-4 mb-10 bg-white rounded-lg shadow">
-                {steps.map((step, index) => (
-                    <React.Fragment key={step.id}>
-                        <StepIndicator {...step} />
-                        {index < steps.length - 1 && (
-                            <div className="flex-1 self-center h-0.5 bg-gray-300 mx-1.5" />
-                        )}
-                    </React.Fragment>
+            {/* Step Indicators */}
+            <div className="relative flex items-center justify-between px-4 mb-12">
+                <div className="absolute left-0 top-5 w-full h-0.5 bg-gray-200 -z-0" />
+                {steps.map((step) => (
+                    <StepIndicator key={step.id} {...step} />
                 ))}
             </div>
 
-            {/* --- Main Content by Step --- */}
+            {/* --- Main Content --- */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
 
-            {/* 1. Create Order */}
-            <div className={`p-5 mb-6 bg-white rounded-lg shadow ${currentStep === 1 ? 'border-2 border-blue-400' : ''}`}>
-                <h3 className="flex items-center mb-3 text-lg font-semibold">
-                    <span className="flex items-center justify-center w-6 h-6 mr-2 font-bold text-blue-600 bg-blue-100 rounded-full">1</span>
-                    Create Order
-                </h3>
-                {!isOrderCreated ? (
-                    <button
-                        onClick={createOrder}
-                        disabled={loading}
-                        className={`px-6 py-2 text-white font-semibold rounded-lg transition ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
-                    >
-                        {loading ? 'Processing...' : `Create Order Now (Service Fee: Rs. ${MOCK_PRICE})`}
-                    </button>
-                ) : (
-                    <p className="font-medium text-green-600">Order created. Proceed to the next step.</p>
+                {/* 1. Upload Documents */}
+                {currentStep === 1 && (
+                    <div className="p-8">
+                        <div className="flex flex-col md:flex-row gap-8">
+                            {/* Left: Requirements List */}
+                            <div className="md:w-1/3 bg-blue-50 p-6 rounded-xl border border-blue-100 h-fit">
+                                <h3 className="flex items-center text-lg font-bold text-blue-900 mb-4">
+                                    <ListBulletIcon className="w-5 h-5 mr-2" />
+                                    Required Documents
+                                </h3>
+                                <ul className="space-y-3">
+                                    {requiredDocs.map((doc, idx) => (
+                                        <li key={idx} className="flex items-start text-sm text-blue-800">
+                                            <span className="mr-2 mt-1">•</span>
+                                            <span>{doc}</span>
+                                        </li>
+                                    ))}
+                                    <li className="flex items-start text-sm text-blue-800 font-semibold pt-2 border-t border-blue-200 mt-2">
+                                        <span className="mr-2 mt-1">•</span>
+                                        <span>Signed E-Agreement</span>
+                                    </li>
+                                </ul>
+                                <button
+                                    onClick={downloadAgreement}
+                                    className="mt-6 w-full flex items-center justify-center px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 text-sm font-medium transition"
+                                >
+                                    <ArrowDownTrayIcon className="w-4 h-4 mr-2" /> Download Agreement
+                                </button>
+                            </div>
+
+                            {/* Right: Upload Area */}
+                            <div className="md:w-2/3">
+                                <h3 className="text-xl font-bold text-gray-800 mb-4">Upload Your Files</h3>
+                                <p className="text-gray-600 text-sm mb-6">
+                                    Please upload the documents listed on the left. You can select multiple files at once.
+                                </p>
+
+                                <div className="mb-6">
+                                    <div className="flex gap-4 items-center">
+                                        <label className="flex-1 cursor-pointer">
+                                            <div className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center hover:border-blue-500 hover:bg-blue-50 transition">
+                                                <CloudArrowUpIcon className="w-8 h-8 text-gray-400 mb-2" />
+                                                <span className="text-sm text-gray-500">Click to select files</span>
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    onChange={handleFiles}
+                                                    className="hidden"
+                                                />
+                                            </div>
+                                        </label>
+                                    </div>
+                                    {filesToUpload.length > 0 && (
+                                        <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+                                            <p className="text-sm font-semibold text-gray-700 mb-2">Selected Files:</p>
+                                            <ul className="text-sm text-gray-600 space-y-1">
+                                                {filesToUpload.map((f, idx) => <li key={idx}>{f.name}</li>)}
+                                            </ul>
+                                            <button
+                                                onClick={uploadDocs}
+                                                disabled={loading}
+                                                className="mt-4 px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 transition w-full"
+                                            >
+                                                {loading ? 'Uploading...' : 'Upload Selected Files'}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="border-t pt-6">
+                                    <h4 className="font-semibold text-gray-700 mb-4">Uploaded Successfully</h4>
+                                    {uploadedDocs.length === 0 ? (
+                                        <p className="text-gray-500 italic text-sm">No documents uploaded yet.</p>
+                                    ) : (
+                                        <ul className="space-y-2 mb-6">
+                                            {uploadedDocs.map(d => (
+                                                <li key={d.id} className="flex items-center justify-between p-3 bg-green-50 rounded border border-green-100">
+                                                    <span className="text-sm text-gray-700">{d.fileName}</span>
+                                                    <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+
+                                <div className="flex justify-end mt-8">
+                                    <button
+                                        onClick={proceedToReview}
+                                        disabled={!areDocsUploaded}
+                                        className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-300 transition"
+                                    >
+                                        Next: Review Application
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 2. Review */}
+                {currentStep === 2 && (
+                    <div className="p-8">
+                        <h3 className="text-xl font-bold text-gray-800 mb-6">Review Your Application</h3>
+
+                        <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <p className="text-sm text-gray-500 mb-1">Service Selected</p>
+                                    <p className="font-semibold text-gray-800 text-lg">{displayTitle}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500 mb-1">Applicant Email</p>
+                                    <p className="font-semibold text-gray-800">{getAuth()?.user?.email}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500 mb-1">Total Documents</p>
+                                    <p className="font-semibold text-gray-800">{uploadedDocs.length} Files</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500 mb-1">E-Agreement Status</p>
+                                    <p className={`font-semibold ${agreementDownloaded ? 'text-green-600' : 'text-orange-500'}`}>
+                                        {agreementDownloaded ? 'Downloaded' : 'Not Downloaded'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <button onClick={() => setCurrentStep(1)} className="text-gray-500 hover:text-gray-700 font-medium px-4">
+                                Back to Upload
+                            </button>
+                            <button
+                                onClick={verifyAndSubmit}
+                                className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition shadow-md flex items-center"
+                            >
+                                <ShieldCheckIcon className="w-5 h-5 mr-2" />
+                                Confirm & Proceed to Payment
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* 3. Payment */}
+                {currentStep === 3 && (
+                    <div className="p-10 text-center">
+                        <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <CurrencyRupeeIcon className="w-8 h-8 text-indigo-600" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-800 mb-2">Final Step: Payment</h3>
+                        <p className="text-gray-600 mb-8">Pay the service fee to officially submit your application.</p>
+
+                        <div className="bg-white p-6 rounded-xl max-w-sm mx-auto mb-8 border-2 border-indigo-100 shadow-sm">
+                            <p className="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-1">Total Payable</p>
+                            <p className="text-4xl font-bold text-indigo-600">₹{MOCK_PRICE}</p>
+                        </div>
+
+                        <button
+                            onClick={handleRazorpayPayment}
+                            disabled={loading}
+                            className="px-10 py-4 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 transition shadow-lg transform hover:scale-105"
+                        >
+                            {loading ? 'Processing...' : 'Pay Securely with Razorpay'}
+                        </button>
+                    </div>
+                )}
+
+                {/* 4. Success */}
+                {currentStep === 4 && (
+                    <div className="p-12 text-center">
+                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <CheckCircleIcon className="w-10 h-10 text-green-600" />
+                        </div>
+                        <h3 className="text-3xl font-bold text-gray-900 mb-4">Application Submitted!</h3>
+                        <p className="text-gray-600 mb-8 max-w-lg mx-auto">
+                            Your application for <strong>{displayTitle}</strong> has been successfully placed. Our experts will verify your documents and contact you shortly.
+                        </p>
+                        <button
+                            onClick={() => navigate('/dashboard/user/my-orders')}
+                            className="px-8 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition"
+                        >
+                            View My Applications
+                        </button>
+                    </div>
                 )}
             </div>
 
-            {/* 2. Upload Documents */}
-            {isOrderCreated && currentStep < 4 && (
-                <div className={`p-5 mb-6 bg-white rounded-lg shadow ${currentStep === 2 ? 'border-2 border-blue-400' : (currentStep > 2 ? 'border-2 border-green-400' : '')}`}>
-                    <h3 className="flex items-center mb-3 text-lg font-semibold">
-                        <span className="flex items-center justify-center w-6 h-6 mr-2 font-bold text-blue-600 bg-blue-100 rounded-full">2</span>
-                        Upload Documents
-                    </h3>
-
-                    {/* File Input */}
-                    {currentStep === 2 && (
-                        <div className="flex items-center mb-4 space-x-4">
-                            <input
-                                type="file"
-                                multiple
-                                onChange={handleFiles}
-                                className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-blue-700 hover:file:bg-gray-200"
-                            />
-                            <button
-                                onClick={uploadDocs}
-                                disabled={loading || filesToUpload.length === 0}
-                                className={`px-4 py-2 text-sm text-white font-semibold rounded-lg transition ${loading || filesToUpload.length === 0 ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}
-                            >
-                                {loading ? 'Uploading...' : `Upload ${filesToUpload.length} File(s)`}
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Upload Queue Preview */}
-                    {filesToUpload.length > 0 && (
-                        <div className="p-3 mb-4 text-yellow-800 border rounded-lg bg-yellow-50">
-                            <h4 className="text-sm font-semibold">Files in Upload Queue:</h4>
-                            <ul className="ml-4 text-xs list-disc">
-                                {filesToUpload.map((f, idx) => <li key={idx}>{f.name}</li>)}
-                            </ul>
-                        </div>
-                    )}
-
-                    {/* Uploaded Documents List (User View) */}
-                    <h4 className="pt-3 mt-4 text-base font-semibold border-t">Uploaded Documents Status</h4>
-                    {uploadedDocs.length === 0 ? (
-                        <p className="mt-2 text-sm text-gray-500">No documents have been uploaded yet.</p>
-                    ) : (
-                        <ul className="mt-2 space-y-2">
-                            {uploadedDocs.map(d => (
-                                <li key={d.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
-                                    <div className="max-w-md text-sm truncate">{d.fileName}</div>
-                                    <div className="flex items-center gap-4">
-                                        <div className={`text-xs font-semibold flex items-center ${d.verified ? 'text-green-600' : 'text-yellow-600'}`}>
-                                            {d.verified ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />}
-                                            {d.verified ? 'Verified by Admin' : 'Pending Admin Verification'}
-                                        </div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-            )}
-
-            {/* 3. Payment & Submit */}
-            {isOrderCreated && currentStep < 4 && (
-                <div className={`p-5 mb-6 bg-white rounded-lg shadow ${currentStep === 3 ? 'border-2 border-blue-400' : ''}`}>
-                    <h3 className="flex items-center mb-3 text-lg font-semibold">
-                        <span className="flex items-center justify-center w-6 h-6 mr-2 font-bold text-blue-600 bg-blue-100 rounded-full">3</span>
-                        Payment & Submit
-                    </h3>
-                    <div className="p-4 mb-4 border rounded-lg bg-indigo-50">
-                        <p className="font-semibold text-gray-800">
-                            Total Service Fee Due: <span className="text-2xl font-extrabold text-indigo-700">Rs. {MOCK_PRICE.toFixed(2)}</span>
-                        </p>
-                        <p className="mt-1 text-xs text-gray-600">
-                            (Payment is required to officially submit the order to the processing team.)
-                        </p>
-                    </div>
-                    <button
-                        onClick={pay}
-                        disabled={loading || !areDocsUploaded || isPaymentCompleted}
-                        className={`px-6 py-2 text-white font-semibold rounded-lg transition ${loading || !areDocsUploaded ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-700'}`}
-                    >
-                        {loading ? 'Processing Payment...' : isPaymentCompleted ? 'Payment Complete' : 'Pay & Submit Order'}
-                    </button>
-                    {!areDocsUploaded && <p className="mt-2 text-sm text-red-500">Please upload your required documents first.</p>}
-                </div>
-            )}
-
-            {/* 4. Order Complete */}
-            {isPaymentCompleted && currentStep === 4 && order && (
-                <div className="p-8 text-center bg-white border-2 border-green-500 rounded-lg shadow-xl">
-                    <CheckCircleIcon className="w-12 h-12 mx-auto text-green-500" />
-                    <h3 className="mt-3 text-2xl font-bold text-green-700">Order Successfully Submitted!</h3>
-                    <p className="mt-2 text-gray-600">Your order **#{order.id}** is now with our processing team. We've notified an expert to begin the work.</p>
-
-                    <div className="flex flex-col justify-center gap-4 mt-6 sm:flex-row">
-                        <button
-                            onClick={downloadInvoice}
-                            disabled={loading}
-                            className="flex items-center justify-center px-6 py-2 font-semibold text-white transition bg-green-600 rounded-lg hover:bg-green-700"
-                        >
-                            <ArrowDownTrayIcon className="w-5 h-5 mr-2" />
-                            {loading ? 'Downloading...' : 'Download Invoice'}
-                        </button>
-                        <button
-                            onClick={() => navigate('/dashboard/user/my-orders')}
-                            className="px-6 py-2 font-semibold text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
-                        >
-                            Go to My Orders
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Message Area */}
+            {/* Global Message Toast */}
             {message && (
-                <div className="p-3 mt-4 text-sm text-white bg-gray-800 rounded">
-                    **System Message:** {message}
+                <div className="fixed bottom-6 right-6 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-xl z-50 animate-fade-in-up">
+                    {message}
                 </div>
             )}
         </div>

@@ -17,6 +17,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts";
+import { getAuth } from "@/lib/auth";
 
 export default function EmployeeSalesPage() {
   const [orders, setOrders] = useState([]);
@@ -25,8 +26,8 @@ export default function EmployeeSalesPage() {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const userStr = localStorage.getItem("authUser");
-        const user = userStr ? JSON.parse(userStr) : null;
+        const auth = getAuth();
+        const user = auth?.user;
         if (user?.email) {
           const res = await orderAPI.listAssigned(user.email);
           setOrders(res.data || []);

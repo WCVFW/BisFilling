@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import { orderAPI } from "@/lib/api";
 import { ArrowUpRight, TrendingUp, CheckCircle, Clock } from "lucide-react";
+import { getAuth } from "@/lib/auth";
 
 export default function EmployeeReportsPage() {
   const [tasks, setTasks] = useState([]);
@@ -23,8 +24,8 @@ export default function EmployeeReportsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userStr = localStorage.getItem("authUser");
-        const user = userStr ? JSON.parse(userStr) : null;
+        const auth = getAuth();
+        const user = auth?.user;
         if (user?.email) {
           const res = await orderAPI.listAssigned(user.email);
           setTasks(res.data || []);

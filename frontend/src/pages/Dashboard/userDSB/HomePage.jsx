@@ -50,12 +50,12 @@ export default function LandingPageContent() {
 
         {/* Buttons */}
         <div className="lp-actions">
-          <Link to="/setup/start" className="lp-btn-primary">
+          <Link to="/dashboard/user/servicehub" className="lp-btn-primary">
             Start a New Business
             <ArrowRightIcon className="lp-btn-icon" />
           </Link>
 
-          <Link to="/setup/add" className="lp-btn-secondary">
+          <Link to="/dashboard/user/servicehub" className="lp-btn-secondary">
             Add an Existing Business
           </Link>
         </div>

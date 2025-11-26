@@ -49,12 +49,12 @@ const WorkflowEventTimeline = ({ events }) => {
                 </h3>
                 <span
                   className={`text-xs font-bold px-3 py-1 rounded-full ${event.status === "COMPLETED"
-                      ? "bg-green-100 text-green-800"
-                      : event.status === "IN_PROGRESS"
-                        ? "bg-blue-100 text-blue-800"
-                        : event.status === "FAILED"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-gray-100 text-gray-800"
+                    ? "bg-green-100 text-green-800"
+                    : event.status === "IN_PROGRESS"
+                      ? "bg-blue-100 text-blue-800"
+                      : event.status === "FAILED"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-800"
                     }`}
                 >
                   {event.status?.replace(/_/g, " ") || "PENDING"}
@@ -125,14 +125,13 @@ const StageActionButtons = ({ currentStage, orderId, onRefresh }) => {
   };
 
   const stageSequence = [
-    "WEB",
-    "CRM",
-    "SALES",
-    "ONBD",
-    "CASE",
-    "EXEC",
-    "GOVT",
-    "QA",
+    "APP_REC",
+    "DOC_VER",
+    "PROC",
+    "DRAFT",
+    "FILING",
+    "GOVT_REV",
+    "APPR",
     "DEL",
   ];
   const currentIndex = stageSequence.indexOf(currentStage);
@@ -506,8 +505,8 @@ export default function OrderDetailPage() {
               <div className="flex items-center gap-2">
                 <span
                   className={`inline-block w-3 h-3 rounded-full ${order?.status === "PAYMENT_COMPLETED"
-                      ? "bg-green-500"
-                      : "bg-yellow-500"
+                    ? "bg-green-500"
+                    : "bg-yellow-500"
                     }`}
                 ></span>
                 <span className="font-semibold text-gray-900">
@@ -671,10 +670,10 @@ export default function OrderDetailPage() {
                   <div
                     key={stage.stage}
                     className={`p-4 rounded-lg border-l-4 transition ${stage.status === "COMPLETED"
-                        ? "bg-green-50 border-l-green-500"
-                        : stage.status === "IN_PROGRESS"
-                          ? "bg-blue-50 border-l-blue-500"
-                          : "bg-gray-50 border-l-gray-300"
+                      ? "bg-green-50 border-l-green-500"
+                      : stage.status === "IN_PROGRESS"
+                        ? "bg-blue-50 border-l-blue-500"
+                        : "bg-gray-50 border-l-gray-300"
                       }`}
                   >
                     <div className="flex items-start gap-3">
@@ -691,10 +690,10 @@ export default function OrderDetailPage() {
                         </p>
                         <p
                           className={`text-xs mt-1 font-medium ${stage.status === "COMPLETED"
-                              ? "text-green-600"
-                              : stage.status === "IN_PROGRESS"
-                                ? "text-blue-600"
-                                : "text-gray-600"
+                            ? "text-green-600"
+                            : stage.status === "IN_PROGRESS"
+                              ? "text-blue-600"
+                              : "text-gray-600"
                             }`}
                         >
                           {stage.status.replace(/_/g, " ")}

@@ -8,114 +8,134 @@ import {
   Calendar,
   BarChart2,
   Headphones,
-  Users,
-  Menu as MenuIcon, // Renamed to avoid confusion
+  Menu as MenuIcon,
   User,
   LogOut,
   Settings,
+  Bell,
+  ShoppingBag
 } from "lucide-react";
 import { clearAuth, getAuth } from "../../../lib/auth";
-// Import the separate CSS file
+import { orderAPI } from "../../../lib/api";
 import "./UserDashboard.css";
 
 export default function UserDashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
-  // indicatorTop state is removed. CSS handles active state now.
   const [user, setUser] = useState(null);
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
   const menuRef = useRef(null);
+  const cartRef = useRef(null);
   const nav = useNavigate();
   const location = useLocation();
 
+  // 1. Handle Logout Logic
   const handleLogout = () => {
+    setMenuOpen(false);
     clearAuth();
     window.dispatchEvent(new Event("auth:update"));
-    // Small delay for smooth transition before reload
     setTimeout(() => {
       window.location.href = "/";
-      // window.location.reload(); // Often not needed if redirecting to root
     }, 200);
   };
 
+  // 2. Handle My Account Navigation
   const handleMyAccount = () => {
     setMenuOpen(false);
     nav("/dashboard/user/profile");
   };
 
+  const handleResumeOrder = (orderId) => {
+    setCartOpen(false);
+    nav(`/dashboard/user/service-order?orderId=${orderId}`);
+  };
+
   useEffect(() => {
-    // Fetch user data
+    // Load User Data
     const authData = getAuth();
     if (authData?.user) {
       setUser(authData.user);
     }
 
-    // Fetch profile image
-    // Note: It's generally better to have the backend return the image URL 
-    // as part of the user object rather than fetching a blob separately, 
-    // but keeping your existing logic here for compatibility.
+    // Load Profile Image
     (async () => {
       try {
         const resp = await (await import("../../../lib/api")).userAPI.profileImage();
         const blob = resp.data;
-        // Ensure we actually got a blob before creating URL
         if (blob instanceof Blob) {
           const url = URL.createObjectURL(blob);
           setUser((u) => ({ ...(u || {}), profileBlobUrl: url }));
         }
       } catch (e) {
-        // silently fail if no image
+        // Silent fail
       }
     })();
 
-    // Close dropdown on outside click
+    // Fetch Pending Orders
+    const fetchPendingOrders = async () => {
+      try {
+        const res = await orderAPI.myOrders();
+        const allOrders = res.data || [];
+        // Filter for DRAFT, DOCUMENTS_PENDING, or PENDING_PAYMENT
+        const pending = allOrders.filter(o =>
+          o.status === 'DRAFT' ||
+          o.status === 'DOCUMENTS_PENDING' ||
+          o.status === 'PENDING_PAYMENT'
+        );
+        setPendingOrders(pending);
+      } catch (err) {
+        console.warn("Failed to fetch pending orders", err);
+      }
+    };
+    fetchPendingOrders();
+
+    // Click Outside Listener
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
+      if (cartRef.current && !cartRef.current.contains(e.target)) {
+        setCartOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      // Revoke object URL to avoid memory leaks if user image changed
       if (user?.profileBlobUrl) URL.revokeObjectURL(user.profileBlobUrl);
-    }
-  }, []);
+    };
+  }, [location.pathname]); // Re-fetch on navigation might be good to update cart
 
-  // Sidebar items configuration
   const navItems = [
     { to: "/dashboard/user/home", label: "Home", icon: <Home size={20} /> },
     { to: "/dashboard/user/compliances", label: "Compliances", icon: <ShieldCheck size={20} /> },
     { to: "/dashboard/user/documents", label: "Documents", icon: <FolderOpen size={20} /> },
     { to: "/dashboard/user/servicehub", label: "Service Hub", icon: <Monitor size={20} /> },
+    { to: "/dashboard/user/my-orders", label: "My Orders", icon: <ShoppingBag size={20} /> },
     { to: "/dashboard/user/calendar", label: "Calendar", icon: <Calendar size={20} /> },
     { to: "/dashboard/user/reports", label: "Reports", icon: <BarChart2 size={20} /> },
     { to: "/dashboard/user/consult", label: "Consult", icon: <Headphones size={20} /> },
-    // { to: "/dashboard/user/users", label: "Users & Roles", icon: <Users size={20} /> },
   ];
 
-  // Helper to find current active label for the header title
   const getCurrentLabel = () => {
-    const currentItem = navItems.find(item => location.pathname.startsWith(item.to));
+    const currentItem = navItems.find((item) => location.pathname.startsWith(item.to));
     return currentItem ? currentItem.label : "Dashboard";
   };
 
   return (
     <div className="dashboard-container">
-      {/* ===== Sidebar ===== */}
+      {/* Sidebar */}
       <aside className="sidebar">
-        {/* Logo area - Replaced just an icon with a placeholder logo brand */}
         <div className="sidebar-logo">
           <MenuIcon size={28} className="text-blue-400" />
           <span>MyApp Panel</span>
         </div>
-
-        {/* Sidebar Navigation */}
         <nav className="sidebar-nav">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
-              // Use className function to apply active class automatically
-              className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+              className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -124,56 +144,104 @@ export default function UserDashboard() {
         </nav>
       </aside>
 
-      {/* ===== Main Wrapper (Header + Content) ===== */}
+      {/* Main Wrapper */}
       <div className="main-wrapper">
-        {/* ===== Header ===== */}
         <header className="dashboard-header">
-          {/* Dynamic Page Title based on route */}
           <h1 className="header-title">{getCurrentLabel()}</h1>
 
-          <div className="user-menu-container" ref={menuRef}>
-            <button
-              className="user-avatar-btn"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="User menu"
-              aria-expanded={menuOpen}
-            >
-              {user?.profileBlobUrl ? (
-                <img
-                  src={user.profileBlobUrl}
-                  alt="Profile"
-                  className="profile-img"
-                />
-              ) : (
-                <User size={24} />
+          <div className="header-actions">
+
+            {/* --- PENDING ORDERS / CART --- */}
+            <div className="relative" ref={cartRef}>
+              <button
+                className="header-icon-btn relative"
+                onClick={() => setCartOpen(!cartOpen)}
+                title="Pending Orders"
+              >
+                <ShoppingBag size={20} />
+                {pendingOrders.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                    {pendingOrders.length}
+                  </span>
+                )}
+              </button>
+
+              {cartOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                  <div className="p-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                    <h3 className="font-semibold text-gray-700">Pending Applications</h3>
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{pendingOrders.length} items</span>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {pendingOrders.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500 text-sm">
+                        No pending orders found.
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-100">
+                        {pendingOrders.map(order => (
+                          <div
+                            key={order.id}
+                            className="p-3 hover:bg-gray-50 cursor-pointer transition"
+                            onClick={() => handleResumeOrder(order.id)}
+                          >
+                            <p className="font-medium text-gray-800 text-sm truncate">{order.serviceName}</p>
+                            <div className="flex justify-between items-center mt-1">
+                              <span className="text-xs text-gray-500">
+                                {new Date(order.createdAt).toLocaleDateString()}
+                              </span>
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded ${order.status === 'PENDING_PAYMENT' ? 'text-orange-600 bg-orange-50' :
+                                  order.status === 'DOCUMENTS_PENDING' ? 'text-blue-600 bg-blue-50' :
+                                    'text-gray-600 bg-gray-100'
+                                }`}>
+                                {order.status === 'PENDING_PAYMENT' ? 'Payment Pending' :
+                                  order.status === 'DOCUMENTS_PENDING' ? 'Docs Uploaded' : 'Draft'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {pendingOrders.length > 0 && (
+                    <div className="p-2 bg-gray-50 border-t border-gray-100">
+                      <button
+                        onClick={() => { setCartOpen(false); nav('/dashboard/user/my-orders'); }}
+                        className="w-full text-center text-sm text-blue-600 font-medium hover:text-blue-800 py-1"
+                      >
+                        View All Orders
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
+            </div>
+
+            <button
+              className="header-icon-btn"
+              onClick={() => nav("/dashboard/user/notifications")}
+              title="Notifications"
+            >
+              <Bell size={20} />
             </button>
 
-            {/* Dropdown Menu */}
-            {menuOpen && (
-              <div className="dropdown-menu">
-                {/* Added username greeting if available */}
-                {user?.firstName && (
-                  <div style={{ padding: '8px 16px', fontSize: '0.85rem', color: '#64748b', borderBottom: '1px solid #e2e8f0', marginBottom: '4px' }}>
-                    Signed in as <strong>{user.firstName}</strong>
-                  </div>
+            <button
+              className="profile-image-btn"
+              onClick={() => nav("/dashboard/user/profile")}
+              title="Profile"
+            >
+              <div className="profile-placeholder">
+                {user?.profileBlobUrl ? (
+                  <img src={user.profileBlobUrl} alt="User" />
+                ) : (
+                  <User size={20} />
                 )}
-                <button onClick={handleMyAccount} className="dropdown-item">
-                  <Settings size={18} />
-                  My Account
-                </button>
-                <button onClick={handleLogout} className="dropdown-item logout">
-                  <LogOut size={18} />
-                  Logout
-                </button>
               </div>
-            )}
+            </button>
           </div>
         </header>
 
-        {/* ===== Page Content Container ===== */}
         <main className="content-container">
-          {/* Use a card style for the main content area */}
           <div className="content-card">
             <Outlet />
           </div>

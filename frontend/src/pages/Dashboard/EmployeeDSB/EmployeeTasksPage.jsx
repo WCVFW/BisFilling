@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { orderAPI } from "@/lib/api";
 import { toast } from "react-hot-toast";
+import { getAuth } from "@/lib/auth";
 
 export default function EmployeeTasksPage() {
   const [tasks, setTasks] = useState([]);
@@ -30,12 +31,13 @@ export default function EmployeeTasksPage() {
   const fetchTasks = async () => {
     setRefreshing(true);
     try {
-      const userStr = localStorage.getItem("authUser");
-      const user = userStr ? JSON.parse(userStr) : null;
+      const auth = getAuth();
+      const user = auth?.user;
       if (!user || !user.email) return;
 
       const res = await orderAPI.listAssigned(user.email);
-      const list = res?.data || [];
+      console.log("EmployeeTasksPage: Fetched tasks for", user.email, res);
+      const list = Array.isArray(res.data) ? res.data : [];
 
       // Ensure consistent structure
       const normalized = list.map((t) => ({

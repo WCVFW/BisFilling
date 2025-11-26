@@ -80,8 +80,8 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/crm-leads")
-    public ResponseEntity<java.util.List<LeadResponse>> listCrmLeads() {
-        return ResponseEntity.ok(adminService.listCrmLeads());
+    public ResponseEntity<java.util.List<LeadResponse>> listCrmLeads(@org.springframework.security.core.annotation.AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(adminService.listCrmLeads(user));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

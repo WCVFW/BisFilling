@@ -108,7 +108,7 @@ public class ServiceHubController {
 
         if ("EMPLOYEE".equalsIgnoreCase(role) && email != null && !email.isBlank()) {
             // Orders assigned to this employee
-            List<Order> assigned = orderRepository.findByAssigneeEmail(email);
+            List<Order> assigned = orderRepository.findByAssigneeEmailIgnoreCase(email);
             res.put("assignedOrdersCount", assigned.size());
             // Documents for assigned orders
             long docsForAssigned = 0;
@@ -178,7 +178,7 @@ public class ServiceHubController {
             if (isAdmin) {
                 orders = orderRepository.findByServiceName(service);
             } else if (isEmployee) {
-                orders = orderRepository.findByAssigneeEmail(email);
+                orders = orderRepository.findByAssigneeEmailIgnoreCase(email);
             } else if (email != null) {
                 orders = orderRepository.findByServiceNameAndCustomerEmail(service, email);
             }
@@ -231,7 +231,7 @@ public class ServiceHubController {
             else orders = orderRepository.findByServiceName(service);
         } else if (isEmployee) {
             // employee sees assigned orders
-            orders = orderRepository.findByAssigneeEmail(email);
+            orders = orderRepository.findByAssigneeEmailIgnoreCase(email);
         } else {
             throw new org.springframework.security.access.AccessDeniedException("Requires ADMIN or EMPLOYEE role");
         }

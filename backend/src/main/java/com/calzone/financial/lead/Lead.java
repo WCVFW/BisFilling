@@ -45,8 +45,8 @@ public class Lead {
     @Column(nullable = false)
     private Instant updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "owner_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = true)
     private User owner;
 
     @PrePersist
