@@ -32,4 +32,7 @@ export const getAuth = () => {
  */
 export const clearAuth = () => {
   localStorage.removeItem(AUTH_KEY);
+  localStorage.removeItem("authUser"); // Legacy key
+  localStorage.removeItem("token"); // Legacy key
+  localStorage.removeItem("user"); // Legacy key
 };

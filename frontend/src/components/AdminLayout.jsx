@@ -18,6 +18,7 @@ import {
   User,
   Menu,
   X,
+  Building
 } from "lucide-react";
 
 // ✅ Import getUser from your auth utility
@@ -62,6 +63,7 @@ const AdminLayout = ({ children, logout }) => {
       children: [
         { path: "/dashboard/admin/crm", label: "Dashboard", Icon: LayoutDashboard },
         { path: "/dashboard/admin/crm/customers", label: "Customers", Icon: Users },
+        { path: "/dashboard/admin/crm/companies", label: "Companies", Icon: Building },
         { path: "/dashboard/admin/leads", label: "Leads", Icon: Zap },
         { path: "/dashboard/admin/deals", label: "Deals", Icon: Gift },
       ],
@@ -71,6 +73,7 @@ const AdminLayout = ({ children, logout }) => {
     { path: "/dashboard/admin/performance", label: "Performance", Icon: TrendingUp },
     { path: "/dashboard/admin/sales-reports", label: "Sales Reports", Icon: BarChart },
     { path: "/dashboard/admin/orders", label: "Orders", Icon: ShoppingCart },
+    { path: "/dashboard/admin/experts", label: "Experts", Icon: User },
     { path: "/dashboard/admin/reports", label: "Reports", Icon: FileText },
   ];
 

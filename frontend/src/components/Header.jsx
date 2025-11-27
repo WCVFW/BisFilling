@@ -335,7 +335,8 @@ export default function Header() {
     clearAuth();
     setUser(null);
     setShowProfileMenu(false);
-    navigate("/login");
+    window.dispatchEvent(new Event("auth:update"));
+    navigate("/");
   };
 
   return (

@@ -1,83 +1,129 @@
-import React, { useState, useEffect } from "react";
-import { getAuth } from "../../../lib/auth";
-import { adminAPI } from "../../../lib/api";
-import { Users, ShoppingCart, BarChart, TrendingUp } from "lucide-react";
-
-const StatCard = ({ title, value, icon, color, loading }) => (
-  <div className="p-6 bg-white border rounded-lg shadow-md">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-500">{title}</p>
-        {loading ? <div className="w-24 h-8 mt-1 bg-gray-200 rounded animate-pulse"></div> : <p className="text-3xl font-bold text-gray-800">{value}</p>}
-      </div>
-      <div className={`p-3 rounded-full ${color}`}>
-        {icon}
-      </div>
-    </div>
-  </div>
-);
+import React, { useEffect, useState } from 'react';
+import { adminAPI } from '../../../lib/api';
+import {
+  Users, UserCheck, UserPlus, FileText, Gift, ShoppingCart, DollarSign, Activity
+} from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts';
 
 export default function AdminHome() {
-  const authData = getAuth();
-  const user = authData?.user;
-  const adminName = user?.fullName || user?.email || "Admin";
-
-  const [dashboardStats, setDashboardStats] = useState({
-    totalCustomers: 0,
-    newOrders: 0,
-    salesRevenue: 0,
-    performance: "0%",
-  });
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboardStats = async () => {
+    const fetchStats = async () => {
       try {
         const res = await adminAPI.getDashboardStats();
-        setDashboardStats(res.data);
-      } catch (error) {
-        console.error("Failed to fetch dashboard stats:", error);
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to fetch dashboard stats", err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchDashboardStats();
+    fetchStats();
   }, []);
 
-  const stats = [
-    { title: "Total Customers", value: dashboardStats.totalCustomers.toLocaleString(), icon: <Users className="w-6 h-6 text-white" />, color: "bg-blue-500" },
-    { title: "New Orders", value: dashboardStats.newOrders, icon: <ShoppingCart className="w-6 h-6 text-white" />, color: "bg-green-500" },
-    { title: "Sales Revenue", value: `₹${dashboardStats.salesRevenue.toLocaleString()}`, icon: <BarChart className="w-6 h-6 text-white" />, color: "bg-yellow-500" },
-    { title: "Performance", value: dashboardStats.performance, icon: <TrendingUp className="w-6 h-6 text-white" />, color: "bg-purple-500" },
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003366]"></div>
+      </div>
+    );
+  }
+
+  if (!stats) return <div>Error loading stats.</div>;
+
+  const statCards = [
+    { title: 'Total Employees', value: stats.totalEmployees, icon: Users, color: 'bg-blue-500' },
+    { title: 'Total Agents', value: stats.totalAgents, icon: UserCheck, color: 'bg-green-500' },
+    { title: 'Total Customers', value: stats.totalCustomers, icon: UserPlus, color: 'bg-purple-500' },
+    { title: 'Total Leads', value: stats.totalLeads, icon: Activity, color: 'bg-orange-500' },
+    { title: 'Total Deals', value: stats.totalDeals, icon: Gift, color: 'bg-pink-500' },
+    { title: 'Total Orders', value: stats.totalOrders, icon: ShoppingCart, color: 'bg-indigo-500' },
+    { title: 'Total Revenue', value: `₹${stats.totalRevenue.toLocaleString()}`, icon: DollarSign, color: 'bg-emerald-600' },
   ];
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back, {adminName}!
-        </h1>
-        <p className="mt-1 text-gray-600">
-          Here's a snapshot of your business activity.
-        </p>
+        <h1 className="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
+        <p className="text-slate-500">Overview of your organization's performance</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <StatCard
-            key={index}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            color={stat.color}
-            loading={loading}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {statCards.map((stat, index) => (
+          <div key={index} className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 flex items-center justify-between hover:shadow-md transition-shadow">
+            <div>
+              <p className="text-sm font-medium text-slate-500">{stat.title}</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">{stat.value}</p>
+            </div>
+            <div className={`p-3 rounded-lg ${stat.color} bg-opacity-10`}>
+              <stat.icon size={24} className={`${stat.color.replace('bg-', 'text-')}`} />
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Placeholder for more components like recent orders or charts */}
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        {/* Leads vs Deals Chart */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+          <h3 className="text-lg font-semibold text-slate-800 mb-6">Leads vs Deals Trend</h3>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={stats.leadsVsDealsChart}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                <YAxis axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                />
+                <Legend />
+                <Bar dataKey="leads" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Leads" />
+                <Bar dataKey="deals" fill="#10b981" radius={[4, 4, 0, 0]} name="Deals" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Order Status Distribution */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+          <h3 className="text-lg font-semibold text-slate-800 mb-6">Order Status Distribution</h3>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={stats.orderStatusChart}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {stats.orderStatusChart.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }

@@ -13,10 +13,11 @@ import {
   LogOut,
   Settings,
   Bell,
-  ShoppingBag
+  ShoppingBag,
+  Building
 } from "lucide-react";
 import { clearAuth, getAuth } from "../../../lib/auth";
-import { orderAPI } from "../../../lib/api";
+import { orderAPI, companyAPI } from "../../../lib/api";
 import "./UserDashboard.css";
 
 export default function UserDashboard() {
@@ -34,9 +35,7 @@ export default function UserDashboard() {
     setMenuOpen(false);
     clearAuth();
     window.dispatchEvent(new Event("auth:update"));
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 200);
+    nav("/");
   };
 
   // 2. Handle My Account Navigation
@@ -106,9 +105,27 @@ export default function UserDashboard() {
     };
   }, [location.pathname]); // Re-fetch on navigation might be good to update cart
 
+  // Check Company Profile
+  useEffect(() => {
+    const checkCompanyProfile = async () => {
+      try {
+        await companyAPI.getProfile();
+      } catch (err) {
+        if (err.response?.status === 404) {
+          nav("/company-setup");
+        }
+      }
+    };
+
+    if (user && user.role === 'USER') {
+      checkCompanyProfile();
+    }
+  }, [user, nav]);
+
   const navItems = [
     { to: "/dashboard/user/home", label: "Home", icon: <Home size={20} /> },
     { to: "/dashboard/user/compliances", label: "Compliances", icon: <ShieldCheck size={20} /> },
+    { to: "/dashboard/user/company", label: "Company", icon: <Building size={20} /> },
     { to: "/dashboard/user/documents", label: "Documents", icon: <FolderOpen size={20} /> },
     { to: "/dashboard/user/servicehub", label: "Service Hub", icon: <Monitor size={20} /> },
     { to: "/dashboard/user/my-orders", label: "My Orders", icon: <ShoppingBag size={20} /> },
@@ -191,8 +208,8 @@ export default function UserDashboard() {
                                 {new Date(order.createdAt).toLocaleDateString()}
                               </span>
                               <span className={`text-xs font-semibold px-2 py-0.5 rounded ${order.status === 'PENDING_PAYMENT' ? 'text-orange-600 bg-orange-50' :
-                                  order.status === 'DOCUMENTS_PENDING' ? 'text-blue-600 bg-blue-50' :
-                                    'text-gray-600 bg-gray-100'
+                                order.status === 'DOCUMENTS_PENDING' ? 'text-blue-600 bg-blue-50' :
+                                  'text-gray-600 bg-gray-100'
                                 }`}>
                                 {order.status === 'PENDING_PAYMENT' ? 'Payment Pending' :
                                   order.status === 'DOCUMENTS_PENDING' ? 'Docs Uploaded' : 'Draft'}

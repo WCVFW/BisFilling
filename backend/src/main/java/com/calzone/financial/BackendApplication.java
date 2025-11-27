@@ -28,7 +28,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         "com.calzone.financial.deal", // Deal repository
         "com.calzone.financial.wallet", // Wallet repository
         "com.calzone.financial.task", // Task repository
-        "com.calzone.financial.system" // System repository
+        "com.calzone.financial.system", // System repository
+        "com.calzone.financial.company", // Company repository
+        "com.calzone.financial.expert", // Expert repository
+        "com.calzone.financial.attendance" // Attendance repository
     },
     basePackageClasses = {
         com.calzone.financial.order.OrderRepository.class,
@@ -55,7 +58,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
     "com.calzone.financial.deal", // Deal entities
     "com.calzone.financial.wallet", // Wallet entities
     "com.calzone.financial.task", // Task entities
-    "com.calzone.financial.system" // System entities
+    "com.calzone.financial.system", // System entities
+    "com.calzone.financial.company", // Company entities
+    "com.calzone.financial.expert", // Expert entities
+    "com.calzone.financial.attendance" // Attendance entities
     })
 public class BackendApplication {
 

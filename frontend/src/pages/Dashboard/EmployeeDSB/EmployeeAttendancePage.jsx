@@ -9,6 +9,8 @@ import {
   History
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { attendanceAPI } from "../../../lib/api";
+import { getAuth } from "../../../lib/auth";
 
 export default function EmployeeAttendancePage() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -17,32 +19,17 @@ export default function EmployeeAttendancePage() {
   const [checkOutTime, setCheckOutTime] = useState(null);
   const [workDuration, setWorkDuration] = useState("00:00:00");
   const [location, setLocation] = useState("Detecting location...");
-
-  // Mock History Data
-  const history = [
-    { date: "2023-10-24", checkIn: "09:00 AM", checkOut: "06:00 PM", status: "Present", duration: "9h 00m" },
-    { date: "2023-10-23", checkIn: "09:15 AM", checkOut: "06:10 PM", status: "Present", duration: "8h 55m" },
-    { date: "2023-10-22", checkIn: "08:55 AM", checkOut: "05:50 PM", status: "Present", duration: "8h 55m" },
-    { date: "2023-10-21", checkIn: "-", checkOut: "-", status: "Absent", duration: "-" },
-    { date: "2023-10-20", checkIn: "09:05 AM", checkOut: "06:05 PM", status: "Present", duration: "9h 00m" },
-  ];
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
 
-    // Restore state from local storage
-    const savedCheckIn = localStorage.getItem("emp_checkInTime");
-    const savedCheckOut = localStorage.getItem("emp_checkOutTime");
+    // Fetch today's attendance status
+    fetchTodayAttendance();
+    fetchHistory();
 
-    if (savedCheckIn && !savedCheckOut) {
-      setIsCheckedIn(true);
-      setCheckInTime(new Date(savedCheckIn));
-    } else if (savedCheckIn && savedCheckOut) {
-      setCheckInTime(new Date(savedCheckIn));
-      setCheckOutTime(new Date(savedCheckOut));
-    }
-
-    // Mock Location
+    // Get Location
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         () => setLocation("Office HQ (Verified)"),
@@ -54,6 +41,40 @@ export default function EmployeeAttendancePage() {
 
     return () => clearInterval(timer);
   }, []);
+
+  const fetchTodayAttendance = async () => {
+    try {
+      const res = await attendanceAPI.getToday();
+      if (res.data) {
+        const att = res.data;
+        setCheckInTime(att.checkInTime ? new Date(att.checkInTime) : null);
+        setCheckOutTime(att.checkOutTime ? new Date(att.checkOutTime) : null);
+        setIsCheckedIn(att.checkInTime && !att.checkOutTime);
+      }
+    } catch (error) {
+      console.error("Failed to fetch today's attendance", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchHistory = async () => {
+    try {
+      const res = await attendanceAPI.getMyHistory();
+      const data = res.data || [];
+      // Format history for display
+      const formatted = data.slice(0, 5).map(att => ({
+        date: new Date(att.date).toLocaleDateString(),
+        checkIn: att.checkInTime ? new Date(att.checkInTime).toLocaleTimeString() : "-",
+        checkOut: att.checkOutTime ? new Date(att.checkOutTime).toLocaleTimeString() : "-",
+        status: att.status || "Present",
+        duration: att.duration || "-"
+      }));
+      setHistory(formatted);
+    } catch (error) {
+      console.error("Failed to fetch history", error);
+    }
+  };
 
   useEffect(() => {
     if (isCheckedIn && checkInTime && !checkOutTime) {
@@ -69,22 +90,33 @@ export default function EmployeeAttendancePage() {
     }
   }, [isCheckedIn, checkInTime, checkOutTime]);
 
-  const handleCheckIn = () => {
-    const now = new Date();
-    setCheckInTime(now);
-    setIsCheckedIn(true);
-    setCheckOutTime(null);
-    localStorage.setItem("emp_checkInTime", now.toISOString());
-    localStorage.removeItem("emp_checkOutTime");
-    toast.success("Checked in successfully at " + now.toLocaleTimeString());
+  const handleCheckIn = async () => {
+    try {
+      const res = await attendanceAPI.checkIn(location);
+      const att = res.data;
+      setCheckInTime(new Date(att.checkInTime));
+      setIsCheckedIn(true);
+      setCheckOutTime(null);
+      toast.success("Checked in successfully at " + new Date(att.checkInTime).toLocaleTimeString());
+      fetchHistory();
+    } catch (error) {
+      toast.error("Failed to check in");
+      console.error(error);
+    }
   };
 
-  const handleCheckOut = () => {
-    const now = new Date();
-    setCheckOutTime(now);
-    setIsCheckedIn(false);
-    localStorage.setItem("emp_checkOutTime", now.toISOString());
-    toast.success("Checked out successfully at " + now.toLocaleTimeString());
+  const handleCheckOut = async () => {
+    try {
+      const res = await attendanceAPI.checkOut();
+      const att = res.data;
+      setCheckOutTime(new Date(att.checkOutTime));
+      setIsCheckedIn(false);
+      toast.success("Checked out successfully at " + new Date(att.checkOutTime).toLocaleTimeString());
+      fetchHistory();
+    } catch (error) {
+      toast.error("Failed to check out");
+      console.error(error);
+    }
   };
 
   return (
@@ -130,7 +162,8 @@ export default function EmployeeAttendancePage() {
                 {!isCheckedIn ? (
                   <button
                     onClick={handleCheckIn}
-                    className="px-8 py-3 bg-white text-[#5E33AC] font-bold rounded-xl shadow-lg hover:bg-gray-50 hover:scale-105 transition-all flex items-center gap-2"
+                    disabled={loading}
+                    className="px-8 py-3 bg-white text-[#5E33AC] font-bold rounded-xl shadow-lg hover:bg-gray-50 hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-50"
                   >
                     <CheckCircle className="w-5 h-5" />
                     Check In
@@ -159,7 +192,7 @@ export default function EmployeeAttendancePage() {
             <StatCard
               icon={<CalendarIcon className="w-6 h-6 text-purple-600" />}
               label="Days Present"
-              value="22 Days"
+              value={`${history.filter(h => h.status === 'Present').length} Days`}
               color="bg-purple-50"
             />
             <StatCard

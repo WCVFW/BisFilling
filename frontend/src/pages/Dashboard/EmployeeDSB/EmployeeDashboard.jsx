@@ -6,7 +6,7 @@ import {
   UserCircleIcon,
   ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { getAuth } from "@/lib/auth";
+import { getAuth, clearAuth } from "@/lib/auth";
 import { userAPI } from "@/lib/api";
 
 
@@ -54,9 +54,9 @@ export default function Dashboard() {
 
   // Handle user logout
   const handleLogout = () => {
-    localStorage.removeItem("authUser"); // Also clear the new auth key if needed, but handleLogout usually redirects
-    // Better to use clearAuth from lib/auth if available, but for now just redirect
-    navigate("/login");
+    clearAuth();
+    window.dispatchEvent(new Event("auth:update"));
+    navigate("/");
   };
 
   // Sidebar menu items
@@ -67,8 +67,16 @@ export default function Dashboard() {
     { name: "Attendance", path: "/dashboard/employee/attendance", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/8i5hdmtf_expires_30_days.png" },
     { name: "Sales", path: "/dashboard/employee/sales", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/gs83arzr_expires_30_days.png" },
     { name: "Reports", path: "/dashboard/employee/reports", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/61zpjsff_expires_30_days.png" },
-    { name: "Contact", path: "/dashboard/employee/contact", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/yig4meo6_expires_30_days.png" },
-    { name: "Company", path: "/dashboard/employee/company", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/sf0ehoxm_expires_30_days.png" },
+  ];
+
+  const crmItems = [
+    { name: "Leads", path: "/dashboard/employee/crm/leads", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/nftk4cn0_expires_30_days.png" },
+    { name: "Deals", path: "/dashboard/employee/crm/deals", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/gs83arzr_expires_30_days.png" },
+    { name: "Customers", path: "/dashboard/employee/crm/customers", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/yig4meo6_expires_30_days.png" },
+    { name: "Companies", path: "/dashboard/employee/crm/companies", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/sf0ehoxm_expires_30_days.png" },
+  ];
+
+  const otherItems = [
     { name: "Calendar", path: "/dashboard/employee/calendar", icon: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/4l6p6d26_expires_30_days.png" },
   ];
 
@@ -114,9 +122,60 @@ export default function Dashboard() {
                 <NavLink
                   key={item.name}
                   to={item.path}
-                  // The 'end' prop ensures the Home link isn't active for all child routes
                   end={item.path === "/dashboard/employee"}
-                  // Use a function in className to receive the `isActive` state
+                  className={({ isActive }) =>
+                    `flex items-center cursor-pointer transition-all duration-200 rounded-2xl ${isActive ? "bg-white/20 px-5 py-3" : "px-3 py-2 hover:bg-white/10"
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <img src={item.icon} alt={item.name} className="w-[28px] h-[28px] mr-4" />
+                      <span
+                        className={`text-lg font-semibold ${isActive ? "text-white" : "text-gray-200"
+                          }`}
+                      >
+                        {item.name}
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              ))}
+
+              {/* CRM Section */}
+              <div className="pt-4">
+                <div className="px-3 pb-2">
+                  <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">CRM</span>
+                </div>
+                {crmItems.map((item) => (
+                  <NavLink
+                    key={item.name}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center cursor-pointer transition-all duration-200 rounded-2xl ${isActive ? "bg-white/20 px-5 py-3" : "px-3 py-2 hover:bg-white/10"
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <img src={item.icon} alt={item.name} className="w-[28px] h-[28px] mr-4" />
+                        <span
+                          className={`text-lg font-semibold ${isActive ? "text-white" : "text-gray-200"
+                            }`}
+                        >
+                          {item.name}
+                        </span>
+                      </>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
+
+              {/* Other Items */}
+              {otherItems.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.path}
                   className={({ isActive }) =>
                     `flex items-center cursor-pointer transition-all duration-200 rounded-2xl ${isActive ? "bg-white/20 px-5 py-3" : "px-3 py-2 hover:bg-white/10"
                     }`

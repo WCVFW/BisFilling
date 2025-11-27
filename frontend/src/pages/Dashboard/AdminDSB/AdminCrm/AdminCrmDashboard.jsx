@@ -4,7 +4,7 @@ import {
     Search, Filter, Plus, MoreVertical,
     Phone, Mail, MapPin, Calendar,
     CheckCircle, Clock, AlertCircle,
-    ChevronRight, ArrowUpRight, Wallet
+    ChevronRight, ArrowUpRight, Wallet, Building
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import StatCard from "../../../../components/StatCard";
@@ -136,6 +136,13 @@ const AdminCrmDashboard = () => {
                     <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your B2C customers, services, and support.</p>
                 </div>
                 <div className="flex gap-3">
+                    <button
+                        onClick={() => navigate("/dashboard/admin/crm/companies")}
+                        className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors flex items-center gap-2"
+                    >
+                        <Building size={18} />
+                        Companies
+                    </button>
                     <button
                         onClick={() => navigate("/dashboard/admin/crm/customers")}
                         className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"

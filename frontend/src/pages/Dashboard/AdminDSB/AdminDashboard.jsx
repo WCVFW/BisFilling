@@ -9,10 +9,7 @@ export default function AdminDashboard() {
   const handleLogout = () => {
     clearAuth();
     window.dispatchEvent(new Event("auth:update"));
-    setTimeout(() => {
-      window.location.href = "/";
-      window.location.reload();
-    }, 100);
+    navigate("/");
   };
 
   return (

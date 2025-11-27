@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getAuth, setAuth, clearAuth } from "../lib/auth";
 import { userAPI } from "../lib/api";
 
 export function useUserAccount() {
+  const navigate = useNavigate();
   const initialAuth = getAuth();
   const [user, setUser] = useState(initialAuth?.user || null);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +18,7 @@ export function useUserAccount() {
     let mounted = true;
     // cleanup previous object URL when user changes
     if (currentImageObjectUrl) {
-      try { URL.revokeObjectURL(currentImageObjectUrl); } catch (e) {}
+      try { URL.revokeObjectURL(currentImageObjectUrl); } catch (e) { }
       currentImageObjectUrl = null;
     }
 
@@ -41,7 +43,7 @@ export function useUserAccount() {
     return () => {
       mounted = false;
       if (currentImageObjectUrl) {
-        try { URL.revokeObjectURL(currentImageObjectUrl); } catch (e) {}
+        try { URL.revokeObjectURL(currentImageObjectUrl); } catch (e) { }
         currentImageObjectUrl = null;
       }
     };
@@ -71,12 +73,12 @@ export function useUserAccount() {
         };
         setUser(userObj);
         setAuth({ ...getAuth(), user: userObj });
-        try { window.dispatchEvent(new Event('auth:update')); } catch (e) {}
+        try { window.dispatchEvent(new Event('auth:update')); } catch (e) { }
       } catch (err) {
         const status = err?.response?.status;
         if (status === 401 || status === 403) {
           clearAuth();
-          try { window.location.href = "/login"; } catch (e) {}
+          try { window.location.href = "/login"; } catch (e) { }
         } else {
           console.error("Failed to fetch user profile:", err);
         }
@@ -104,7 +106,7 @@ export function useUserAccount() {
       };
       setUser(userObj);
       setAuth({ ...getAuth(), user: userObj });
-      try { window.dispatchEvent(new Event('auth:update')); } catch (e) {}
+      try { window.dispatchEvent(new Event('auth:update')); } catch (e) { }
       // If backend now has a profile image, fetch the image blob and set URL
       let newImageUrl = null;
       if (userObj.hasProfileImage) {
@@ -126,7 +128,7 @@ export function useUserAccount() {
       const status = err?.response?.status;
       if (status === 401 || status === 403) {
         clearAuth();
-        try { window.location.href = "/login"; } catch (e) {}
+        try { window.location.href = "/login"; } catch (e) { }
         return { success: false };
       }
       const msg = err?.response?.data?.message || err?.message || "Failed to update profile.";
@@ -140,11 +142,9 @@ export function useUserAccount() {
   const logout = useCallback(() => {
     clearAuth();
     setUser(null);
-    try { window.dispatchEvent(new Event('auth:update')); } catch (e) {}
-    setTimeout(() => {
-      try { window.location.href = "/"; window.location.reload(); } catch (e) {}
-    }, 100);
-  }, []);
+    try { window.dispatchEvent(new Event('auth:update')); } catch (e) { }
+    navigate("/");
+  }, [navigate]);
 
   return {
     user,

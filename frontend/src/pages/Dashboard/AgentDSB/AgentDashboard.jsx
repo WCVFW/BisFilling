@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
     LayoutDashboard,
     Wallet,
@@ -14,6 +14,7 @@ import { clearAuth } from "../../../lib/auth";
 const AgentDashboard = ({ user }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const location = useLocation();
+    const navigate = useNavigate();
 
     const menuItems = [
         { path: "/dashboard/agent", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
@@ -24,7 +25,8 @@ const AgentDashboard = ({ user }) => {
 
     const handleLogout = () => {
         clearAuth();
-        window.location.href = "/login";
+        window.dispatchEvent(new Event("auth:update"));
+        navigate("/");
     };
 
     return (
@@ -49,8 +51,8 @@ const AgentDashboard = ({ user }) => {
                                 key={item.path}
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
+                                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
                                     }`}
                             >
                                 {item.icon}

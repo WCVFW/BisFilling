@@ -33,13 +33,14 @@ public class AdminService {
     private final OrderRepository orderRepository;
     private final CaseRepository caseRepository;
     private final com.calzone.financial.lead.LeadService leadService;
+    private final com.calzone.financial.deal.DealRepository dealRepository;
 
     // Define a constant for the maximum image size (e.g., 5MB)
     private static final long MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
     public AdminService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder,
                         LeadRepository leadRepository, OrderRepository orderRepository, CaseRepository caseRepository,
-                        com.calzone.financial.lead.LeadService leadService) {
+                        com.calzone.financial.lead.LeadService leadService, com.calzone.financial.deal.DealRepository dealRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -47,6 +48,7 @@ public class AdminService {
         this.orderRepository = orderRepository;
         this.caseRepository = caseRepository;
         this.leadService = leadService;
+        this.dealRepository = dealRepository;
     }
 
     @Transactional
@@ -130,18 +132,64 @@ public class AdminService {
     @Transactional(readOnly = true)
     public Map<String, Object> getDashboardStats() {
         Map<String, Object> stats = new HashMap<>();
+        
+        // Counts
+        long totalEmployees = userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "EMPLOYEE".equals(r.getName())))
+                .count();
+        long totalAgents = userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "AGENT".equals(r.getName())))
+                .count();
         long totalCustomers = userRepository.findAll().stream()
                 .filter(u -> u.getRoles().stream().anyMatch(r -> "CLIENT".equals(r.getName())))
                 .count();
-        long newOrders = orderRepository.count(); // Simplified: total orders
-        double salesRevenue = orderRepository.findAll().stream()
+        // Get total leads including user-based leads (users without orders)
+        // We need to pass a dummy admin user to get all leads
+        User adminUser = userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "ADMIN".equals(r.getName())))
+                .findFirst()
+                .orElse(null);
+        long totalLeads = adminUser != null ? leadService.findAll(adminUser).size() : leadRepository.count();
+        // Total deals includes both manual deals and orders (as shown in AdminDeals page)
+        long totalDeals = dealRepository.count() + orderRepository.count();
+        long totalOrders = orderRepository.count();
+        double totalRevenue = orderRepository.findAll().stream()
                 .mapToDouble(Order::getTotalAmount)
                 .sum();
-        
+
+        stats.put("totalEmployees", totalEmployees);
+        stats.put("totalAgents", totalAgents);
         stats.put("totalCustomers", totalCustomers);
-        stats.put("newOrders", newOrders);
-        stats.put("salesRevenue", salesRevenue);
-        stats.put("performance", "100%"); // Mock
+        stats.put("totalLeads", totalLeads);
+        stats.put("totalDeals", totalDeals);
+        stats.put("totalOrders", totalOrders);
+        stats.put("totalRevenue", totalRevenue);
+
+        // Chart Data: Order Status Distribution
+        Map<String, Long> orderStatusCounts = new HashMap<>();
+        orderRepository.findAll().forEach(order -> {
+            String status = order.getStatus() != null ? order.getStatus().toString() : "UNKNOWN";
+            orderStatusCounts.put(status, orderStatusCounts.getOrDefault(status, 0L) + 1);
+        });
+        List<Map<String, Object>> orderStatusChart = new ArrayList<>();
+        orderStatusCounts.forEach((status, count) -> {
+            orderStatusChart.add(Map.of("name", status, "value", count));
+        });
+        stats.put("orderStatusChart", orderStatusChart);
+
+        // Chart Data: Leads vs Deals (Mock monthly trend for now as we might not have dates on all)
+        // In a real scenario, we would group by createdDate
+        List<Map<String, Object>> leadsVsDealsChart = new ArrayList<>();
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun"};
+        for (String m : months) {
+            leadsVsDealsChart.add(Map.of(
+                "name", m,
+                "leads", (int)(Math.random() * 50),
+                "deals", (int)(Math.random() * 20)
+            ));
+        }
+        stats.put("leadsVsDealsChart", leadsVsDealsChart);
+
         return stats;
     }
 

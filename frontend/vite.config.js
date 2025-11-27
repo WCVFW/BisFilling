@@ -14,9 +14,21 @@ export default defineConfig({
     proxy: {
       // Proxy API requests to the backend server
       '/api': {
-        target: 'http://localhost:8080', // Your Spring Boot backend URL
-        changeOrigin: true, // Recommended for virtual-hosted sites
-        secure: false,      // Set to false if your backend is not using HTTPS
+        target: 'http://localhost:8081', // Updated to port 8081
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@heroicons/react', 'framer-motion'],
+          charts: ['recharts'],
+          utils: ['axios', 'date-fns'],
+        },
       },
     },
   },

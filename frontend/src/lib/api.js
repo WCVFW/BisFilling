@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // This should typically be set to your backend server URL (e.g., http://localhost:8080)
-const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8080' : "");
+const API_BASE = 'http://localhost:8081'; // Hardcoded to bypass .env and match new backend port
 
 // Create the custom Axios instance
 const api = axios.create({
@@ -69,6 +69,7 @@ export const authAPI = {
 export const userAPI = {
     me: () => api.get("/api/user/me"),
     all: () => api.get("/api/user/all"),
+    getAll: () => api.get("/api/user/all"), // Alias for all
     update: (formData) => api.put("/api/user/me", formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
     profileImage: () => api.get("/api/user/me/profile-image", { responseType: 'blob' }),
     getById: (id) => api.get(`/api/user/${id}`),
@@ -125,22 +126,6 @@ export const orderAPI = {
     listAssigned: (assigneeEmail) => api.get(`/api/orders/assigned?assigneeEmail=${encodeURIComponent(assigneeEmail || '')}`),
 };
 
-// Leads
-export const leadAPI = {
-    getAll: () => api.get("/api/leads"),
-    getById: (id) => api.get(`/api/leads/${id}`),
-    create: (payload) => api.post("/api/leads", payload),
-    update: (id, payload) => api.put(`/api/leads/${id}`, payload),
-    delete: (id) => api.delete(`/api/leads/${id}`),
-};
-
-// Deals
-export const dealAPI = {
-    getAll: () => api.get("/api/deals"),
-    create: (payload) => api.post("/api/deals", payload),
-    update: (id, payload) => api.put(`/api/deals/${id}`, payload),
-    delete: (id) => api.delete(`/api/deals/${id}`),
-};
 
 // Cases
 export const caseAPI = {
@@ -201,6 +186,16 @@ export const adminAPI = {
     listCrmLeads: () => api.get(`/api/admin/crm-leads`),
     getCustomerLifecycleData: () => api.get("/api/admin/customer-lifecycle"),
 };
+
+// Lead APIs (accessible by employees and admins)
+export const leadAPI = {
+    getAll: () => api.get("/api/leads"),
+    getById: (id) => api.get(`/api/leads/${id}`),
+    create: (payload) => api.post("/api/leads", payload),
+    update: (id, payload) => api.put(`/api/leads/${id}`, payload),
+    delete: (id) => api.delete(`/api/leads/${id}`),
+};
+
 
 // Service hub
 export const serviceHubAPI = {
@@ -288,6 +283,43 @@ export const taskAPI = {
     create: (payload) => api.post("/api/tasks", payload),
     update: (id, payload) => api.put(`/api/tasks/${id}`, payload),
     delete: (id) => api.delete(`/api/tasks/${id}`),
+};
+
+// Company
+export const companyAPI = {
+    setup: (formData) => api.post("/api/company/setup", formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    getProfile: () => api.get("/api/company/profile"),
+    getAllProfiles: () => api.get("/api/company/all"),
+};
+
+
+// Deals
+export const dealAPI = {
+    getAll: () => api.get("/api/deals"),
+    getById: (id) => api.get(`/api/deals/${id}`),
+    create: (payload) => api.post("/api/deals", payload),
+    update: (id, payload) => api.put(`/api/deals/${id}`, payload),
+    delete: (id) => api.delete(`/api/deals/${id}`),
+};
+
+// Attendance
+export const attendanceAPI = {
+    checkIn: (location) => api.post("/api/attendance/check-in", { location }),
+    checkOut: () => api.post("/api/attendance/check-out"),
+    getMyHistory: () => api.get("/api/attendance/my-history"),
+    getToday: () => api.get("/api/attendance/today"),
+    getAll: () => api.get("/api/attendance/all"),
+    getStats: () => api.get("/api/attendance/stats"),
+    getTrend: () => api.get("/api/attendance/trend"),
+};
+
+// Experts
+export const expertAPI = {
+    getAll: () => api.get("/api/experts"),
+    getById: (id) => api.get(`/api/experts/${id}`),
+    create: (data) => api.post("/api/experts", data),
+    update: (id, data) => api.put(`/api/experts/${id}`, data),
+    delete: (id) => api.delete(`/api/experts/${id}`),
 };
 
 export default api;

@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import StatCard from "../../../components/StatCard";
 import DataTable from "../../../components/DataTable";
 import { Users, TrendingUp, TrendingDown, Phone } from "lucide-react";
-import { getAuth } from "../../../lib/auth";
-import { adminAPI } from "../../../lib/api";
+import { leadAPI } from "../../../lib/api";
 import AddLeadModal from "../../../components/AddLeadModal";
 
 const AdminLeads = () => {
@@ -19,38 +18,43 @@ const AdminLeads = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        const res = await adminAPI.listCrmLeads();
-        // Backend returns a list of leads directly
-        const leadsData = res.data || [];
-        setLeads(leadsData);
-
-        // Calculate stats from leadsData
-        const newLeads = leadsData.filter(l => l.status === 'New').length;
-        const converted = leadsData.filter(l => l.status === 'Converted').length;
-        const lost = leadsData.filter(l => l.status === 'Lost').length;
-        const followUps = leadsData.filter(l => l.status === 'Contacted').length;
-
-        setStats({
-          newLeads,
-          convertedLeads: converted,
-          lostLeads: lost,
-          followUps
-        });
-      } catch (error) {
-        console.error("Failed to fetch leads:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchLeads();
   }, []);
 
+  const fetchLeads = async () => {
+    try {
+      const res = await leadAPI.getAll();
+      const rawLeads = res.data || [];
+
+      // Ensure unique IDs
+      const leadsData = rawLeads.map((lead, index) => ({
+        ...lead,
+        id: lead.id ? lead.id : `lead-${index}-${Date.now()}`
+      }));
+
+      setLeads(leadsData);
+
+      // Calculate stats from leadsData
+      const newLeads = leadsData.filter(l => l.status === 'New').length;
+      const converted = leadsData.filter(l => l.status === 'Converted').length;
+      const lost = leadsData.filter(l => l.status === 'Lost').length;
+      const followUps = leadsData.filter(l => l.status === 'Contacted').length;
+
+      setStats({
+        newLeads,
+        convertedLeads: converted,
+        lostLeads: lost,
+        followUps
+      });
+    } catch (error) {
+      console.error("Failed to fetch leads:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLeadAdded = (newLead) => {
-    setLeads((prev) => [newLead, ...prev]);
-    // Recalculate stats if needed, or just let the next fetch handle it
+    fetchLeads(); // Refresh the list
   };
 
   const leadStats = [
