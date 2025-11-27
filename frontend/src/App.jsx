@@ -48,6 +48,8 @@ const EmployeeCompanyPage = React.lazy(() => import("./pages/Dashboard/EmployeeD
 const EmployeeCalendarPage = React.lazy(() => import("./pages/Dashboard/EmployeeDSB/EmployeeCalendarPage"));
 const EmployeeLeads = React.lazy(() => import("./pages/Dashboard/EmployeeDSB/EmployeeLeads"));
 
+const AdminAgents = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminAgents"));
+
 /* ---------------------- Admin Modules ---------------------- */
 const AdminEmployees = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminEmployees"));
 const AdminAttendance = React.lazy(() => import("./pages/Dashboard/AdminDSB/AdminAttendance"));
@@ -274,6 +276,7 @@ export default function App() {
               <Route path="notifications" element={<AdminNotifications />} />
               <Route path="leads" element={<AdminLeads />} />
               <Route path="employees" element={<AdminEmployees />} />
+              <Route path="agents" element={<AdminAgents />} />
               <Route path="experts" element={<AdminExpertList />} />
               <Route path="deals" element={<AdminDeals />} />
               <Route path="attendance" element={<AdminAttendance />} />

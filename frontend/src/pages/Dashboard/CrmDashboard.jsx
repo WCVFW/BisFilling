@@ -5,11 +5,7 @@ import {
   CheckCircleIcon,
   CurrencyRupeeIcon,
   ListBulletIcon,
-  ClockIcon,
-  FolderOpenIcon,
   ExclamationTriangleIcon,
-  ArrowPathIcon,
-  EyeIcon,
 } from "@heroicons/react/24/outline";
 import axios from "axios";
 
@@ -55,16 +51,16 @@ const WorkflowTimeline = ({ orderId, progress }) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 border-t-4 border-indigo-600">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">Workflow Timeline</h2>
-        <div className="text-sm font-semibold text-indigo-600">
+    <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 border-t-4 border-indigo-600">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900">Workflow Timeline</h2>
+        <div className="text-xs md:text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
           {progress?.completionPercentage || 0}% Complete
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-8">
+      <div className="mb-8 hidden md:block">
         <div className="w-full bg-gray-200 rounded-full h-2.5">
           <div
             className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2.5 rounded-full transition-all duration-500"
@@ -73,34 +69,36 @@ const WorkflowTimeline = ({ orderId, progress }) => {
         </div>
       </div>
 
-      {/* Timeline Stages - Horizontal Layout */}
+      {/* Timeline Stages - Responsive Layout */}
       <div className="relative">
-        {/* Connecting Line */}
-        <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-300 via-purple-300 to-emerald-300 transform -translate-y-1/2" />
+        {/* Desktop: Horizontal Connecting Line */}
+        <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-300 via-purple-300 to-emerald-300 transform -translate-y-1/2" />
+
+        {/* Mobile: Vertical Connecting Line */}
+        <div className="lg:hidden absolute top-4 bottom-4 left-6 w-1 bg-gradient-to-b from-blue-300 via-purple-300 to-emerald-300 transform -translate-x-1/2" />
 
         {/* Stage Cards */}
-        <div className="grid grid-cols-9 gap-2">
+        <div className="flex flex-col lg:grid lg:grid-cols-9 gap-6 lg:gap-2">
           {stages.map((stage, idx) => {
             const stageStatus = stageStatusMap[stage.key] || "PENDING";
             const isCompleted = stageStatus === "COMPLETED";
             const isInProgress = stageStatus === "IN_PROGRESS";
 
             return (
-              <div key={stage.key} className="relative">
+              <div key={stage.key} className="relative pl-14 lg:pl-0">
                 <div
-                  className={`flex flex-col items-center cursor-pointer transition-all hover:scale-110 ${
-                    isCompleted
+                  className={`flex lg:flex-col items-center lg:justify-center cursor-pointer transition-all lg:hover:scale-110 ${isCompleted
                       ? "opacity-100"
                       : isInProgress
                         ? "opacity-100"
                         : "opacity-75"
-                  }`}
+                    }`}
                   title={`${stage.label} - ${stageStatus}`}
                 >
                   {/* Stage Circle */}
-                  <div className="relative mb-3">
+                  <div className="absolute left-0 lg:static lg:mb-3">
                     <div
-                      className={`w-12 h-12 rounded-full ${getStatusColor(stageStatus)} ring-4 flex items-center justify-center text-white font-bold text-sm shadow-lg relative z-10`}
+                      className={`w-12 h-12 rounded-full ${getStatusColor(stageStatus)} ring-4 flex items-center justify-center text-white font-bold text-sm shadow-lg relative z-10 bg-white`}
                     >
                       {isCompleted ? (
                         <CheckCircleIcon className="w-6 h-6" />
@@ -113,20 +111,21 @@ const WorkflowTimeline = ({ orderId, progress }) => {
                     )}
                   </div>
 
-                  {/* Stage Label */}
-                  <div className="text-center text-xs font-semibold text-gray-700 leading-tight">
-                    {stage.label}
-                  </div>
-                  <div
-                    className={`text-xs mt-1 font-medium ${
-                      isCompleted
-                        ? "text-green-600"
-                        : isInProgress
-                          ? "text-blue-600"
-                          : "text-gray-500"
-                    }`}
-                  >
-                    {stageStatus.replace(/_/g, " ")}
+                  {/* Stage Label & Status (Desktop: Centered, Mobile: Left aligned) */}
+                  <div className="text-left lg:text-center">
+                    <div className="text-sm lg:text-xs font-semibold text-gray-700 leading-tight">
+                      {stage.label}
+                    </div>
+                    <div
+                      className={`text-xs mt-1 font-medium ${isCompleted
+                          ? "text-green-600"
+                          : isInProgress
+                            ? "text-blue-600"
+                            : "text-gray-500"
+                        }`}
+                    >
+                      {stageStatus.replace(/_/g, " ")}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -235,14 +234,14 @@ const LeadsTable = () => {
   }, []);
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h2 className="text-xl font-bold text-gray-900">
           Active Leads Pipeline
         </h2>
         <Link
           to="/crm/leads/add"
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-semibold"
+          className="w-full sm:w-auto text-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-semibold"
         >
           + New Lead
         </Link>
@@ -254,12 +253,12 @@ const LeadsTable = () => {
             key={lead.id}
             className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
           >
-            <div className="flex justify-between items-start mb-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
               <div>
                 <h3 className="font-semibold text-gray-900">{lead.name}</h3>
                 <p className="text-sm text-gray-600">{lead.service}</p>
               </div>
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold self-start sm:self-auto">
                 {lead.status}
               </span>
             </div>
@@ -281,7 +280,7 @@ const LeadsTable = () => {
               </div>
             </div>
 
-            <div className="flex justify-between items-center text-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm gap-2">
               <span className="text-gray-600">
                 Assigned to:{" "}
                 <span className="font-semibold">{lead.assigned}</span>
@@ -378,11 +377,11 @@ export default function CrmDashboard() {
   }, [orderId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-6 lg:p-10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-4 md:p-6 lg:p-10">
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">CRM Dashboard</h1>
-        <p className="text-gray-600">
+      <div className="mb-6 md:mb-10">
+        <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">CRM Dashboard</h1>
+        <p className="text-sm md:text-base text-gray-600">
           Manage your entire sales and service delivery pipeline
         </p>
       </div>
@@ -397,10 +396,10 @@ export default function CrmDashboard() {
 
           {/* Exceptions Section */}
           {progress.exceptions && progress.exceptions.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-lg p-8 mt-8 border-l-4 border-red-500">
+            <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8 mt-8 border-l-4 border-red-500">
               <div className="flex items-center mb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-red-600 mr-3" />
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
                   Active Issues & Exceptions
                 </h2>
               </div>

@@ -142,4 +142,109 @@ public class AdminController {
         adminService.deleteEmployee(id); // Re-using the same service method which deletes a user by ID
         return ResponseEntity.noContent().build();
     }
+
+    // --- Agent Management Endpoints ---
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/agents")
+    public ResponseEntity<Map<String, Object>> listAgents() {
+        java.util.List<EmployeeDto> agents = adminService.listAgents().stream()
+                .map(AdminController::toDto)
+                .toList();
+        Map<String, Object> stats = adminService.getAgentStats();
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("agents", agents);
+        response.put("stats", stats);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/agents")
+    public ResponseEntity<?> createAgent(
+            @RequestParam("email") @Email String email,
+            @RequestParam("fullName") @NotBlank String fullName,
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "state", required = false) String state,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "aadhaarNumber", required = false) String aadhaarNumber,
+            @RequestParam(value = "panNumber", required = false) String panNumber,
+            @RequestParam(value = "firmName", required = false) String firmName,
+            @RequestParam(value = "referralCode", required = false) String referralCode,
+            @RequestParam(value = "bankHolderName", required = false) String bankHolderName,
+            @RequestParam(value = "bankAccountNumber", required = false) String bankAccountNumber,
+            @RequestParam(value = "bankIfsc", required = false) String bankIfsc,
+            @RequestParam(value = "bankName", required = false) String bankName,
+            @RequestParam(value = "aadhaarFront", required = false) MultipartFile aadhaarFront,
+            @RequestParam(value = "aadhaarBack", required = false) MultipartFile aadhaarBack,
+            @RequestParam(value = "panCard", required = false) MultipartFile panCard
+    ) {
+        try {
+            User createdAgent = adminService.createAgent(
+                email, fullName, password, phone, address, state, city,
+                aadhaarNumber, panNumber, firmName, referralCode,
+                bankHolderName, bankAccountNumber, bankIfsc, bankName,
+                aadhaarFront, aadhaarBack, panCard
+            );
+            return ResponseEntity.ok(Map.of("id", createdAgent.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/agents/{id}")
+    public ResponseEntity<?> updateAgent(
+            @PathVariable Long id,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "fullName", required = false) String fullName,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "state", required = false) String state,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "aadhaarNumber", required = false) String aadhaarNumber,
+            @RequestParam(value = "panNumber", required = false) String panNumber,
+            @RequestParam(value = "firmName", required = false) String firmName,
+            @RequestParam(value = "referralCode", required = false) String referralCode,
+            @RequestParam(value = "bankHolderName", required = false) String bankHolderName,
+            @RequestParam(value = "bankAccountNumber", required = false) String bankAccountNumber,
+            @RequestParam(value = "bankIfsc", required = false) String bankIfsc,
+            @RequestParam(value = "bankName", required = false) String bankName,
+            @RequestParam(value = "aadhaarFront", required = false) MultipartFile aadhaarFront,
+            @RequestParam(value = "aadhaarBack", required = false) MultipartFile aadhaarBack,
+            @RequestParam(value = "panCard", required = false) MultipartFile panCard
+    ) {
+        try {
+            User updatedAgent = adminService.updateAgent(
+                id, fullName, email, phone, address, state, city,
+                aadhaarNumber, panNumber, firmName, referralCode,
+                bankHolderName, bankAccountNumber, bankIfsc, bankName,
+                aadhaarFront, aadhaarBack, panCard
+            );
+            return ResponseEntity.ok(Map.of("id", updatedAgent.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/agents/{id}")
+    public ResponseEntity<Void> deleteAgent(@PathVariable Long id) {
+        adminService.deleteAgent(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/agents/{id}/status")
+    public ResponseEntity<?> toggleAgentStatus(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        try {
+            adminService.toggleAgentStatus(id, payload.get("status"));
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }

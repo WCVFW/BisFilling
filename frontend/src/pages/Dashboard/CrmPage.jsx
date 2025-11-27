@@ -173,17 +173,17 @@ const stats = [
 export default function CrmPage() {
   return (
     <div className="font-[Poppins] antialiased p-4 sm:p-6 lg:p-8 space-y-8 bg-[#F5F7F9]">
-      <header className="flex justify-between items-center bg-white rounded-xl shadow p-6">
-        <h1 className="text-3xl font-bold text-gray-900">CRM Dashboard</h1>
+      <header className="flex flex-col sm:flex-row justify-between items-center bg-white rounded-xl shadow p-6 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">CRM Dashboard</h1>
         <Link
           to="/crm/leads/add"
-          className="flex items-center px-4 py-2 bg-[#0074e0] text-white font-medium rounded-lg shadow-md hover:bg-[#005bb5] transition duration-150 text-sm"
+          className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-[#0074e0] text-white font-medium rounded-lg shadow-md hover:bg-[#005bb5] transition duration-150 text-sm"
         >
           <UserPlusIcon className="w-5 h-5 mr-2" /> Add New Client/Lead
         </Link>
       </header>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <div
             key={stat.name}
@@ -249,15 +249,21 @@ function ProcessTimeline({ orderId }) {
 
   return (
     <div className="bg-white rounded-xl shadow p-6 border-t-4 border-[#0074e0]">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
         <h2 className="text-xl font-bold text-gray-800">
           End-to-End Process Timeline
         </h2>
         <span className="text-sm text-gray-500">Order #{orderId}</span>
       </div>
+
       <div className="relative">
-        <div className="absolute top-1/2 left-2 right-2 h-1 bg-gray-200 -translate-y-1/2" />
-        <div className="flex items-center justify-between">
+        {/* Desktop Horizontal Line */}
+        <div className="hidden lg:block absolute top-1/2 left-2 right-2 h-1 bg-gray-200 -translate-y-1/2" />
+
+        {/* Mobile Vertical Line */}
+        <div className="lg:hidden absolute top-2 bottom-2 left-[19px] w-1 bg-gray-200" />
+
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-0">
           {PIPELINE_STEPS.map((step, idx) => {
             const isDone = done.has(step.key);
             const isFail = failed.has(step.key);
@@ -274,10 +280,10 @@ function ProcessTimeline({ orderId }) {
             return (
               <div
                 key={step.key}
-                className="flex-1 flex flex-col items-center text-center"
+                className="flex lg:flex-col items-center text-left lg:text-center gap-4 lg:gap-0 w-full lg:w-auto"
               >
-                <div className={`w-5 h-5 rounded-full ${color} ${ring}`} />
-                <div className="mt-2 text-xs font-medium text-gray-700 whitespace-nowrap">
+                <div className={`w-10 h-10 lg:w-5 lg:h-5 rounded-full ${color} ${ring} flex-shrink-0 z-10`} />
+                <div className="mt-0 lg:mt-2 text-sm lg:text-xs font-medium text-gray-700 whitespace-nowrap">
                   {idx + 1}. {step.label}
                 </div>
               </div>
@@ -286,14 +292,14 @@ function ProcessTimeline({ orderId }) {
         </div>
       </div>
       {!!events.length && (
-        <div className="mt-4">
+        <div className="mt-6">
           <h3 className="text-sm font-semibold text-gray-700 mb-2">
             Recent Events
           </h3>
-          <ul className="space-y-1 text-sm text-gray-600">
+          <ul className="space-y-2 text-sm text-gray-600">
             {events.map((e) => (
-              <li key={e.id}>
-                <span className="font-semibold">{e.stage}</span> — {e.status}
+              <li key={e.id} className="bg-gray-50 p-2 rounded border border-gray-100">
+                <span className="font-semibold text-gray-800">{e.stage}</span> — <span className={e.status === 'Completed' ? 'text-green-600' : 'text-gray-600'}>{e.status}</span>
                 {e.notes ? ` • ${e.notes}` : ""}
               </li>
             ))}

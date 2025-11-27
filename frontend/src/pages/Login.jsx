@@ -34,6 +34,7 @@ export default function Login() {
       const role = r.data.user?.role || "USER";
       if (role === "ADMIN") nav("/dashboard/admin", { replace: true });
       else if (role === "EMPLOYEE") nav("/dashboard/employee", { replace: true });
+      else if (role === "AGENT") nav("/dashboard/agent", { replace: true });
       else nav("/dashboard/user", { replace: true });
     } catch (err) {
       const errMsg =
@@ -81,12 +82,13 @@ export default function Login() {
       const role = r.data.user?.role || "USER";
       if (role === "ADMIN") nav("/dashboard/admin", { replace: true });
       else if (role === "EMPLOYEE") nav("/dashboard/employee", { replace: true });
+      else if (role === "AGENT") nav("/dashboard/agent", { replace: true });
       else nav("/dashboard/user", { replace: true });
     } catch (err) {
       setMessage(
         err?.response?.data?.message ||
-          err?.response?.data?.error ||
-          "OTP verification failed"
+        err?.response?.data?.error ||
+        "OTP verification failed"
       );
     } finally {
       setLoading(false);
@@ -108,11 +110,10 @@ export default function Login() {
         {/* Toggle Buttons */}
         <div className="flex gap-2 mb-6">
           <button
-            className={`flex-1 py-2 rounded-lg font-medium transition ${
-              mode === "password"
-                ? "bg-[#003366] text-white shadow-md"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-            }`}
+            className={`flex-1 py-2 rounded-lg font-medium transition ${mode === "password"
+              ? "bg-[#003366] text-white shadow-md"
+              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
             onClick={() => {
               setMode("password");
               setOtpSent(false);
@@ -122,11 +123,10 @@ export default function Login() {
             Email Login
           </button>
           <button
-            className={`flex-1 py-2 rounded-lg font-medium transition ${
-              mode === "phone"
-                ? "bg-[#003366] text-white shadow-md"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-            }`}
+            className={`flex-1 py-2 rounded-lg font-medium transition ${mode === "phone"
+              ? "bg-[#003366] text-white shadow-md"
+              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
             onClick={() => {
               setMode("phone");
               setMessage(null);
@@ -206,9 +206,8 @@ export default function Login() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   disabled={otpSent}
-                  className={`mt-1 w-full border border-slate-300 px-3 py-2 rounded-lg focus:ring-[#003366] focus:border-[#003366] outline-none ${
-                    otpSent ? "bg-slate-50" : ""
-                  }`}
+                  className={`mt-1 w-full border border-slate-300 px-3 py-2 rounded-lg focus:ring-[#003366] focus:border-[#003366] outline-none ${otpSent ? "bg-slate-50" : ""
+                    }`}
                   placeholder="e.g. 9876543210"
                 />
               </div>
@@ -245,8 +244,8 @@ export default function Login() {
                     ? "Verifying..."
                     : "Sending..."
                   : otpSent
-                  ? "Verify OTP"
-                  : "Send OTP"}
+                    ? "Verify OTP"
+                    : "Send OTP"}
               </button>
 
               {otpSent && (
@@ -271,11 +270,10 @@ export default function Login() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className={`mt-5 p-3 rounded-lg text-sm text-center shadow-sm ${
-              message.includes("success") || message.includes("sent")
-                ? "bg-green-50 text-green-700"
-                : "bg-red-50 text-red-700"
-            }`}
+            className={`mt-5 p-3 rounded-lg text-sm text-center shadow-sm ${message.includes("success") || message.includes("sent")
+              ? "bg-green-50 text-green-700"
+              : "bg-red-50 text-red-700"
+              }`}
           >
             {message}
             {showResetLink && mode === "password" && (

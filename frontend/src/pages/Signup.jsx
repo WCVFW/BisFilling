@@ -108,94 +108,93 @@ export default function Signup() {
         </h2>
 
         <form onSubmit={submit}>
-            <div className="flex flex-col items-center mb-4">
-              <label
-                htmlFor="profile-image-upload"
-                className="cursor-pointer"
-              >
-                <img
-                  src={
-                    imagePreview ||
-                    "https://via.placeholder.com/100?text=Avatar"
-                  }
-                  alt="Profile Preview"
-                  className="w-24 h-24 rounded-full object-cover border-2 border-slate-300"
-                />
-              </label>
-              <input
-                id="profile-image-upload"
-                type="file"
-                accept="image/png, image/jpeg, image/svg+xml"
-                onChange={handleImageChange}
-                className="hidden"
-                disabled={loading}
-              />
-            </div>
-
-            <label className="block text-sm font-medium text-slate-700">
-              Full Name
-            </label>
-            <input
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              disabled={loading}
-              className="mt-2 w-full border border-slate-300 px-3 py-2 rounded focus:ring-[#003366] focus:border-[#003366] outline-none disabled:bg-slate-100"
-              placeholder="Full name"
-            />
-
-            <label className="block mt-4 text-sm font-medium text-slate-700">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              className="mt-2 w-full border border-slate-300 px-3 py-2 rounded focus:ring-[#003366] focus:border-[#003366] outline-none disabled:bg-slate-100"
-              placeholder="you@domain.com"
-            />
-
-            <label className="block mt-4 text-sm font-medium text-slate-700">
-              Phone
-            </label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={loading}
-              className="mt-2 w-full border border-slate-300 px-3 py-2 rounded focus:ring-[#003366] focus:border-[#003366] outline-none disabled:bg-slate-100"
-              placeholder="e.g. 9876543210"
-            />
-
-            <label className="block mt-4 text-sm font-medium text-slate-700">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              className="mt-2 w-full border border-slate-300 px-3 py-2 rounded focus:ring-[#003366] focus:border-[#003366] outline-none disabled:bg-slate-100"
-              placeholder="Choose a password"
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-6 w-full bg-[#003366] text-white py-2 rounded transition-colors hover:bg-[#002244] disabled:bg-slate-400"
+          <div className="flex flex-col items-center mb-4">
+            <label
+              htmlFor="profile-image-upload"
+              className="cursor-pointer"
             >
-              {loading ? "Signing up..." : "Sign up"}
-            </button>
-          </form>
+              <img
+                src={
+                  imagePreview ||
+                  "https://via.placeholder.com/100?text=Avatar"
+                }
+                alt="Profile Preview"
+                className="w-24 h-24 rounded-full object-cover border-2 border-slate-300"
+              />
+            </label>
+            <input
+              id="profile-image-upload"
+              type="file"
+              accept="image/png, image/jpeg, image/svg+xml"
+              onChange={handleImageChange}
+              className="hidden"
+              disabled={loading}
+            />
+          </div>
+
+          <label className="block text-sm font-medium text-slate-700">
+            Full Name
+          </label>
+          <input
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            disabled={loading}
+            className="mt-2 w-full border border-slate-300 px-3 py-2 rounded focus:ring-[#003366] focus:border-[#003366] outline-none disabled:bg-slate-100"
+            placeholder="Full name"
+          />
+
+          <label className="block mt-4 text-sm font-medium text-slate-700">
+            Email
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+            className="mt-2 w-full border border-slate-300 px-3 py-2 rounded focus:ring-[#003366] focus:border-[#003366] outline-none disabled:bg-slate-100"
+            placeholder="you@domain.com"
+          />
+
+          <label className="block mt-4 text-sm font-medium text-slate-700">
+            Phone
+          </label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            disabled={loading}
+            className="mt-2 w-full border border-slate-300 px-3 py-2 rounded focus:ring-[#003366] focus:border-[#003366] outline-none disabled:bg-slate-100"
+            placeholder="e.g. 9876543210"
+          />
+
+          <label className="block mt-4 text-sm font-medium text-slate-700">
+            Password
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+            className="mt-2 w-full border border-slate-300 px-3 py-2 rounded focus:ring-[#003366] focus:border-[#003366] outline-none disabled:bg-slate-100"
+            placeholder="Choose a password"
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-6 w-full bg-[#003366] text-white py-2 rounded transition-colors hover:bg-[#002244] disabled:bg-slate-400"
+          >
+            {loading ? "Signing up..." : "Sign up"}
+          </button>
+        </form>
 
         {message && (
           <div
-            className={`mt-4 p-3 rounded text-sm ${
-              message.toLowerCase().includes("success") ||
+            className={`mt-4 p-3 rounded text-sm ${message.toLowerCase().includes("success") ||
               message.toLowerCase().includes("signup successful")
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+              }`}
           >
             {message}
           </div>

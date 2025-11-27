@@ -5,6 +5,8 @@ import {
   Cog6ToothIcon,
   UserCircleIcon,
   ArrowLeftOnRectangleIcon,
+  Bars3Icon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getAuth, clearAuth } from "@/lib/auth";
 import { userAPI } from "@/lib/api";
@@ -15,6 +17,7 @@ export default function Dashboard() {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
   const settingsRef = useRef(null);
@@ -51,6 +54,11 @@ export default function Dashboard() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [settingsRef]);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [navigate]);
 
   // Handle user logout
   const handleLogout = () => {
@@ -95,22 +103,42 @@ export default function Dashboard() {
     <>
       <style>{internalCss}</style>
       <div className="flex h-screen w-full overflow-hidden bg-gray-100">
+
+        {/* ---- MOBILE SIDEBAR OVERLAY ---- */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 z-20 bg-black/50 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
         {/* ---- SIDEBAR ---- */}
-        {/* The sidebar is fixed and has its own scrollbar if content overflows */}
-        <aside className="flex-shrink-0 w-[260px] bg-[#5E33AC] shadow-xl">
+        <aside
+          className={`
+            fixed inset-y-0 left-0 z-30 w-[260px] transform bg-[#5E33AC] shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0
+            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+        >
           {/* Added 'scrollbar-hide' class to conceal the scrollbar visually */}
-          <div className="flex h-full flex-col overflow-y-auto p-6 scrollbar-hide">
+          <div className="flex h-full flex-col overflow-y-auto p-6 scrollbar-hide relative">
+
+            {/* Close Button (Mobile Only) */}
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="absolute top-4 right-4 text-white lg:hidden hover:bg-white/10 rounded-full p-1 transition"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+
             {/* Profile Section */}
             <div className="mb-10 flex flex-col items-center text-center">
               {/* --- PROFILE IMAGE --- */}
-              {/* It uses the avatar from localStorage, or a default image if not found. */}
               <img
                 src={avatarUrl || "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/wubvUxErdY/wgo6e9kp_expires_30_days.png"}
                 alt="Profile"
                 className="h-20 w-20 rounded-full border-2 border-white object-cover shadow-md"
               />
               {/* --- EMPLOYEE NAME --- */}
-              {/* It uses the name from localStorage, or a default name if not found. */}
               <h2 className="mt-3 text-lg font-semibold text-white">
                 {employee?.fullName || "Employee Name"}
               </h2>
@@ -199,30 +227,41 @@ export default function Dashboard() {
         </aside>
 
         {/* ---- MAIN CONTENT AREA ---- */}
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col w-full min-w-0">
           {/* Header: Search + Profile */}
-          <header className="flex flex-shrink-0 items-center justify-between border-b bg-white p-4 px-6">
-            {/* Left side: Search Box */}
-            <div className="relative w-[450px]">
-              <input
-                placeholder="Search"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-gray-50 py-2.5 pl-12 pr-5 text-gray-700 outline-none focus:border-blue-500 focus:bg-white"
-              />
+          <header className="flex flex-shrink-0 items-center justify-between border-b bg-white p-4 px-6 gap-4">
 
-              {/* Search Icon */}
-              <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/149/149852.png"
-                  alt="search"
-                  className="w-5 opacity-50"
+            <div className="flex items-center gap-4 flex-1">
+              {/* Hamburger Menu (Mobile) */}
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="text-gray-500 lg:hidden hover:text-gray-800 transition"
+              >
+                <Bars3Icon className="h-6 w-6" />
+              </button>
+
+              {/* Left side: Search Box */}
+              <div className="relative w-full max-w-[450px] hidden sm:block">
+                <input
+                  placeholder="Search"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 bg-gray-50 py-2.5 pl-12 pr-5 text-gray-700 outline-none focus:border-blue-500 focus:bg-white"
                 />
+
+                {/* Search Icon */}
+                <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/149/149852.png"
+                    alt="search"
+                    className="w-5 opacity-50"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Right side: Actions & Profile */}
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-3 sm:gap-5">
               <button className="relative text-gray-500 transition hover:text-gray-800">
                 <BellIcon className="h-6 w-6" />
                 {/* Notification dot */}
@@ -240,7 +279,7 @@ export default function Dashboard() {
 
                 {/* Dropdown Menu */}
                 {isSettingsOpen && (
-                  <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
                     <NavLink
                       to="/dashboard/employee/profile" // Assuming this is your profile route
                       className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -263,7 +302,7 @@ export default function Dashboard() {
           </header>
 
           {/* ---- SCROLLABLE CONTENT ---- */}
-          <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10">
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
             <Outlet />
           </main>
         </div>

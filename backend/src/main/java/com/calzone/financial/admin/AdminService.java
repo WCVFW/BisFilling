@@ -260,6 +260,132 @@ public class AdminService {
         userRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
+    public List<User> listAgents() {
+        return userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> r.getName().equals("AGENT")))
+                .toList();
+    }
+
+    @Transactional
+    public User createAgent(
+            String email, String fullName, String password, String phone,
+            String address, String state, String city,
+            String aadhaarNumber, String panNumber, String firmName, String referralCode,
+            String bankHolderName, String bankAccountNumber, String bankIfsc, String bankName,
+            MultipartFile aadhaarFrontFile, MultipartFile aadhaarBackFile, MultipartFile panCardFile
+    ) throws IOException {
+        User user = new User();
+        user.setEmail(email);
+        user.setFullName(fullName);
+        if (password != null && !password.isBlank()) {
+            user.setPassword(passwordEncoder.encode(password));
+        } else {
+            user.setPassword("");
+        }
+        user.setPhone(phone != null ? phone : "");
+        user.setAddress(address);
+        user.setState(state);
+        user.setCity(city);
+        user.setAadhaarNumber(aadhaarNumber);
+        user.setPanNumber(panNumber);
+        user.setFirmName(firmName);
+        user.setReferralCode(referralCode);
+        user.setBankHolderName(bankHolderName);
+        user.setBankAccountNumber(bankAccountNumber);
+        user.setBankIfsc(bankIfsc);
+        user.setBankName(bankName);
+
+        if (aadhaarFrontFile != null && !aadhaarFrontFile.isEmpty()) {
+            user.setAadhaarFront(aadhaarFrontFile.getBytes());
+            user.setAadhaarFrontType(aadhaarFrontFile.getContentType());
+        }
+        if (aadhaarBackFile != null && !aadhaarBackFile.isEmpty()) {
+            user.setAadhaarBack(aadhaarBackFile.getBytes());
+            user.setAadhaarBackType(aadhaarBackFile.getContentType());
+        }
+        if (panCardFile != null && !panCardFile.isEmpty()) {
+            user.setPanCard(panCardFile.getBytes());
+            user.setPanCardType(panCardFile.getContentType());
+        }
+
+        Role agentRole = roleRepository.findByName("AGENT").orElseGet(() -> roleRepository.save(new Role("AGENT")));
+        user.getRoles().add(agentRole);
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User updateAgent(
+            Long id, String fullName, String email, String phone,
+            String address, String state, String city,
+            String aadhaarNumber, String panNumber, String firmName, String referralCode,
+            String bankHolderName, String bankAccountNumber, String bankIfsc, String bankName,
+            MultipartFile aadhaarFrontFile, MultipartFile aadhaarBackFile, MultipartFile panCardFile
+    ) throws IOException {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Agent not found with id: " + id));
+
+        if (fullName != null) user.setFullName(fullName);
+        if (email != null) user.setEmail(email);
+        if (phone != null) user.setPhone(phone);
+        if (address != null) user.setAddress(address);
+        if (state != null) user.setState(state);
+        if (city != null) user.setCity(city);
+        if (aadhaarNumber != null) user.setAadhaarNumber(aadhaarNumber);
+        if (panNumber != null) user.setPanNumber(panNumber);
+        if (firmName != null) user.setFirmName(firmName);
+        if (referralCode != null) user.setReferralCode(referralCode);
+        if (bankHolderName != null) user.setBankHolderName(bankHolderName);
+        if (bankAccountNumber != null) user.setBankAccountNumber(bankAccountNumber);
+        if (bankIfsc != null) user.setBankIfsc(bankIfsc);
+        if (bankName != null) user.setBankName(bankName);
+
+        if (aadhaarFrontFile != null && !aadhaarFrontFile.isEmpty()) {
+            user.setAadhaarFront(aadhaarFrontFile.getBytes());
+            user.setAadhaarFrontType(aadhaarFrontFile.getContentType());
+        }
+        if (aadhaarBackFile != null && !aadhaarBackFile.isEmpty()) {
+            user.setAadhaarBack(aadhaarBackFile.getBytes());
+            user.setAadhaarBackType(aadhaarBackFile.getContentType());
+        }
+        if (panCardFile != null && !panCardFile.isEmpty()) {
+            user.setPanCard(panCardFile.getBytes());
+            user.setPanCardType(panCardFile.getContentType());
+        }
+
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteAgent(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void toggleAgentStatus(Long id, String status) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Agent not found with id: " + id));
+        // Assuming User entity has an enabled flag or similar status field. 
+        // If not, we might need to add one or use a workaround.
+        // For now, let's assume enabled = true means ACTIVE, enabled = false means INACTIVE
+        user.setEnabled("ACTIVE".equalsIgnoreCase(status));
+        userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getAgentStats() {
+        List<User> allAgents = listAgents();
+        long total = allAgents.size();
+        long active = allAgents.stream().filter(User::isEnabled).count();
+        long inactive = total - active;
+        
+        return Map.of(
+            "totalAgents", total,
+            "activeAgents", active,
+            "inactiveAgents", inactive
+        );
+    }
+
     private void validateAndSetImage(User user, MultipartFile imageFile) throws IOException {
         if (imageFile != null && !imageFile.isEmpty()) {
             if (imageFile.getSize() > MAX_IMAGE_SIZE_BYTES) {

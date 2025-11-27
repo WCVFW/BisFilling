@@ -9,8 +9,8 @@ import {
   CheckCircle2,
   Calendar as CalendarIcon
 } from "lucide-react";
-import { orderAPI } from "@/lib/api"; 
-import { getAuth } from "@/lib/auth"; 
+import { orderAPI } from "@/lib/api";
+import { getAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
 
 // --- Month-wise Image Configuration ---
@@ -37,9 +37,9 @@ export default function DesignCalendarPage() {
   const navigate = useNavigate();
 
   // --- Design Constants ---
-  const THEME_COLOR = "text-[#F2994A]"; 
+  const THEME_COLOR = "text-[#F2994A]";
   const THEME_BG = "bg-[#F2994A]";
-  
+
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -88,120 +88,120 @@ export default function DesignCalendarPage() {
   const daysArray = Array.from({ length: days }, (_, i) => i + 1);
   const blanks = Array.from({ length: firstDay }, (_, i) => i);
   const selectedTasks = tasks.filter(t => isSameDay(new Date(t.createdAt), selectedDate));
-  
+
   // Get dynamic image based on current month index (0-11)
   const currentHeroImage = MONTH_IMAGES[currentDate.getMonth()];
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8 font-sans">
-      
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 lg:p-8 font-sans">
+
       {/* Main Card Container */}
-      <div className="bg-white w-full max-w-[1400px] min-h-[800px] shadow-2xl flex relative overflow-hidden rounded-lg">
-        
+      <div className="bg-white w-full max-w-[1400px] min-h-screen lg:min-h-[800px] shadow-2xl flex flex-col lg:flex-row relative overflow-hidden rounded-lg">
+
         {/* --- LEFT SIDE: DYNAMIC IMAGE & OVERLAYS --- */}
-        <div className="relative w-[45%] bg-gray-900 overflow-hidden group">
+        <div className="relative w-full lg:w-[45%] h-[250px] lg:h-auto bg-gray-900 overflow-hidden group shrink-0">
           {/* Animated Background Image */}
           <div className="absolute inset-0 transition-transform duration-1000 ease-in-out group-hover:scale-110">
-             <img 
-                key={currentDate.getMonth()} // Key forces fade effect when month changes
-                src={currentHeroImage} 
-                alt="Seasonal Background" 
-                className="w-full h-full object-cover opacity-90 transition-opacity duration-500"
-              />
+            <img
+              key={currentDate.getMonth()} // Key forces fade effect when month changes
+              src={currentHeroImage}
+              alt="Seasonal Background"
+              className="w-full h-full object-cover opacity-90 transition-opacity duration-500"
+            />
           </div>
-          
+
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
           {/* Logo Area */}
-          <div className="absolute top-10 left-10">
-            <h2 className="text-[#F2994A] text-2xl font-bold tracking-wider uppercase drop-shadow-md">
-                My Company
+          <div className="absolute top-6 left-6 lg:top-10 lg:left-10">
+            <h2 className="text-[#F2994A] text-xl lg:text-2xl font-bold tracking-wider uppercase drop-shadow-md">
+              My Company
             </h2>
           </div>
 
           {/* Contact Info (Bottom Left) */}
-          <div className="absolute bottom-10 left-10 text-white space-y-3 z-10">
-            <h3 className={`text-xl font-bold ${THEME_COLOR} mb-2 uppercase tracking-wide`}>Contact Us:</h3>
-            <div className="flex items-center gap-3 text-sm font-medium opacity-90 hover:opacity-100 transition-opacity">
-              <div className="p-2 bg-white/10 rounded-full backdrop-blur-sm"><Phone className="w-4 h-4" /></div>
+          <div className="absolute bottom-6 left-6 lg:bottom-10 lg:left-10 text-white space-y-2 lg:space-y-3 z-10">
+            <h3 className={`text-lg lg:text-xl font-bold ${THEME_COLOR} mb-2 uppercase tracking-wide`}>Contact Us:</h3>
+            <div className="flex items-center gap-3 text-xs lg:text-sm font-medium opacity-90 hover:opacity-100 transition-opacity">
+              <div className="p-1.5 lg:p-2 bg-white/10 rounded-full backdrop-blur-sm"><Phone className="w-3 h-3 lg:w-4 lg:h-4" /></div>
               <span>+123 456 789</span>
             </div>
-            <div className="flex items-center gap-3 text-sm font-medium opacity-90 hover:opacity-100 transition-opacity">
-              <div className="p-2 bg-white/10 rounded-full backdrop-blur-sm"><Mail className="w-4 h-4" /></div>
+            <div className="flex items-center gap-3 text-xs lg:text-sm font-medium opacity-90 hover:opacity-100 transition-opacity">
+              <div className="p-1.5 lg:p-2 bg-white/10 rounded-full backdrop-blur-sm"><Mail className="w-3 h-3 lg:w-4 lg:h-4" /></div>
               <span>calendar@gmail.com</span>
             </div>
-             <div className="flex items-center gap-3 text-sm font-medium opacity-90 hover:opacity-100 transition-opacity">
-              <div className="p-2 bg-white/10 rounded-full backdrop-blur-sm"><MapPin className="w-4 h-4" /></div>
+            <div className="flex items-center gap-3 text-xs lg:text-sm font-medium opacity-90 hover:opacity-100 transition-opacity">
+              <div className="p-1.5 lg:p-2 bg-white/10 rounded-full backdrop-blur-sm"><MapPin className="w-3 h-3 lg:w-4 lg:h-4" /></div>
               <span>123 Street Name, City, Country</span>
             </div>
           </div>
         </div>
 
-        {/* --- MIDDLE: THE CURVED DIVIDER --- */}
-        <div className="absolute left-[45%] top-0 bottom-0 w-[150px] z-10 pointer-events-none -ml-[75px]">
+        {/* --- MIDDLE: THE CURVED DIVIDER (Hidden on Mobile) --- */}
+        <div className="hidden lg:block absolute left-[45%] top-0 bottom-0 w-[150px] z-10 pointer-events-none -ml-[75px]">
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
             {/* White Shape */}
             <path d="M 50 0 C 20 25 20 75 50 100 L 100 100 L 100 0 Z" fill="white" />
             {/* Orange Border Stroke */}
-            <path d="M 50 0 C 20 25 20 75 50 100" fill="none" stroke="#F2994A" strokeWidth="2.5"/>
+            <path d="M 50 0 C 20 25 20 75 50 100" fill="none" stroke="#F2994A" strokeWidth="2.5" />
           </svg>
         </div>
 
         {/* --- RIGHT SIDE: CALENDAR CONTENT --- */}
-        <div className="flex-1 bg-white p-12 lg:p-16 flex flex-col relative z-20">
-          
+        <div className="flex-1 bg-white p-6 lg:p-16 flex flex-col relative z-20">
+
           {/* Header Section */}
-          <div className="text-right mb-10">
-            <div className="flex flex-col items-end">
-                <h1 className="text-7xl font-extrabold text-gray-800 tracking-tighter leading-none">
+          <div className="text-center lg:text-right mb-6 lg:mb-10">
+            <div className="flex flex-col items-center lg:items-end">
+              <h1 className="text-5xl lg:text-7xl font-extrabold text-gray-800 tracking-tighter leading-none">
                 <span className={THEME_COLOR}>{currentDate.getFullYear()}</span>
-                </h1>
-                <h2 className="text-3xl font-bold text-gray-400 tracking-[0.2em] uppercase mt-2">
+              </h1>
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-400 tracking-[0.2em] uppercase mt-2">
                 Calendar
-                </h2>
+              </h2>
             </div>
-            
+
             {/* Decorative Line */}
-            <div className={`h-1.5 w-24 ${THEME_BG} ml-auto mt-6 mb-4 rounded-full`}></div>
+            <div className={`h-1.5 w-24 ${THEME_BG} mx-auto lg:ml-auto lg:mr-0 mt-4 lg:mt-6 mb-4 rounded-full`}></div>
 
             {/* Dynamic Month Description */}
-            <div className="text-gray-400 text-sm max-w-sm ml-auto text-right">
-                Plan your success for <strong>{currentDate.toLocaleDateString('en-US', { month: 'long' })}</strong>.
-                You have {tasks.length} active tasks scheduled.
+            <div className="text-gray-400 text-sm max-w-sm mx-auto lg:ml-auto lg:mr-0 lg:text-right">
+              Plan your success for <strong>{currentDate.toLocaleDateString('en-US', { month: 'long' })}</strong>.
+              You have {tasks.length} active tasks scheduled.
             </div>
           </div>
 
           {/* Month Navigation */}
           <div className="flex items-center justify-between mb-6 px-2">
             <div className="flex gap-2">
-                <button 
-                    onClick={() => changeMonth(-1)} 
-                    className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 hover:border-[#F2994A] hover:text-[#F2994A] transition-all"
-                >
-                    <ChevronLeft className="w-5 h-5"/>
-                </button>
-                <button 
-                    onClick={() => changeMonth(1)} 
-                    className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 hover:border-[#F2994A] hover:text-[#F2994A] transition-all"
-                >
-                    <ChevronRight className="w-5 h-5"/>
-                </button>
+              <button
+                onClick={() => changeMonth(-1)}
+                className="w-8 h-8 lg:w-10 lg:h-10 flex items-center justify-center rounded-full border border-gray-200 hover:border-[#F2994A] hover:text-[#F2994A] transition-all"
+              >
+                <ChevronLeft className="w-4 h-4 lg:w-5 lg:h-5" />
+              </button>
+              <button
+                onClick={() => changeMonth(1)}
+                className="w-8 h-8 lg:w-10 lg:h-10 flex items-center justify-center rounded-full border border-gray-200 hover:border-[#F2994A] hover:text-[#F2994A] transition-all"
+              >
+                <ChevronRight className="w-4 h-4 lg:w-5 lg:h-5" />
+              </button>
             </div>
-            <h2 className={`text-2xl font-black uppercase tracking-widest ${THEME_COLOR}`}>
+            <h2 className={`text-xl lg:text-2xl font-black uppercase tracking-widest ${THEME_COLOR}`}>
               {currentDate.toLocaleDateString('en-US', { month: 'long' })}
             </h2>
           </div>
 
           {/* Calendar Box */}
-          <div className="bg-gray-50 rounded-[30px] p-8 flex-1 flex flex-col shadow-inner">
-            
+          <div className="bg-gray-50 rounded-[20px] lg:rounded-[30px] p-4 lg:p-8 flex-1 flex flex-col shadow-inner">
+
             {/* Grid Header */}
-            <div className="grid grid-cols-7 mb-6 border-b border-gray-200 pb-4">
+            <div className="grid grid-cols-7 mb-4 lg:mb-6 border-b border-gray-200 pb-4">
               {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day, i) => (
-                <div 
-                  key={day} 
-                  className={`text-center font-bold text-xs tracking-widest
+                <div
+                  key={day}
+                  className={`text-center font-bold text-[10px] lg:text-xs tracking-widest
                     ${(i === 0 || i === 6) ? THEME_COLOR : 'text-gray-400'} 
                   `}
                 >
@@ -211,26 +211,26 @@ export default function DesignCalendarPage() {
             </div>
 
             {/* Dates Grid */}
-            <div className="grid grid-cols-7 gap-y-6 gap-x-2">
+            <div className="grid grid-cols-7 gap-y-4 lg:gap-y-6 gap-x-1 lg:gap-x-2">
               {blanks.map(i => <div key={`blank-${i}`} />)}
 
               {daysArray.map(day => {
-                 const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-                 const dayTasks = getTasksForDate(day);
-                 const isSelected = isSameDay(date, selectedDate);
-                 const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                 const isToday = isSameDay(date, new Date());
+                const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                const dayTasks = getTasksForDate(day);
+                const isSelected = isSameDay(date, selectedDate);
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const isToday = isSameDay(date, new Date());
 
-                 return (
+                return (
                   <div key={day} className="flex flex-col items-center group/date relative">
                     <button
                       onClick={() => setSelectedDate(date)}
                       className={`
-                        w-9 h-9 flex items-center justify-center rounded-full text-sm font-semibold transition-all relative z-10
-                        ${isSelected 
-                          ? `${THEME_BG} text-white shadow-lg shadow-orange-200 scale-110` 
-                          : isWeekend 
-                            ? `text-[#F2994A] hover:bg-orange-50` 
+                        w-7 h-7 lg:w-9 lg:h-9 flex items-center justify-center rounded-full text-xs lg:text-sm font-semibold transition-all relative z-10
+                        ${isSelected
+                          ? `${THEME_BG} text-white shadow-lg shadow-orange-200 scale-110`
+                          : isWeekend
+                            ? `text-[#F2994A] hover:bg-orange-50`
                             : 'text-gray-600 hover:bg-gray-200'
                         }
                         ${isToday && !isSelected ? 'ring-1 ring-[#F2994A] ring-offset-2' : ''}
@@ -238,48 +238,48 @@ export default function DesignCalendarPage() {
                     >
                       {day}
                     </button>
-                    
+
                     {/* Task Dot */}
                     {dayTasks.length > 0 && (
-                        <div className={`mt-1 w-1 h-1 rounded-full ${isSelected ? 'bg-orange-200' : THEME_BG}`}></div>
+                      <div className={`mt-1 w-1 h-1 rounded-full ${isSelected ? 'bg-orange-200' : THEME_BG}`}></div>
                     )}
                   </div>
-                 );
+                );
               })}
             </div>
 
             {/* Bottom Panel: Selected Date Details */}
             <div className="mt-auto pt-6 border-t border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-gray-400 uppercase">
-                        {selectedDate.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric' })}
-                    </span>
-                    <span className="text-xs font-bold text-[#F2994A] bg-orange-50 px-2 py-1 rounded-full">
-                        {selectedTasks.length} Events
-                    </span>
-                </div>
-                
-                <div className="space-y-2 h-[100px] overflow-y-auto pr-1 scrollbar-hide">
-                    {selectedTasks.length === 0 ? (
-                        <div className="text-center py-4 text-gray-300 text-xs italic">
-                            No tasks scheduled for this day
-                        </div>
-                    ) : (
-                        selectedTasks.map(task => (
-                            <div 
-                                key={task.id} 
-                                onClick={() => navigate(`/dashboard/employee/task/${task.id}`)}
-                                className="bg-white p-2.5 rounded-lg border border-gray-100 hover:border-orange-300 hover:shadow-sm cursor-pointer transition flex items-center justify-between group"
-                            >
-                                <div className="flex items-center gap-2 overflow-hidden">
-                                    <Clock className="w-3 h-3 text-gray-300 group-hover:text-[#F2994A]"/>
-                                    <span className="text-xs font-medium text-gray-600 truncate">{task.serviceName || "Service Order"}</span>
-                                </div>
-                                <CheckCircle2 className={`w-3 h-3 ${task.status === 'COMPLETED' ? 'text-green-500' : 'text-gray-300'}`}/>
-                            </div>
-                        ))
-                    )}
-                </div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold text-gray-400 uppercase">
+                  {selectedDate.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric' })}
+                </span>
+                <span className="text-xs font-bold text-[#F2994A] bg-orange-50 px-2 py-1 rounded-full">
+                  {selectedTasks.length} Events
+                </span>
+              </div>
+
+              <div className="space-y-2 h-[100px] overflow-y-auto pr-1 scrollbar-hide">
+                {selectedTasks.length === 0 ? (
+                  <div className="text-center py-4 text-gray-300 text-xs italic">
+                    No tasks scheduled for this day
+                  </div>
+                ) : (
+                  selectedTasks.map(task => (
+                    <div
+                      key={task.id}
+                      onClick={() => navigate(`/dashboard/employee/task/${task.id}`)}
+                      className="bg-white p-2.5 rounded-lg border border-gray-100 hover:border-orange-300 hover:shadow-sm cursor-pointer transition flex items-center justify-between group"
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <Clock className="w-3 h-3 text-gray-300 group-hover:text-[#F2994A]" />
+                        <span className="text-xs font-medium text-gray-600 truncate">{task.serviceName || "Service Order"}</span>
+                      </div>
+                      <CheckCircle2 className={`w-3 h-3 ${task.status === 'COMPLETED' ? 'text-green-500' : 'text-gray-300'}`} />
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
 
           </div>

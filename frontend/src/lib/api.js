@@ -185,6 +185,13 @@ export const adminAPI = {
     getDashboardStats: () => api.get(`/api/admin/dashboard-stats`),
     listCrmLeads: () => api.get(`/api/admin/crm-leads`),
     getCustomerLifecycleData: () => api.get("/api/admin/customer-lifecycle"),
+
+    // Agent Management
+    listAgents: () => api.get(`/api/admin/agents`),
+    createAgent: (data) => api.post(`/api/admin/agents`, data),
+    updateAgent: (id, data) => api.put(`/api/admin/agents/${id}`, data),
+    deleteAgent: (id) => api.delete(`/api/admin/agents/${id}`),
+    toggleAgentStatus: (id, status) => api.put(`/api/admin/agents/${id}/status`, { status }),
 };
 
 // Lead APIs (accessible by employees and admins)
