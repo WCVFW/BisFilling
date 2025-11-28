@@ -29,15 +29,8 @@ export default function EmployeeAttendancePage() {
     fetchTodayAttendance();
     fetchHistory();
 
-    // Get Location
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        () => setLocation("Office HQ (Verified)"),
-        () => setLocation("Remote / Unknown")
-      );
-    } else {
-      setLocation("Location unavailable");
-    }
+    // Location logic removed for compatibility
+    setLocation("Location unavailable");
 
     return () => clearInterval(timer);
   }, []);

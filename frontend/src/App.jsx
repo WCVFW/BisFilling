@@ -110,34 +110,40 @@ export default function App() {
 
   /* ---------------------- Location & Notification on Load ---------------------- */
   useEffect(() => {
-    // 1. Geolocation Request
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log('User location:', {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-          // You can now use these coordinates, e.g., send them to your backend.
-        },
-        (error) => {
-          console.error('Error getting user location:', error.message);
-        }
-      );
-    } else {
-      console.log('Geolocation is not supported by this browser.');
-    }
-
     // 2. Notification Request
     if ('Notification' in window) {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          console.log('Notification permission granted.');
+      const showWelcomeNotification = () => {
+        try {
           new Notification('Welcome to BisFilling!', {
             body: 'We are glad to have you here. We can now send you important updates.',
           });
+        } catch (e) {
+          console.warn("Notification creation failed:", e);
         }
-      });
+      };
+
+      try {
+        // Check if permission is already granted to avoid unnecessary promises
+        if (Notification.permission === 'granted') {
+          // Optional: You can show it here if you want it on every load
+          // showWelcomeNotification();
+        } else if (Notification.permission !== 'denied') {
+          // Request permission
+          const promise = Notification.requestPermission();
+          if (promise) {
+            promise.then((permission) => {
+              if (permission === 'granted') showWelcomeNotification();
+            }).catch(err => console.warn("Notification permission request failed:", err));
+          } else {
+            // Fallback for older browsers that use callback
+            Notification.requestPermission((permission) => {
+              if (permission === 'granted') showWelcomeNotification();
+            });
+          }
+        }
+      } catch (error) {
+        console.warn("Error requesting notification permission:", error);
+      }
     }
   }, []); // Empty dependency array ensures this runs only once on mount.
 

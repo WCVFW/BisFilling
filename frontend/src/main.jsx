@@ -19,18 +19,23 @@ import Isotope from "isotope-layout";
 import "odometer";
 
 // ⚙️ Safe WOW initialization inside React
-let WOWInstance = null;
-if (typeof window !== "undefined") {
-  import("wowjs").then((mod) => {
-    WOWInstance = new mod.WOW({ live: false });
-  });
-}
+
 
 // ✅ Initialize global libraries after mount
 function GlobalInit() {
   useEffect(() => {
-    // Wait for DOM to be ready
-    if (WOWInstance) WOWInstance.init();
+    // ✅ Initialize WOW.js
+    if (typeof window !== "undefined") {
+      import("wowjs").then((mod) => {
+        // Handle different export formats (CommonJS vs ES modules)
+        const WOW = mod.WOW || mod.default;
+        if (WOW) {
+          new WOW({ live: false }).init();
+        }
+      }).catch(err => {
+        console.warn("WOW.js failed to initialize:", err);
+      });
+    }
 
     // ✅ Initialize Slick Carousel if found
     if (window.$ && typeof window.$(".slick-slider").slick === "function") {
